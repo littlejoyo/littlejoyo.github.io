@@ -14,7 +14,7 @@ avatar: https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://littlejoyo.github.io/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
