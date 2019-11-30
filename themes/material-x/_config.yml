@@ -38,7 +38,7 @@ music:
   autoplay: false   # 自动播放
 
 # 友链页头像占位图
-avatar_placeholder: https://cdn.jsdelivr.net/gh/xaoxuu/assets@master/avatar/avatar.png
+avatar_placeholder: https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg
 
 # 日期格式 http://momentjs.com/docs/
 date_format: 'YYYY-MM-DD' # 文章发布日期的格式
@@ -50,8 +50,7 @@ backstretch:
   duration: 6000 # 持续时间（毫秒）
   fade: 2500     # 渐变（毫秒）
   images:
-    - https://img.vim-cn.com/29/91197b04c13f512f734a76d4ac422d89dbe229.jpg
-
+    - https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg
 
 
 ############################### 自定义 ###############################
@@ -67,7 +66,7 @@ cover:
     - name: 博文
       icon: fas fa-rss
       url: /
-    - name: 项目
+    - name: Github
       icon: fas fa-code-branch
       url: projects/
     - name: 友链
@@ -87,15 +86,15 @@ menu_desktop:
     url: /
   - name: 分类
     icon: fas fa-folder-open
-    url: blog/categories/
+    url: categories/
     rel: nofollow
   - name: 标签
     icon: fas fa-hashtag
-    url: blog/tags/
+    url: tags/
     rel: nofollow
   - name: 归档
     icon: fas fa-archive
-    url: blog/archives/
+    url: archives/
     rel: nofollow
 
 # 手机端导航菜单（从右上角的按钮点击展开）
@@ -105,7 +104,7 @@ menu_mobile:
     url: /
   - name: 文章归档
     icon: fas fa-archive
-    url: blog/archives/
+    url: archives/
     rel: nofollow
   - name: 开源项目
     icon: fas fa-code-branch
@@ -129,7 +128,7 @@ layout:
     # 列表中每一篇文章的meta信息
     meta: [title, author, date, categories, top]
     # 列表类页面的侧边栏
-    sidebar: [author, list, grid, category, tagcloud]
+    sidebar: [author, grid, category, tagcloud]
   # 文章页面布局
   article:
     # 文章页面主体元素，你也可以在页面的Front-matter中设置
@@ -140,14 +139,14 @@ layout:
     header: [title, author, date, categories, counter, top]
     footer: [updated, tags, share]
     # 文章页面的侧边栏
-    sidebar: [author, toc, grid, category, tagcloud, list, related_posts]
+    sidebar: [ toc, grid, related_posts]
   # 其他的页面布局暂时等于文章列表
 
 
 # 侧边栏小部件配置
 sidebar:
   - widget: author
-    avatar: https://cdn.jsdelivr.net/gh/xaoxuu/assets@master/avatar/avatar.png
+    avatar: https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg
     social: true
   - widget: toc
   - widget: grid
@@ -159,7 +158,7 @@ sidebar:
         url: /
       - name: 文章归档
         icon: fas fa-archive
-        url: blog/archives/
+        url: archives/
         rel: nofollow
       - name: 开源项目
         icon: fas fa-code-branch
@@ -179,13 +178,13 @@ sidebar:
   - widget: category
     more:
       icon: fas fa-expand-arrows-alt
-      url: blog/categories/
+      url: categories/
       rel: nofollow
   - widget: tagcloud
     icon: fas fa-tags
     more:
       icon: fas fa-expand-arrows-alt
-      url: blog/tags/
+      url: tags/
       rel: nofollow
   # - widget: related_posts # 需要安装插件  npm i -S hexo-related-popular-posts
   - widget: music
@@ -218,14 +217,14 @@ sidebar:
 
 # 社交信息
 social:
-  - icon: fas fa-rss
-    url: atom.xml
+  # - icon: fas fa-rss
+   #  url: atom.xml
   - icon: fas fa-envelope
-    url: mailto:me@xaoxuu.com
+    url: mailto:554882285@qq.com
   - icon: fab fa-github
-    url: https://github.com/xaoxuu
-  - icon: fas fa-headphones-alt
-    url: https://music.163.com/#/user/home?id=63035382
+    url: https://github.com/littlejoyo
+ # - icon: fas fa-headphones-alt
+  #  url: https://music.163.com/#/user/home?id=63035382
 
 
 # 分享按钮
