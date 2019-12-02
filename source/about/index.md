@@ -1,4 +1,8 @@
 ---
-title: about
-date: 2019-11-30 23:30:58
+layout: page
+title: 关于Joyo
+body: [article, grid, comments]
+valine:
+  placeholder: 有什么想对我说的呢？
+sidebar: false
 ---

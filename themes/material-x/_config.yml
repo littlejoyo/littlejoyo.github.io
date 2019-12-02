@@ -68,7 +68,7 @@ cover:
       url: /
     - name: Github
       icon: fas fa-code-branch
-      url: projects/
+      url: https://github.com/littlejoyo
     - name: 友链
       icon: fas fa-link
       url: friends/
@@ -81,7 +81,7 @@ cover:
 
 # 桌面端导航栏菜单
 menu_desktop:
-  - name: 示例
+  - name: 博文
     icon: fas fa-grin
     url: /
   - name: 分类
