@@ -29,17 +29,13 @@ tag:
 - 使用`TTL`查询键剩余生存时间
 ```
 redis> SET cache_page "www.google.com"
-OK
- 
+OK 
 redis> EXPIRE cache_page 30  # 设置过期时间为 30 秒
 (integer) 1
- 
 redis> TTL cache_page    # 查看剩余生存时间
 (integer) 23
- 
 redis> EXPIRE cache_page 30000   # 更新过期时间
 (integer) 1
- 
 redis> TTL cache_page
 (integer) 29996
 ```
@@ -96,7 +92,7 @@ ok
 ```
 使用redisDb结构存储数据图表示：([图片来源](https://juejin.im/post/5da7144ff265da5ba532b753#heading-12))
 
-![image](https://user-gold-cdn.xitu.io/2019/11/17/16e788f67704e9e9?w=1262&h=650&f=png&s=274262)
+![image](https://i.loli.net/2019/12/09/d9Sk7n4NAwO6jMI.png)
 
 # 过期键删除策略
 
@@ -105,7 +101,7 @@ ok
 
 - **惰性删除**：放任键过期不管，但在每次从键空间获取键时，都检查取得的键是否过期，如果过期的话，就删除该键，如果没有过期，就返回该键
 
-![惰性删除](https://user-gold-cdn.xitu.io/2019/11/17/16e788f677f1666e?w=738&h=606&f=png&s=131616)
+![惰性删除](https://i.loli.net/2019/12/09/bVHYqrMiQsEov31.png)
 
 
 - **定期删除**：每隔一点时间，程序就对数据库进行一次检查，删除里面的过期键，至于要删除多少过期键，以及要检查多少个数据库，则由算法决定。
@@ -133,7 +129,7 @@ ok
 - 举个简单的例子：如果所有首页的Key失效时间都是12小时，中午12点刷新的，我零点有个秒杀活动大量用户涌入，假设当时每秒 6000 个请求，本来缓存在可以扛住每秒 5000 个请求，但是缓存当时所有的Key都失效了。
 
 - 缓存失效过程，画图理解：
-![缓存雪崩](https://user-gold-cdn.xitu.io/2019/11/17/16e788f67801b63e?w=574&h=500&f=png&s=115699)
+![缓存雪崩](https://i.loli.net/2019/12/09/4npbmDGMexfwtBv.png)
 
 # RDB和AOF对过期键的处理
 

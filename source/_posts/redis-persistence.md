@@ -1,6 +1,6 @@
 ---
 title: Redis基础篇：由浅入深对比两种持久化
-date: 2019-12-01 15:03:16
+date: 2019-11-24 15:03:16
 categories:
   - [数据库]
   - [Redis]
@@ -33,7 +33,7 @@ tag:
 
 - Redis加载持久化数据流程：
 
-![Redis加载持久化数据流程](https://user-gold-cdn.xitu.io/2019/11/16/16e739f935819f03?w=1008&h=1158&f=png&s=337074)
+![Redis加载持久化数据流程](https://i.loli.net/2019/12/09/XvL2pJjyKWBEHPC.png)
 
 # RDB
 
@@ -149,7 +149,7 @@ Background saving started
 > 注意：配置文件里禁用了快照生成功能不影响SAVE和BGSAVE命令的效果。
 
 
-![RDB持久化方式](https://user-gold-cdn.xitu.io/2019/11/16/16e73a018e1da2a2?w=527&h=381&f=png&s=113921)
+![RDB持久化方式](https://i.loli.net/2019/12/09/3iPpteXzxMAvRa4.png)
 
 # AOF
 - 快照并不是很可靠。如果你的电脑突然宕机了，或者电源断了，又或者不小心杀掉了进程，那么最新的数据就会丢失。
@@ -210,7 +210,7 @@ appendfsync everysec
 # appendfsync no
 ```
 
-![aof](https://user-gold-cdn.xitu.io/2019/11/16/16e73a0767dedc7a?w=1616&h=664&f=png&s=294472)
+![aof](https://i.loli.net/2019/12/09/fHyTU3AwCzWKIFL.png)
 
 ## 日志重写
 > 随着写操作的不断增加，AOF文件会越来越大。例如你递增一个计数器100次，那么最终结果就是数据集里的计数器的值为最终的递增结果，但是AOF文件里却会把这100次操作完整的记录下来。而事实上要恢复这个记录，只需要1个命令就行了，也就是说AOF文件里那100条命令其实可以精简为1条。所以Redis支持这样一个功能：在不中断服务的情况下在后台重建AOF文件。
@@ -242,7 +242,7 @@ auto-aof-rewrite-percentage 0
 > Redis 2.4以上才可以自动进行日志重写，之前的版本需要手动运行`BGREWRITEAOF`这个命令。
 
 
-![日志重写](https://user-gold-cdn.xitu.io/2019/11/16/16e73a0aea7f590d?w=1608&h=914&f=png&s=478530)
+![日志重写](https://i.loli.net/2019/12/09/wq7NMOQpTi9Ulbs.png)
 
 ## 数据损坏修复
 

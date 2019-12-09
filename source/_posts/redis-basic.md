@@ -1,6 +1,6 @@
 ---
 title: Redis基础篇：初识Redis中间件
-date: 2019-12-01 15:03:16
+date: 2019-11-18 15:03:16
 categories:
   - [数据库]
   - [Redis]
@@ -15,13 +15,14 @@ Redis基础篇：初识Redis中间件。
 - 与Mysql不同的是，Mysql是关系型数据库，而Redis是非关系型的数据库；
 
 - 本篇基础篇主要展开对Nosql和Redis的理解和基本的运用。
+
+![Redis](https://i.loli.net/2019/12/09/2aAYzLyjNuPn4if.png)
 <!-- more -->
 
 > Github issues:https://github.com/littlejoyo/Blog/issues/3
 
 > 个人博客：https://littlejoyo.github.io/
 
-![Redis](https://user-gold-cdn.xitu.io/2019/11/16/16e730fd4f43da69?w=700&h=150&f=png&s=63173)
 
 # 什么是Redis？
 
