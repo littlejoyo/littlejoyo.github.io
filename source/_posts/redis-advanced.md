@@ -17,7 +17,8 @@ tag:
 
 - Redis下的IO多路复用技术是怎样的工作流程呢？
 
-![fengmian](https://i.loli.net/2019/12/16/UQM4XOLHlupNCDP.png)
+<img width=600 height=200 src="https://i.loli.net/2019/12/16/UQM4XOLHlupNCDP.png" >
+
 <!-- more -->
 > Github issues:https://github.com/littlejoyo/Blog/issues/5
 
