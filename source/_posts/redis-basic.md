@@ -19,7 +19,7 @@ Redis基础篇：初识Redis中间件。
 ![Redis](https://i.loli.net/2019/12/09/2aAYzLyjNuPn4if.png)
 <!-- more -->
 
-> Github issues:https://github.com/littlejoyo/Blog/issues/3
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
 

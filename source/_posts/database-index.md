@@ -17,6 +17,9 @@ tag:
 - 本篇重点介绍：数据库索引什么情况下会失效呢？查询的时候到底走没走索引！！
 
 <!-- more -->
+> Github issues:https://github.com/littlejoyo/Blog/issues/
+
+> 个人博客：https://littlejoyo.github.io/
 
 # 如何判断数据库查询操作走了索引呢？
 

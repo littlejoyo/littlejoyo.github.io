@@ -18,6 +18,10 @@ tag:
 
 <!-- more -->
 
+> Github issues:https://github.com/littlejoyo/Blog/issues/
+
+> 个人博客：https://littlejoyo.github.io/
+
 # EXPLAIN命令
 
 使用方法，在 select 语句前加上`EXPLAIN`就可以了,简单粗暴。

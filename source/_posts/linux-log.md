@@ -18,6 +18,10 @@ tag:
 
 <!-- more -->
 
+> Github issues:https://github.com/littlejoyo/Blog/issues/
+
+> 个人博客：https://littlejoyo.github.io/
+
 # tail 命令
 
 > tail 命令可以查看实时日志的更新，当日志有更新的时候，实时打印到控制台显示。

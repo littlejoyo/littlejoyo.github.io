@@ -16,7 +16,7 @@ tag:
 - 本篇主要从过期键的设计来对Redis进行了解
 
 <!-- more -->
-> Github issues:https://github.com/littlejoyo/Blog/issues/5
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
 
