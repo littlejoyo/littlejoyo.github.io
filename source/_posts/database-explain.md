@@ -22,7 +22,7 @@ tag:
 
 > 个人博客：https://littlejoyo.github.io/
 
-# EXPLAIN命令
+# 1.EXPLAIN命令
 
 使用方法，在 select 语句前加上`EXPLAIN`就可以了,简单粗暴。
 
@@ -31,7 +31,7 @@ tag:
 EXPLAIN SELECT `x`,`y` FORM `a`,`b` WHERE `a`.`id`=`b`.`id`
 ```
 
-# EXPLAIN列字段
+# 2.EXPLAIN列字段
 
 | 列 | 描述 |
 | :----: | ------ |
@@ -44,7 +44,7 @@ EXPLAIN SELECT `x`,`y` FORM `a`,`b` WHERE `a`.`id`=`b`.`id`
 | rows | MySQL认为必须检查的用来返回请求数据的行数。 |
 | Extra | 关于MySQL如何解析查询的额外信息。<br/>这里可以看到的坏的例子是`Using temporary`和`Using filesort`，意思MySQL根本不能使用索引，结果是检索会很慢。 |
 
-# extra列返回的描述的意义
+# 3.extra列返回的描述的意义
 
 
 | 值                                           | 意义                                                         |
