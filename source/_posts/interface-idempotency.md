@@ -17,6 +17,10 @@ tag:
 
 <!-- more -->
 
+> Github issues:https://github.com/littlejoyo/Blog/
+
+> 个人博客：https://littlejoyo.github.io/
+
 # 1、什么是幂等性？
 
 - 含义：一个操作，不论执行多少次，产生的效果和返回的结果都是一样的。

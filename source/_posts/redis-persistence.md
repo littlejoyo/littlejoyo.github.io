@@ -18,7 +18,7 @@ tag:
 
 > [文章参考来源](https://segmentfault.com/a/1190000002906345#articleHeader20)
 
-> Github issues:https://github.com/littlejoyo/Blog/issues/
+> Github issues:https://github.com/littlejoyo/Blog/
 
 > 个人博客：https://littlejoyo.github.io/
 

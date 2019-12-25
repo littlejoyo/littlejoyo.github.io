@@ -18,7 +18,7 @@ tag:
 
 <!-- more -->
 
-> Github issues:https://github.com/littlejoyo/Blog/issues/
+> Github issues:https://github.com/littlejoyo/Blog/
 
 > 个人博客：https://littlejoyo.github.io/
 

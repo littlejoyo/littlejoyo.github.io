@@ -20,7 +20,7 @@ tag:
 <img width=600 height=200 src="https://i.loli.net/2019/12/16/UQM4XOLHlupNCDP.png" >
 
 <!-- more -->
-> Github issues:https://github.com/littlejoyo/Blog/issues/
+> Github issues:https://github.com/littlejoyo/Blog/
 
 > 个人博客：https://littlejoyo.github.io/
 
