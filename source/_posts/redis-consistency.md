@@ -1,5 +1,5 @@
 ---
-title: 进阶篇：Redis和Mysql如何保持数据一致性？
+title: Redis进阶篇：Redis和Mysql如何保持数据一致性？
 date: 2019-12-31 17:39:40
 categories:
   - [数据库]
