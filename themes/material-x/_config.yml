@@ -4,7 +4,7 @@ info:
   docs: https://xaoxuu.com/wiki/material-x/
   cdn: # 把对应的那一行注释掉就使用本地的文件
     css:
-      style: https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.10.22/css/style.css
+      # style: https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.10.22/css/style.css
     js:
       app: https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/app.js
       search: https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/search.js
@@ -147,7 +147,7 @@ layout:
 sidebar:
   - widget: author
     avatar: https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg
-    jinrishici: 体验生活，全面发展    
+    jinrishici: 体验生活，全面发展
     # social: true
   - widget: toc
   - widget: grid

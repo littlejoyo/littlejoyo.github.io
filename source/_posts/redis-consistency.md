@@ -106,7 +106,7 @@ public void write( String key, Object data )
 
 - 同时又增加了写请求的耗时。 
 
-## 3.2 异步更新缓存（基于Mysql binlogd的同步机制）
+## 3.2 异步更新缓存（基于Mysql binlog的同步机制）
 
 ### 3.2.1 整体思路
 

@@ -69,7 +69,7 @@ tag:
 
 - 如果要修改文件的存储路径和名称，可以通过修改配置文件`redis.conf`实现：
 
-```css
+```SQL
 # RDB文件名，默认为dump.rdb。
 dbfilename dump.rdb
 
@@ -82,7 +82,7 @@ dir ./
 - 保存点可以进行配置，使Redis如果在每N秒后数据发生了M次改变就保存快照文件。
 
 - 例如下面这个保存点配置表示每60秒，如果数据发生了1000次以上的变动，Redis就会自动保存快照文件：
-```
+```SQL
 save 60 1000
 ```
 
@@ -95,7 +95,7 @@ save 300 10 #300秒后至少10个key有变动
 save 60 10000 #60秒后至少10000个key有变动
 ```
 - 如果想禁用快照保存的功能，可以通过注释掉所有"save"配置达到，或者在最后一条"save"配置后添加如下的配置：
-```
+```SHELL
 save ""
 ```
 
@@ -112,7 +112,7 @@ stop-writes-on-bgsave-error yes
 - 默认Redis会采用`LZF`对数据进行压缩。
 
 - 如果你想节省点CPU的性能，你可以把压缩功能禁用掉，但是数据集就会比没压缩的时候要大。
-```go
+```SQL
 rdbcompression yes
 ```
 ## 2.8 数据校验
@@ -120,7 +120,7 @@ rdbcompression yes
 - 从版本5的RDB的开始，一个`CRC64`的校验码会放在文件的末尾。这样更能保证文件的完整性，但是在保存或者加载文件时会损失一定的性能（大概10%）。
 
 - 如果想追求更高的性能，可以把它禁用掉，这样文件在写入校验码时会用`0`替代，加载的时候看到`0`就会直接跳过校验。
-```
+```SQL
 rdbchecksum yes
 ```
 ## 2.9 手动生成快照备份数据
@@ -139,7 +139,7 @@ rdbchecksum yes
 - Redis会产生一个子进程进行处理并立刻恢复对客户端的服务。
 
 - 在客户端我们可以使用`LASTSAVE`命令查看操作是否成功。
-```
+```SQL
 127.0.0.1:6379> BGSAVE
 Background saving started
 127.0.0.1:6379> LASTSAVE
@@ -184,11 +184,11 @@ Background saving started
 
 ## 3.3 启用AOF
 - 把配置项`appendonly`设为`yes`：
-```go
+```SQL
 appendonly yes
 ```
 ## 3.4 文件路径和名称
-```go
+```SQL
 # 文件存放目录，与RDB共用。默认为当前工作目录。
 dir ./
 
@@ -204,7 +204,7 @@ appendfilename "appendonly.aof"
 - 从不fsync，交由系统去处理。这个方式速度最快，但是安全性一般。
 
 推荐使用每秒fsync一次的方式（默认的方式），因为它速度快，安全性也不错。相关配置如下：
-```go
+```SQL
 # appendfsync always
 appendfsync everysec
 # appendfsync no
@@ -226,7 +226,7 @@ appendfsync everysec
 - 当子进程完成文件的重写后，主进程会获得一个信号，然后把内存里的buffer追加到子进程生成的那个新AOF里。
 
 - 我们可以通过配置设置日志重写的条件：
-```go
+```SQL
 # Redis会记住自从上一次重写后AOF文件的大小（如果自Redis启动后还没重写过，则记住启动时使用的AOF文件的大小）。
 # 如果当前的文件大小比起记住的那个大小超过指定的百分比，则会触发重写。
 # 同时需要设置一个文件大小最小值，只有大于这个值文件才会重写，以防文件很小，但是已经达到百分比的情况。
@@ -235,7 +235,7 @@ auto-aof-rewrite-percentage 100
 auto-aof-rewrite-min-size 64mb
 ```
 - 要禁用自动的日志重写功能，我们可以把百分比设置为0：
-```go
+```SQL
 auto-aof-rewrite-percentage 0
 ```
 
@@ -251,7 +251,7 @@ auto-aof-rewrite-percentage 0
 1.备份AOF文件。
 
 2.使用`redis-check-aof`命令修复原始的AOF文件：
-```go
+```SQL
 $ redis-check-aof --fix
 ```
 3.可以使用`diff -u`命令看下两个文件的差异。
@@ -265,7 +265,7 @@ $ redis-check-aof --fix
 - 备份一个最新的`dump.rdb`的文件，并把备份文件放在一个安全的地方。
 
 - 运行以下两条命令：
-```go
+```SQL
 $ redis-cli config set appendonly yes
 $ redis-cli config set save ""
 ```

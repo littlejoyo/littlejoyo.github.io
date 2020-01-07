@@ -27,7 +27,7 @@ tag:
 - Redis中使用`EXPIRE `进行键时间的设置
 
 - 使用`TTL`查询键剩余生存时间
-```
+```JAVA
 redis> SET cache_page "www.google.com"
 OK 
 redis> EXPIRE cache_page 30  # 设置过期时间为 30 秒
@@ -84,7 +84,7 @@ typedef struct redisDb {
 2.通过判断当前UNIX时间戳是否大于键的过期时间，是的话，键已过期，相反则键未过期。
 
 - 设置键值存储实例：
-```
+```JAVA
 redis> set Ccww   5 2 0  
 ok  
 redis> expire Ccww 5  

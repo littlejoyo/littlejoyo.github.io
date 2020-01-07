@@ -32,7 +32,7 @@ tag:
 
 - 在select语句前加上 `EXPLAIN` 就可以，然后查看返回的信息进行判断。
 
-```
+```SQL
 EXPLAIN SELECT `name`,`age` FORM `a` WHERE `a`.`name`
 ```
 
