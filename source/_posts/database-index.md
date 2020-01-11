@@ -18,9 +18,15 @@ tag:
 
 <!-- more -->
 
-> Github issues:https://github.com/littlejoyo/Blog/
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
+
+> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
+
+> 微信公众号：Joyo说
+
+![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
 
 # 1.如何判断数据库查询操作走了索引呢？
 
@@ -133,3 +139,9 @@ EXPLAIN SELECT `name`,`age` FORM `a` WHERE `a`.`name`
 ![有limit](https://i.loli.net/2019/12/17/KZa3pGfxR8j7thE.png)
 
 > 注意：limit不影响order by 的索引选择，但是会影响扫描的rows数目，不添加limit限制的话，说明会花费更多的开销去扫描所有的查询结果。
+
+# 微信公众号
+
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)

@@ -16,9 +16,16 @@ tag:
 - 本篇主要从过期键的设计来对Redis进行了解
 
 <!-- more -->
-> Github issues:https://github.com/littlejoyo/Blog/
+
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
+
+> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
+
+> 微信公众号：Joyo说
+
+![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
 
 > Redis是基于键值对存储形式的数据库，又因为数据存储的位置在内存，所以设置键值过期并及时清理是非常重要的。
 
@@ -172,3 +179,9 @@ ok
 2. **从服务器**接受到命令后，删除过期键
 
 PS:**从服务器**在接收到客户端对过期键的读命令时，依旧会返回该键对应的值给客户端，而不会将其删除。
+
+# 微信公众号
+
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)

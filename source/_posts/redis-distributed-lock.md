@@ -18,9 +18,15 @@ tag:
 
 <!-- more -->
 
-> Github issues:https://github.com/littlejoyo/Blog/
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
+
+> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
+
+> 微信公众号：Joyo说
+
+![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
 
 # 1.为什么需要分布式锁？
 
@@ -297,4 +303,8 @@ public static void wrongReleaseLock2(Jedis jedis, String lockKey, String request
 
 - 如果项目中的Redis出现了多机部署的情况，那么就要考虑**容错性**（java开发场景下可以尝试使用Redisson实现分布式锁，这是Redis官方提供的Java组件。）
 
+# 微信公众号
 
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)

@@ -17,9 +17,15 @@ tag:
 
 <!-- more -->
 
-> Github issues:https://github.com/littlejoyo/Blog/
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
+
+> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
+
+> 微信公众号：Joyo说
+
+![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
 
 # 1、什么是幂等性？
 
@@ -212,5 +218,11 @@ tag:
  - 应用在分布式的架构下，token机制是目前使用较为广泛的其中一种方案
 
  - 幂等性应该是合格程序员的一个基因，在设计系统时，是首要考虑的问题，尤其是在像支付宝，银行，互联网金融公司等涉及的都是钱的系统，既要高效，数据也要准确，所以不能出现多扣款，多打款等问题，这样会很难处理，用户体验也不好。
+
+# 微信公众号
+
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)
 
  

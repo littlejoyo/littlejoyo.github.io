@@ -19,9 +19,15 @@ Redis基础篇：初识Redis中间件。
 ![Redis](https://i.loli.net/2019/12/09/2aAYzLyjNuPn4if.png)
 <!-- more -->
 
-> Github issues:https://github.com/littlejoyo/Blog/
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
+
+> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
+
+> 微信公众号：Joyo说
+
+![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
 
 
 # 1.什么是Redis？
@@ -178,3 +184,9 @@ Redis的内存淘汰策略，是指当内存使用达到maxmemory极限时，需
 - 1）客户端执行数据写入操作
 - 2）redis server接收到写入操作之后，检查`maxmemory`的限制，如果超过了限制，那么就根据对应的policy清理掉部分数据
 - 3）写入操作完成执行。
+
+# 微信公众号
+
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)

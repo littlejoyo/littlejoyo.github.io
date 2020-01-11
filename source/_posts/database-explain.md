@@ -18,9 +18,16 @@ tag:
 
 <!-- more -->
 
-> Github issues:https://github.com/littlejoyo/Blog/
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
+
+> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
+
+> 微信公众号：Joyo说
+
+![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
+
 
 # 1.EXPLAIN命令
 
@@ -64,3 +71,8 @@ EXPLAIN SELECT `x`,`y` FORM `a`,`b` WHERE `a`.`id`=`b`.`id`
 | index                                        | 这个连接类型对前面的表中的每一个记录联合进行完全扫描（比`ALL`更好，因为索引一般小于表数据）。 |
 | ALL                                          | 这个连接类型对于前面的每一个记录联合进行完全扫描，这一般比较糟糕，应该尽量避免。 |
 
+# 微信公众号
+
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)

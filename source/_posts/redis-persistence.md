@@ -16,11 +16,15 @@ tag:
 - 本篇从数据的持久化入手进一步了解Redis的设计
 <!-- more -->
 
-> [文章参考来源](https://segmentfault.com/a/1190000002906345#articleHeader20)
-
-> Github issues:https://github.com/littlejoyo/Blog/
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
+
+> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
+
+> 微信公众号：Joyo说
+
+![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
 
 # 1.Redis的两种持久化方式
 > 分别是RDB（快照）和 AOF（追加式）
@@ -285,3 +289,11 @@ $ redis-cli config set save ""
 - 定时任务运行时，把太旧的文件进行删除。例如只保留48小时的按小时创建的快照和一到两个月的按天创建的快照。
 
 - 每天确保一次把快照文件传输到数据中心外的地方进行保存，至少不能保存在Redis服务所在的服务器。
+
+> [参考：](https://segmentfault.com/a/1190000002906345#articleHeader20)
+
+# 微信公众号
+
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)

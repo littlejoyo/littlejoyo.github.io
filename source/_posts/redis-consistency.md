@@ -17,9 +17,15 @@ tag:
 
 <!-- more -->
 
-> Github issues:https://github.com/littlejoyo/Blog/
+> Github issues:https://github.com/littlejoyo/Blog/issues/
 
 > 个人博客：https://littlejoyo.github.io/
+
+> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
+
+> 微信公众号：Joyo说
+
+![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
 
 # 1.导致数据不一致的原因
 
@@ -152,4 +158,8 @@ public void write( String key, Object data )
 
 - 另外，`设置缓存的过期时间`是保证数据保持一致性的关键操作，需要结合业务进行合理的设置。
 
+# 微信公众号
 
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)

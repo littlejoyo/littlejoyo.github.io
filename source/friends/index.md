@@ -5,14 +5,14 @@ links:
   - group: Joyo部落
     icon: fas fa-user-tie
     items:
-    - name: Github     # 博客名
+    - name: 微信公众号     # 博客名
       avatar: https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg   # 头像链接
-      url: https://littlejoyo.github.io/      # 博客链接
+      url: https://mp.weixin.qq.com/s/GVq5qbzXdlSh4V-sB8aA_Q     # 博客链接
       backgroundColor: '#3E74C9' # 卡片背景颜色
       textColor: '#fff'  # 卡片文字颜色
       tags:     # 标签
       - Joyo
-      - Github
+      - 微信公众号
     - name: Joyo的掘金     # 博客名
       avatar: https://i.loli.net/2019/12/01/c6ohNAfs8KMtREm.jpg  # 头像链接
       url: https://juejin.im/user/59c1c16f6fb9a00a4c270402      # 博客链接
