@@ -69,6 +69,10 @@ cover:
     - name: Github
       icon: fas fa-code-branch
       url: https://github.com/littlejoyo
+    - name: 归档
+      icon: fas fa-archive
+      url: archives/
+      rel: nofollow
     - name: 友链
       icon: fas fa-link
       url: friends/
