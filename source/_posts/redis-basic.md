@@ -21,14 +21,6 @@ Redis基础篇：初识Redis中间件。
 
 > Github issues:https://github.com/littlejoyo/Blog/issues/
 
-> 个人博客：https://littlejoyo.github.io/
-
-> 掘金：https://juejin.im/user/59c1c16f6fb9a00a4c270402
-
-> 微信公众号：Joyo说
-
-![weixin](https://i.loli.net/2020/01/11/NJIXozj5WAxgCiu.png)
-
 
 # 1.什么是Redis？
 
