@@ -97,5 +97,10 @@ theme: material-x
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type: git
-  repo: https://github.com/littlejoyo/littlejoyo.github.io.git
+ - type: git
+   repo: https://github.com/littlejoyo/littlejoyo.github.io.git
+   brance: master
+ - type: git 
+   repo: git@gitee.com:joyohub/joyohub.git
+   branch: master
+
