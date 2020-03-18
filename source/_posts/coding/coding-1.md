@@ -13,6 +13,8 @@ tag:
 
 <!-- more -->
 
+> Github issues:https://github.com/littlejoyo/Blog/issues/
+
 # 1.题目
 
 在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
@@ -131,3 +133,8 @@ public class Solution {
 
 - 空间复杂度：O(1)
 
+# 微信公众号
+
+> 扫一扫关注Joyo说公众号，共同学习和研究开发技术。
+
+![weixin-a](https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png)
