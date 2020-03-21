@@ -19,6 +19,8 @@ sidebar: false
 
 [2.替换空格](http://joyohub.com/2020/03/20/coding/coding2/)
 
+[3.从尾到头打印链表](http://joyohub.com/2020/03/21/coding/coding-3/)
+
 > 持续更新中......
 
 
