@@ -16,6 +16,8 @@ tag:
 
 <!-- more -->
 
+> Github issues:https://github.com/littlejoyo/Blog/issues/
+
 # 1.时间类型
 
 - `time.Time`表示时间类型
@@ -233,6 +235,8 @@ func formatDemo() {
 
 # 7.解析时间字符串为时间类型
 
+- 使用`time.ParseInLocation()`
+
 ```go
 now := time.Now()
 	fmt.Println(now)
@@ -259,6 +263,23 @@ now := time.Now()
 2020-03-21 18:24:15.428607 +0800 CST m=+0.002097406
 2020-03-22 14:15:20 +0800 CST
 19h51m4.571393s
+```
+
+- 使用`time.Date()`
+
+```go
+the_time := time.Date(2020, 3, 20, 5, 50, 4, 0, time.Local)
+
+fmt.Println(the_time)
+// 转化为时间戳
+unix_time := the_time.Unix()
+fmt.Println(unix_time)
+```
+输出结果：
+
+```go
+2020-03-20 05:50:04 +0800 CST
+1584654604
 ```
 
 # 微信公众号
