@@ -21,6 +21,8 @@ sidebar: false
 
 [3.从尾到头打印链表](http://joyohub.com/2020/03/21/coding/coding-3/)
 
+[4.重建二叉树](http://joyohub.com/2020/03/22/coding/coding-4/)
+
 > 持续更新中......
 
 
