@@ -159,9 +159,9 @@ fmt.Printf("99%%\n")
 ```go
 100
 false
-{小王子}
-{name:小王子}
-struct { name string }{name:"小王子"}
+{Joyo}
+{name:Joyo}
+struct { name string }{name:"Joyo"}
 struct { name string }
 99%
 ```
