@@ -25,6 +25,8 @@ sidebar: false
 
 [5.用两个栈实现队列](http://joyohub.com/2020/03/23/coding/coding-5/)
 
+[6.旋转数组的最小数字](http://joyohub.com/2020/03/24/coding/coding-6/)
+
 > 持续更新中......
 
 
