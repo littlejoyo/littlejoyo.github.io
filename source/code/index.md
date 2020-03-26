@@ -27,6 +27,10 @@ sidebar: false
 
 [6.旋转数组的最小数字](http://joyohub.com/2020/03/24/coding/coding-6/)
 
+[7.斐波那契数列](http://joyohub.com/2020/03/25/coding/coding-7/)
+
+[8.青蛙跳台阶](http://joyohub.com/2020/03/26/coding/coding-8/)
+
 > 持续更新中......
 
 
