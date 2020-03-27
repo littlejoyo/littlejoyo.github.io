@@ -31,6 +31,8 @@ sidebar: false
 
 [8.青蛙跳台阶](http://joyohub.com/2020/03/26/coding/coding-8/)
 
+[9.变态跳台阶](http://joyohub.com/2020/03/27/coding/coding-9/)
+
 > 持续更新中......
 
 
