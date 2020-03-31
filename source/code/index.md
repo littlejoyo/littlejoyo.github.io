@@ -35,6 +35,8 @@ sidebar: false
 
 [10.矩形覆盖](http://joyohub.com/2020/03/28/coding/coding-10/)
 
+[11.二进制中1的个数](http://joyohub.com/2020/03/30/coding/coding-11/)
+
 > 持续更新中......
 
 
