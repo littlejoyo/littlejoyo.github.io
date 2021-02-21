@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>【Redis】：Redis事务、Lua事务和管道的实践探究 | JoyoHub</title>
+  
+  <meta name="keywords" content="Joyo,Java,Go,js,高并发，分布式，高性能，数据库，博客。">
+  
+  
+  <meta name="description" content="高并发，分布式，高性能，Java,Go,hexo博客文章归档。">
+  
+
+  
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.10.1/css/all.min.css">
+  
+
+  
+  <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class='cover post half'>
+      
+        
+  <h1 class='title'>JoyoHub</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder="" />
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class='menu navgation'>
+  <ul class='h-list'>
+    
+      
+        <li>
+          <a class="nav home" href="/"
+            
+            
+            id="home">
+            <i class='fas fa-rss fa-fw'></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="https://github.com/littlejoyo"
+            
+            
+            id="https:github.comlittlejoyo">
+            <i class='fas fa-code-branch fa-fw'></i>&nbsp;Github
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/archives/"
+            
+              rel="nofollow"
+            
+            
+            id="archives">
+            <i class='fas fa-archive fa-fw'></i>&nbsp;归档
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/code/"
+            
+              rel="nofollow"
+            
+            
+            id="code">
+            <i class='fas fa-battery-half fa-fw'></i>&nbsp;算法
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/"
+            
+              rel="nofollow"
+            
+            
+            id="friends">
+            <i class='fas fa-link fa-fw'></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/"
+            
+              rel="nofollow"
+            
+            
+            id="about">
+            <i class='fas fa-info-circle fa-fw'></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href='/' >
+        
+          JoyoHub
+        
+      </a>
+			<div class='menu navgation'>
+				<ul class='h-list'>
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/"
+                  
+                  
+                  id="home">
+									<i class='fas fa-grin fa-fw'></i>&nbsp;博文
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/categories/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="categories">
+									<i class='fas fa-folder-open fa-fw'></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/tags/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="tags">
+									<i class='fas fa-hashtag fa-fw'></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/archives/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="archives">
+									<i class='fas fa-archive fa-fw'></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索" />
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a class="fas fa-search fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+				
+				<li class='s-menu'><a class="fas fa-bars fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo flat-box"></a>
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a class="flat-btn fas fa-comments fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+          <li class='s-toc'><a class="flat-btn fas fa-list fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/"
+                
+                
+                id="home">
+								<i class='fas fa-clock fa-fw'></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/archives/"
+                
+                  rel="nofollow"
+                
+                
+                id="archives">
+								<i class='fas fa-archive fa-fw'></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/"
+                
+                
+                id="projects">
+								<i class='fas fa-code-branch fa-fw'></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/"
+                
+                  rel="nofollow"
+                
+                
+                id="friends">
+								<i class='fas fa-link fa-fw'></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="https://xaoxuu.com/wiki/material-x/"
+                
+                  rel="nofollow"
+                
+                
+                id="https:xaoxuu.comwikimaterial-x">
+								<i class='fas fa-book fa-fw'></i>&nbsp;主题文档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/"
+                
+                  rel="nofollow"
+                
+                
+                id="about">
+								<i class='fas fa-info-circle fa-fw'></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class='l_main'>
+  
+
+  <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    
+
+
+  <section class='meta'>
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/2020/07/26/redis/redis-lua-tx/">
+        【Redis】：Redis事务、Lua事务和管道的实践探究
+      </a>
+    </h1>
+  
+
+
+      
+      <div class='new-meta-box'>
+        
+          
+        
+          
+            
+  <div class='new-meta-item author'>
+    
+      <a href="/https:/littlejoyo.github.io" rel="nofollow">
+        
+          <img src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+        
+        <p>Joyo</p>
+      </a>
+    
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2020-07-26</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/Redis/' rel="nofollow">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+      <p>数据库&nbsp;/&nbsp;Redis</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class='notlink'>
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+    <section class="article typo">
+      <div class="article-entry" itemprop="articleBody">
+        <ul>
+<li><p>虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？</p>
+</li>
+<li><p>Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？</p>
+</li>
+<li><p>本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景</p>
+</li>
+</ul>
+<a id="more"></a>
+
+<blockquote>
+<p>Github issues:<a href="https://github.com/littlejoyo/Blog/issues/" target="_blank" rel="noopener">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h2 id="1-Redis什么场景下会出现并发问题？"><a href="#1-Redis什么场景下会出现并发问题？" class="headerlink" title="1.Redis什么场景下会出现并发问题？"></a>1.Redis什么场景下会出现并发问题？</h2><ul>
+<li><p>Redis是基于C/S架构，支持多个客户端请求，然后Redis服务并没有对每个请求进行同步处理，也就是不保证命令执行的有序性</p>
+</li>
+<li><p>当一个客户端存在<strong>先读后写</strong>的多个执行指令时，不能保证其顺序就可能出现并发问题</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>举个例子：</strong></p>
+</blockquote>
+<p>1.有一个共同访问的<code>key=&quot;joyo&quot;</code>,当前<code>value=1</code>，然后客户端有下面操作，如果value&gt;0,就执行递减操作<code>decr joyo</code>（减1操作）,否则直接返回</p>
+<p>2.现有A和B两个客户端发送请求到服务端，每个客户端都有<strong>1</strong>和<strong>2</strong>两个指令，分别对应读和写</p>
+<p>3.理想情况的顺序是<strong>A1-&gt;A2-&gt;B1-&gt;B2</strong>或者<strong>B1-&gt;B2-&gt;A1-&gt;A2</strong>,这样就能保证key的最终value是0，但是多客户端下，各个执行的顺序是不能保证的</p>
+<p>4.但是实际上，很可能会出现<strong>A1-&gt;B1-&gt;A2-&gt;B2</strong>或者<strong>B1-&gt;A1-&gt;B2-&gt;B1</strong>，这样A和B都能执行减1的操作，因为都会读取到<code>value=1</code>，最终的结果就会是-1，这个时候就是因为并发问题导致业务bug的发生了</p>
+<h2 id="2-如何解决并发问题？"><a href="#2-如何解决并发问题？" class="headerlink" title="2.如何解决并发问题？"></a>2.如何解决并发问题？</h2><h2 id="2-1-redis事务-watch"><a href="#2-1-redis事务-watch" class="headerlink" title="2.1 redis事务+watch"></a>2.1 redis事务+watch</h2><ul>
+<li><p>使用redis事务可以保证当前客户端的指令执行不会被其他客户端打断的，也就是满足事务的隔离性</p>
+</li>
+<li><p>但是，在一个事务中，只有当所有命令都依次执行完后才能得到每个结果的返回值，可是有些情况下需要先获得一条命令的返回值，然后再根据这个返回值进行业务判断后，才去执行下一条命令，比如我们这里就需要先去读取到<code>key=&quot;joyo&quot;</code>的值，如果<code>value&gt;0</code>，再去执行下一条命令</p>
+</li>
+<li><p>此时，对于<code>get</code>命令，这个时候我们是放在事务之外的，也就是当前事务体中只有一条递减的指令<code>decr</code>,是否能执行取决于读指令<code>get</code>取到的value</p>
+</li>
+<li><p>最终还是可能出现客户端A和B读取到value都是1,如，<strong>A1-&gt;B1-&gt;A2-&gt;B2</strong>或者<strong>B1-&gt;A1-&gt;B2-&gt;B1</strong>,此时<code>watch</code>命令就派上用场了</p>
+</li>
+<li><p><code>watch</code>命令能够监控key是否被修改过，如果发现被修改了就不执行事务的操作，直接返回</p>
+</li>
+<li><p>如果此时的命令执行顺序为<strong>A1-&gt;B1-&gt;A2-&gt;B2</strong>，表示此刻客户端A先执行了事务，读取到<code>value=1</code>,对key进行了减1的操作，<strong>value变为0</strong>，然后轮到客户端B执行的时候就会发现key已经被修改了，所以不执行事务然后直接返回，所以最终结果会是<code>value=0</code></p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 读取</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">redis＞ get joyo <span class="comment">// A1=1 B1=1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 监控key （如果发现已经被修改就不执行下面的事务）</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">redis＞ watch joyo</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 事务操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">redis＞MULTI</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">OK</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">redis＞DECR joyo </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">QUEUED</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">redis＞EXEC</span></pre></td></tr></table></figure>
+
+<blockquote>
+<p>redis事务参考另一篇文章：<a href="https://joyohub.com/2020/03/01/redis/redis-transaction/" target="_blank" rel="noopener">【Redis】：正确认识Redis的事务机制</a></p>
+</blockquote>
+<h2 id="2-2-使用lua脚本"><a href="#2-2-使用lua脚本" class="headerlink" title="2.2 使用lua脚本"></a>2.2 使用lua脚本</h2><ul>
+<li><p>Redis 从 2.6 版本开始在服务器内部嵌入了一个 Lua 解释器，使得用户可以在服务器端执行 Lua 脚本</p>
+</li>
+<li><p>Redis提供了<code>eval</code>指令，只需要传入<code>lua脚本</code>和<code>对应参数</code>就能执行具备原子性操作的指令集合</p>
+</li>
+<li><p>还有一点就是，所有脚本都是以事务的形式来执行的，脚本在执行过程中不会被其他工作打断，也不会引起任何竞争条件，完全可以使用 Lua 脚本来代替事务和乐观锁</p>
+</li>
+<li><p>如果当前Redis服务端正在执行lua执行脚本，不会再接受其他指令，知道lua脚本执行完成后再去执行别的指令，因此，写lua脚本的时候切记不要写耗时过长的操作，避免出现死循环语句</p>
+</li>
+</ul>
+<p><strong>如何解决上面的问题呢？</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 写一段lua脚本</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="string">"if redis.call('get', KEYS[1]) &gt; 0 then return redis.call('decr', KEYS[1]) else return 0 end"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 假设当前key=joyo的值为1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">redis＞ get joyo</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">redis＞ <span class="number">1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// redis客户端执行</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第一次执行</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">redis＞ eval <span class="string">"if redis.call('get', KEYS[1]) &gt; 0 then return redis.call('decr', KEYS[1]) else return 0 end"</span> <span class="number">1</span> joyo </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">redis＞ <span class="number">1</span> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 再次执行</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">redis＞ eval <span class="string">"if redis.call('get', KEYS[1]) &gt; 0 then return redis.call('decr', KEYS[1]) else return 0 end"</span> <span class="number">1</span> joyo </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">redis＞ <span class="number">0</span></span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>第一次执行的时候，读取到value=1，所以执行了递减操作</p>
+</li>
+<li><p>第二次以及后面都读取到的value=0，直接返回0</p>
+</li>
+<li><p>通过lua语句保证了指令执行的原子性还有有序性，因为是一次性执行的</p>
+</li>
+</ul>
+<h2 id="3-Lua脚本的好处"><a href="#3-Lua脚本的好处" class="headerlink" title="3.Lua脚本的好处"></a>3.Lua脚本的好处</h2><ol>
+<li><p>使用脚本可以直接在服务器端执行 Redis 命令，一般的数据处理操作可以直接使用 Lua 语言或者Lua 解释器提供的函数库来完成，不必再返回给客户端进行处理。</p>
+</li>
+<li><p>所有脚本都是以事务的形式来执行的，脚本在执行过程中不会被其他工作打断，也不会引起任何竞争条件，完全可以使用 Lua 脚本来代替事务和乐观锁。</p>
+</li>
+<li><p>所有脚本都是可重用的，重复执行相同的操作时，只要调用储存在服务器内部的脚本缓存就可以了，不用重新发送整个脚本，从而尽可能地节约网络资源，(redis提供了<code>evalsha</code>的指令)</p>
+</li>
+</ol>
+<h2 id="4-如何在Redis中使用Lua？"><a href="#4-如何在Redis中使用Lua？" class="headerlink" title="4.如何在Redis中使用Lua？"></a>4.如何在Redis中使用Lua？</h2><h2 id="4-1-基本语法"><a href="#4-1-基本语法" class="headerlink" title="4.1 基本语法"></a>4.1 基本语法</h2><ul>
+<li>基本语法如下：</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">redis <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; EVAL script numkeys key [key ...] arg [arg ...]</span></pre></td></tr></table></figure>
+<ul>
+<li><p>EVAL: Redis执行Lua脚本的指令</p>
+</li>
+<li><p>script: Lua脚本（字符串格式）</p>
+</li>
+<li><p>numkeys: 脚本要处理的数据库键的数量，指明后面key数组的长度</p>
+</li>
+<li><p>key [key …]: 指定了脚本要处理的数据库键，被传入的键可以在脚本里面通过访问 KEYS 数组来取得，比如 KEYS[1] 就取出第一个输入的键，KEYS[2] 取出第二个输入的键，诸如此类。</p>
+</li>
+<li><p>arg [arg …]: 指定了脚本要用到的参数，在脚本里面可以通过访问 ARGV 数组来获取这些参数。显式地指定脚本里面用到的键是为了配合 Redis 集群对键的检查，如果不这样做的话，在集群里面使用脚本可能会出错。</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">"return 'hello joyo'"</span> 0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">"hello joyo"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">"return 1+2"</span> 0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">(integer) 3</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">"return &#123;KEYS[1], KEYS[2], ARGV[1], ARGV[2]&#125;"</span> 2 <span class="string">"name"</span> <span class="string">"age"</span> <span class="string">"joyo"</span> 18</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">1) "name" # KEYS[1]</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">2) "age" # KEYS[2]</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">3) "joyo" # ARGV[1]</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">4) 18 # ARGV[2]</span></pre></td></tr></table></figure>
+
+<h2 id="4-2-如果调用Redis命令？"><a href="#4-2-如果调用Redis命令？" class="headerlink" title="4.2 如果调用Redis命令？"></a>4.2 如果调用Redis命令？</h2><ul>
+<li>通过调用 <code>redis.call()</code> 函数或者 <code>redis.pcall()</code> 函数，就可以直接在 Lua 脚本里面执行 Redis 命令。</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 Lua 脚本里面执行 PING 命令</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">redis&gt; EVAL <span class="string">"return redis.call('PING')"</span> <span class="number">0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">PONG</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 Lua 脚本里面执行 DBSIZE 命令</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">redis&gt; EVAL <span class="string">"return redis.call('DBSIZE')"</span> <span class="number">0</span> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">(integer) <span class="number">16</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 Lua 脚本里面执行 GET 命令，取出键 msg 的值，并对值进行字符串拼接操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">redis&gt; SET msg <span class="string">"hello joyo"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">OK</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">redis&gt; EVAL <span class="string">"return 'The message is: ' .. redis.call('GET', KEYS[1]) '"</span> <span class="number">1</span> msg</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="string">"The message is: hello joyo"</span></span></pre></td></tr></table></figure>
+
+<h2 id="4-3-redis-call和redis-pcall的区别"><a href="#4-3-redis-call和redis-pcall的区别" class="headerlink" title="4.3 redis.call和redis.pcall的区别"></a>4.3 redis.call和redis.pcall的区别</h2><ul>
+<li><p><code>redis.call()</code> 和 <code>redis.pcall()</code> 都可以用来执行 Redis 命令</p>
+</li>
+<li><p>不同的地方表现为，当被执行的脚本出错时，<code>redis.call()</code> 会返回出错脚本的名字以及 EVAL 命令的错误信息，而 <code>redis.pcall()</code> 只返回 EVAL 命令的错误信息。</p>
+</li>
+<li><p>在被执行的脚本出错时， redis.call() 可以提供更详细的错误信息，方便进行查错</p>
+</li>
+<li><p>使用时一定要注意 call 函数出错时会中断脚本的执行，而 pcall 会继续执行后面的内容</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 执行call</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">"return redis.call('NotExistsCommand')"</span> 0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">(error) ERR Error running script (call to f_ddabd662fa0a8e105765181ee7606562c1e6f1ce):</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">@user_script:1: @user_script: 1: Unknown Redis command called from Lua script</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 执行pcall</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">"return redis.pcall('NotExistsCommand')"</span> 0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">(error) @user_script: 1: Unknown Redis command called from Lua script</span></pre></td></tr></table></figure>
+
+<h2 id="4-4-EVALSHA命令减少网络资源损耗"><a href="#4-4-EVALSHA命令减少网络资源损耗" class="headerlink" title="4.4 EVALSHA命令减少网络资源损耗"></a>4.4 EVALSHA命令减少网络资源损耗</h2><ul>
+<li><p>任何 Lua 脚本，只要被 EVAL 命令执行过一次，就会被储存到服务器的脚本缓存里面</p>
+</li>
+<li><p>然后其实用户只要通过EVALSHA 命令，指定被缓存脚本的 SHA1 值，就可以在不发送脚本的情况下，再次执行脚本：<br><code>EVALSHA sha1 numkeys key [key ...] arg [arg ...]</code></p>
+</li>
+<li><p>如若每次执行EVAL都需要读取一大段Lua脚本会造成不必要的网络加载开销，通过SHA1值可以进行脚本的重用,那么如何生成这个SHA1值呢？</p>
+</li>
+<li><p>Redis提供了<code>SCRIPTLOAD</code>命令可以生成Lua脚本的SHA1值</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">"return 'hello world'"</span> 0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">"hello world"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 生成SHA1值</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> SCRIPTLOAD <span class="string">"return 'hello world'"</span> 0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">"5332031c6b470dc5a0dd9b4bf2030dea6d65de91"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVALSHA 5332031c6b470dc5a0dd9b4bf2030dea6d65de91 0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">"hello world"</span></pre></td></tr></table></figure>
+
+<h2 id="4-5-Lua脚本管理命令"><a href="#4-5-Lua脚本管理命令" class="headerlink" title="4.5 Lua脚本管理命令"></a>4.5 Lua脚本管理命令</h2><style>
+table th:first-of-type {  
+    width: 25%; 
+}
+</style>
+
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SCRIPT EXISTS</td>
+<td>检查 sha1 值所代表的脚本是否已经被加入到脚本缓存里面，是的话返回 1 ，不是的话返回 0</td>
+</tr>
+<tr>
+<td>SCRIPT LOAD script</td>
+<td>将脚本储存到脚本缓存里面，等待将来 EVALSHA 使用</td>
+</tr>
+<tr>
+<td>SCRIPT FLUSH</td>
+<td>清除脚本缓存储存的所有脚本</td>
+</tr>
+<tr>
+<td>SCRIPT KILL</td>
+<td>杀死运行超时的脚本。如果脚本已经执行过写入操作，那么还需要使用 SHUTDOWN NOSAVE 命令来强制服务器不保存数据，以免错误的数据被保存到数据库里面。</td>
+</tr>
+</tbody></table>
+<h2 id="4-6-Lua函数库"><a href="#4-6-Lua函数库" class="headerlink" title="4.6 Lua函数库"></a>4.6 Lua函数库</h2><ul>
+<li><p>Lua语言提供了各种函数库可以供程序员使用，直接写在脚本中即可有调用</p>
+</li>
+<li><p>具体的使用参考Lua的语法：<a href="https://www.runoob.com/lua/lua-basic-syntax.html" target="_blank" rel="noopener">Lua语法入门</a></p>
+</li>
+</ul>
+<style>
+table th:first-of-type {  
+    width: 25%; 
+}
+</style>
+
+<table>
+<thead>
+<tr>
+<th>函数库</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>base 库</td>
+<td>包含 Lua 的核心（core）函数，比如 assert、tostring、error、type 等</td>
+</tr>
+<tr>
+<td>string 库</td>
+<td>包含用于处理字符串的函数，比如 find、format、len、reverse 等</td>
+</tr>
+<tr>
+<td>table 库</td>
+<td>包含用于处理表格的函数，比如 concat、insert、remove、sort 等</td>
+</tr>
+<tr>
+<td>math 库</td>
+<td>包含常用的数学计算函数，比如 abs、sqrt、log 等</td>
+</tr>
+<tr>
+<td>debug 库</td>
+<td>包含调试程序所需的函数，比如 sethook、gethook 等,以及外部库</td>
+</tr>
+<tr>
+<td>struct 库</td>
+<td>在 C 语言的结构和 Lua 语言的值之间进行转换</td>
+</tr>
+<tr>
+<td>cjson 库</td>
+<td>将 Lua 值转换为 JSON 对象，或者将 JSON 对象转换为 Lua 值</td>
+</tr>
+<tr>
+<td>cmsgpack 库</td>
+<td>将 Lua 值编码为 MessagePack 格式，或者从 MessagePack 格式里面解码出 Lua值</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>另外还有一个用于计算 sha1 值的外部函数 redis.sha1hex。</p>
+</blockquote>
+<h2 id="5-Lua脚本出现死循环怎办？"><a href="#5-Lua脚本出现死循环怎办？" class="headerlink" title="5.Lua脚本出现死循环怎办？"></a>5.Lua脚本出现死循环怎办？</h2><ul>
+<li><p>此时有一个问题要思考，Redis的指令执行是个单线程，如果当前执行的的lua 脚本中出现了死循环，是不是 Redis 服务也就完全卡死没用了？</p>
+</li>
+<li><p>此时的确会导致Redis无法提供服务，但是Redis提供了终止脚本死循环的命令：<code>SCRIPT KILL</code></p>
+</li>
+<li><p>如果当前出现了死循环的话，解决方案就是另起一个Redis客户端执行：<code>SCRIPT KILL</code>命令来终止脚本的执行</p>
+</li>
+</ul>
+<blockquote>
+<p>不过 SCRIPT KILL 的执行有一个重要的前提，那就是当前正在执行的脚本没有对 Redis 的内部数据状态进行修改，因为 Redis 不允许 SCRIPT KILL 破坏脚本执行的原子性。</p>
+</blockquote>
+<p><strong>思考：此时Redis都卡死了，为什么还可以执行SCRIPT KILL指令?</strong></p>
+<ul>
+<li><p>Lua脚本引擎功能提供了各式各样的钩子函数，它允许在内部虚拟机执行指令时运行钩子代码。</p>
+</li>
+<li><p>比如每执行 N 条指令执行一次某个钩子函数，Redis 正是使用了这个钩子函数。</p>
+</li>
+<li><p>Redis 在钩子函数里会忙里偷闲去处理客户端的请求，并且只有在发现 Lua 脚本执行超时之后才会去处理请求，这个超时时间默认是 5 秒，因此执行<code>SCRIPT KILL</code>指令可能需要等待几秒后才返回执行成功</p>
+</li>
+</ul>
+<h2 id="6-Redis事务和Lua脚本的对比"><a href="#6-Redis事务和Lua脚本的对比" class="headerlink" title="6.Redis事务和Lua脚本的对比"></a>6.Redis事务和Lua脚本的对比</h2><ul>
+<li><p>虽然使用事务可以一次执行多个命令，并且通过乐观锁可以防止事务产生竞争条件，但是在实际中，要正确地使用事务和乐观锁并不是一件容易的事情。</p>
+</li>
+<li><p>对于一个业务场景需要考虑需要对哪些键加锁，给不相关的key加锁或者相关的key却不加锁，都会出现意外的错误，因此需要仔细结合业务场景进行全面的综合考虑，需要有一个思考的过程</p>
+</li>
+<li><p>另外一个就是引入事务和乐观锁会让代码显得更加复杂，还有带来额外的损耗</p>
+</li>
+<li><p>相比较之下，Lua脚本可能更加容易接受，上面已经总结了使用Lua脚本的有点，缺点就是需要保证好Lua脚本的准确性，相比较增加了新一门语言语法的掌握，值得庆幸的是Lua基本语法还算简单易懂。</p>
+</li>
+<li><p>Lua保证了脚本执行的原子性，在当前脚本没执行完之前，别的命令和脚本都是等待状态，所以一定要控制好脚本中的内容，防止出现需要消耗大量时间的内容(逻辑相对简单)</p>
+</li>
+</ul>
+<h2 id="7-管道"><a href="#7-管道" class="headerlink" title="7.管道"></a>7.管道</h2><blockquote>
+<p>最后简单讲一下关于管道和事务、Lua脚本的区别</p>
+</blockquote>
+<ul>
+<li><p>Redis是基于TCP连接进行通信的，每一个请求/响应过程都需要经历一个RTT往返时间，如果需要执行很多短小的命令，这些往返时间的开销是很大的，在此情形下，redis提出了管道来提高执行效率。</p>
+</li>
+<li><p>管道的思想是：如果client执行一些<strong>相互之间无关的命令</strong>或者<strong>不需要获取命令的返回值</strong>，那么redis允许你连续发送多条命令，而不需要等待前面命令执行完毕。</p>
+</li>
+<li><p>比如我们执行3条INCR命令，如果使用管道，理论上只需要一个RTT+3条命令的执行时间即可，如果不适用管道，那么可能需要额外的两个RTT时间。因此，管道相当于批处理脚本，相当于是命令集，可以理解为复用了当前的TCP连接完成所有命令的执行。</p>
+</li>
+</ul>
+<blockquote>
+<p>注意：管道中的多个命令，如果其中一个出现执行错误，仍然会去执行下一个命令，不会停止。</p>
+</blockquote>
+<ul>
+<li>使用管道可能在效率上比使用Lua脚本要好，但是有的情况下只能使用script。<strong>因为管道在执行后面的命令时，无法得到前面命令的结果</strong>，就像事务一样，所以如果需要在后面命令中使用前面命令的value等结果，则只能使用script或者事务+watch。</li>
+</ul>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" alt="weixin-a"></p>
+
+      </div>
+      
+        <br>
+        
+
+
+  <section class='meta' id="footer-meta">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T12:28:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>更新于 2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>数据库</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Redis/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>Redis</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/2020/07/26/redis/redis-lua-tx/&title=【Redis】：Redis事务、Lua事务和管道的实践探究 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？
+
+Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？
+
+本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/2020/07/26/redis/redis-lua-tx/&title=【Redis】：Redis事务、Lua事务和管道的实践探究 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？
+
+Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？
+
+本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/2020/07/26/redis/redis-lua-tx/&title=【Redis】：Redis事务、Lua事务和管道的实践探究 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？
+
+Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？
+
+本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+      
+      
+          <div class="prev-next">
+              
+                  <section class="prev">
+                      <span class="art-item-left">
+                          <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;上一页</h6>
+                          <h4>
+                              <a href="/2020/08/09/go/go-dependency/" rel="prev" title="【Go语言】：依赖管理之vendor和Go Modules">
+                                
+                                    【Go语言】：依赖管理之vendor和Go Modules
+                                
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/Go/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Go</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+              
+                  <section class="next">
+                      <span class="art-item-right" aria-hidden="true">
+                          <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                          <h4>
+                              <a href="/2020/07/04/mysql/mysql-string/" rel="prev" title="【Mysql】：搞清楚字符串类型char、varchar、text">
+                                  
+                                      【Mysql】：搞清楚字符串类型char、varchar、text
+                                  
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 数据库</a> <a class="tag" href="/tags/Mysql/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Mysql</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+          </div>
+      
+    </section>
+  </article>
+
+
+
+  <!-- 显示推荐文章和评论 -->
+
+
+
+  
+
+
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: '【Redis】：Redis事务、Lua事务和管道的实践探究',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class='l_side'>
+  
+    
+    
+      
+      
+        
+          
+          
+        
+          
+          
+            
+              
+  <section class='widget toc-wrapper'>
+    
+<header class='pure'>
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <!-- <div class='wrapper'><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer noopener" href="javascript:void(0)" target="_blank"><i class="fas fa-thumbtack fa-fw"></i></a></div> -->
+  
+</header>
+
+    <div class='content pure'>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Redis什么场景下会出现并发问题？"><span class="toc-text">1.Redis什么场景下会出现并发问题？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-如何解决并发问题？"><span class="toc-text">2.如何解决并发问题？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-redis事务-watch"><span class="toc-text">2.1 redis事务+watch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-使用lua脚本"><span class="toc-text">2.2 使用lua脚本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Lua脚本的好处"><span class="toc-text">3.Lua脚本的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-如何在Redis中使用Lua？"><span class="toc-text">4.如何在Redis中使用Lua？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-基本语法"><span class="toc-text">4.1 基本语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-如果调用Redis命令？"><span class="toc-text">4.2 如果调用Redis命令？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-redis-call和redis-pcall的区别"><span class="toc-text">4.3 redis.call和redis.pcall的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-EVALSHA命令减少网络资源损耗"><span class="toc-text">4.4 EVALSHA命令减少网络资源损耗</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-Lua脚本管理命令"><span class="toc-text">4.5 Lua脚本管理命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-Lua函数库"><span class="toc-text">4.6 Lua函数库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Lua脚本出现死循环怎办？"><span class="toc-text">5.Lua脚本出现死循环怎办？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-Redis事务和Lua脚本的对比"><span class="toc-text">6.Redis事务和Lua脚本的对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-管道"><span class="toc-text">7.管道</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#微信公众号"><span class="toc-text">微信公众号</span></a>
+    </div>
+  </section>
+
+
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="mailto:554882285@qq.com"
+            class="social fas fa-envelope flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://github.com/littlejoyo"
+            class="social fab fa-github flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="https://xaoxuu.com/wiki/material-x/" target="_blank" class="codename">Material X</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/app.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>

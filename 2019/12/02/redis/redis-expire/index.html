@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>【Redis】：Redis过期时间是怎么设计的？ | JoyoHub</title>
+  
+  <meta name="keywords" content="Joyo,Java,Go,js,高并发，分布式，高性能，数据库，博客。">
+  
+  
+  <meta name="description" content="高并发，分布式，高性能，Java,Go,hexo博客文章归档。">
+  
+
+  
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.10.1/css/all.min.css">
+  
+
+  
+  <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class='cover post half'>
+      
+        
+  <h1 class='title'>JoyoHub</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder="" />
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class='menu navgation'>
+  <ul class='h-list'>
+    
+      
+        <li>
+          <a class="nav home" href="/"
+            
+            
+            id="home">
+            <i class='fas fa-rss fa-fw'></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="https://github.com/littlejoyo"
+            
+            
+            id="https:github.comlittlejoyo">
+            <i class='fas fa-code-branch fa-fw'></i>&nbsp;Github
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/archives/"
+            
+              rel="nofollow"
+            
+            
+            id="archives">
+            <i class='fas fa-archive fa-fw'></i>&nbsp;归档
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/code/"
+            
+              rel="nofollow"
+            
+            
+            id="code">
+            <i class='fas fa-battery-half fa-fw'></i>&nbsp;算法
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/"
+            
+              rel="nofollow"
+            
+            
+            id="friends">
+            <i class='fas fa-link fa-fw'></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/"
+            
+              rel="nofollow"
+            
+            
+            id="about">
+            <i class='fas fa-info-circle fa-fw'></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href='/' >
+        
+          JoyoHub
+        
+      </a>
+			<div class='menu navgation'>
+				<ul class='h-list'>
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/"
+                  
+                  
+                  id="home">
+									<i class='fas fa-grin fa-fw'></i>&nbsp;博文
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/categories/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="categories">
+									<i class='fas fa-folder-open fa-fw'></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/tags/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="tags">
+									<i class='fas fa-hashtag fa-fw'></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/archives/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="archives">
+									<i class='fas fa-archive fa-fw'></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索" />
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a class="fas fa-search fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+				
+				<li class='s-menu'><a class="fas fa-bars fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo flat-box"></a>
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a class="flat-btn fas fa-comments fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+          <li class='s-toc'><a class="flat-btn fas fa-list fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/"
+                
+                
+                id="home">
+								<i class='fas fa-clock fa-fw'></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/archives/"
+                
+                  rel="nofollow"
+                
+                
+                id="archives">
+								<i class='fas fa-archive fa-fw'></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/"
+                
+                
+                id="projects">
+								<i class='fas fa-code-branch fa-fw'></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/"
+                
+                  rel="nofollow"
+                
+                
+                id="friends">
+								<i class='fas fa-link fa-fw'></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="https://xaoxuu.com/wiki/material-x/"
+                
+                  rel="nofollow"
+                
+                
+                id="https:xaoxuu.comwikimaterial-x">
+								<i class='fas fa-book fa-fw'></i>&nbsp;主题文档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/"
+                
+                  rel="nofollow"
+                
+                
+                id="about">
+								<i class='fas fa-info-circle fa-fw'></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class='l_main'>
+  
+
+  <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    
+
+
+  <section class='meta'>
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/2019/12/02/redis/redis-expire/">
+        【Redis】：Redis过期时间是怎么设计的？
+      </a>
+    </h1>
+  
+
+
+      
+      <div class='new-meta-box'>
+        
+          
+        
+          
+            
+  <div class='new-meta-item author'>
+    
+      <a href="/https:/littlejoyo.github.io" rel="nofollow">
+        
+          <img src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+        
+        <p>Joyo</p>
+      </a>
+    
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2019-12-02</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/Redis/' rel="nofollow">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+      <p>数据库&nbsp;/&nbsp;Redis</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class='notlink'>
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+    <section class="article typo">
+      <div class="article-entry" itemprop="articleBody">
+        <ul>
+<li><p>Redis的数据是存储于内存之中，所以对内存的清理是非常重要的</p>
+</li>
+<li><p>Redis提出了定期数据存储的设计，也就是数据在Redis上存储是有时间限制的</p>
+</li>
+<li><p>本篇主要从过期键的设计来对Redis进行了解</p>
+</li>
+</ul>
+<a id="more"></a>
+
+<blockquote>
+<p>Github issues:<a href="https://github.com/littlejoyo/Blog/issues/" target="_blank" rel="noopener">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<blockquote>
+<p>Redis是基于键值对存储形式的数据库，又因为数据存储的位置在内存，所以设置键值过期并及时清理是非常重要的。</p>
+</blockquote>
+<h1 id="1-Redis如何设置键的过期时间？"><a href="#1-Redis如何设置键的过期时间？" class="headerlink" title="1.Redis如何设置键的过期时间？"></a>1.Redis如何设置键的过期时间？</h1><ul>
+<li><p>Redis中使用<code>EXPIRE</code>进行键时间的设置</p>
+</li>
+<li><p>使用<code>TTL</code>查询键剩余生存时间</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">redis&gt; SET cache_page <span class="string">"www.google.com"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">OK </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">redis&gt; EXPIRE cache_page 30  # 设置过期时间为 30 秒</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">(integer) <span class="number">1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">redis&gt; TTL cache_page    # 查看剩余生存时间</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">(integer) <span class="number">23</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">redis&gt; EXPIRE cache_page 30000   # 更新过期时间</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">(integer) <span class="number">1</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">redis&gt; TTL cache_page</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">(integer) <span class="number">29996</span></span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="2-Redis下的-Expire-Key"><a href="#2-Redis下的-Expire-Key" class="headerlink" title="2.Redis下的 Expire Key"></a>2.Redis下的 Expire Key</h1><h2 id="2-1-Expire-Key-底层的数据结构"><a href="#2-1-Expire-Key-底层的数据结构" class="headerlink" title="2.1 Expire Key 底层的数据结构"></a>2.1 Expire Key 底层的数据结构</h2><p>Redis数据库在数据库服务器中使用了redisDb数据结构，结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">typedef struct redisDb &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">     dict *dict;     &#x2F;* 键空间 key space *&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">     dict *expires;    &#x2F;* 过期字典 *&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">     dict *blocking_keys;  &#x2F;* Keys with clients waiting for data (BLPOP) *&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">     dict *ready_keys;   &#x2F;* Blocked keys that received a PUSH *&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">     dict *watched_keys;   &#x2F;* WATCHED keys for MULTI&#x2F;EXEC CAS *&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">     struct evictionPoolEntry *eviction_pool; &#x2F;* Eviction pool of keys *&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">     int id;      &#x2F;* Database ID *&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">     long long avg_ttl;   &#x2F;* Average TTL, just for stats *&#x2F;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">&#125; redisDb;</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>键空间(key space)：redisDb中的dict *dict成员就是将key和具体的对象（可能是string、list、set、zset、hash中任意类型之一）关联起来，存储着该数据库中所有的键值对数据。</p>
+</li>
+<li><p>过期字典(expires):保存数据库中所有键的过期时间，过期时间用UNIX时间戳表示，且值为long long整数</p>
+</li>
+<li><p>id成员：id是数据库的编号，以整型表示。</p>
+</li>
+</ul>
+<h2 id="2-2-设置过期时间的命令"><a href="#2-2-设置过期时间的命令" class="headerlink" title="2.2 设置过期时间的命令"></a>2.2 设置过期时间的命令</h2><ul>
+<li><code>EXPIRE \&lt;key&gt; \&lt;ttl&gt;</code>：命令用于将键key的过期时间设置为<code>ttl</code>秒之后</li>
+<li><code>PEXPIRE \&lt;key&gt; \&lt;ttl&gt;</code>：命令用于将键key的过期时间设置为<code>ttl</code>毫秒之后</li>
+<li><code>EXPIREAT \&lt;key&gt; \&lt;timesramp&gt;</code>：命令用于将key的过期时间设置为<code>timrestamp</code>所指定的秒数时间戳</li>
+<li><code>PEXPIREAT \&lt;key&gt; \&lt;timesramp&gt;</code>：命令用于将key的过期时间设置为<code>timrestamp</code>所指定的毫秒数时间戳</li>
+</ul>
+<h2 id="2-3-redisDb下expires的底层"><a href="#2-3-redisDb下expires的底层" class="headerlink" title="2.3 redisDb下expires的底层"></a>2.3 redisDb下expires的底层</h2><ul>
+<li><p>expires字段也是一个字典dict结构，字典的键为key，值为该key对应的过期时间</p>
+</li>
+<li><p>过期时间为long long类型整数，是以毫秒为单位的过期 UNIX 时间戳。</p>
+</li>
+<li><p>过期键的判定，其实是通过过期字典进行判定，步骤：</p>
+</li>
+</ul>
+<p>1.检查给定键是否存在于过期字典，如果存在，取出键的过期时间</p>
+<p>2.通过判断当前UNIX时间戳是否大于键的过期时间，是的话，键已过期，相反则键未过期。</p>
+<ul>
+<li>设置键值存储实例：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">redis&gt; set Ccww   <span class="number">5</span> <span class="number">2</span> <span class="number">0</span>  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ok  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">redis&gt; expire Ccww <span class="number">5</span>  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">ok</span></pre></td></tr></table></figure>
+使用redisDb结构存储数据图表示：(<a href="https://juejin.im/post/5da7144ff265da5ba532b753#heading-12" target="_blank" rel="noopener">图片来源</a>)</li>
+</ul>
+<p><img src="https://i.loli.net/2019/12/09/d9Sk7n4NAwO6jMI.png" alt="image"></p>
+<h1 id="3-过期键删除策略"><a href="#3-过期键删除策略" class="headerlink" title="3.过期键删除策略"></a>3.过期键删除策略</h1><h2 id="3-1-三种删除策略"><a href="#3-1-三种删除策略" class="headerlink" title="3.1 三种删除策略"></a>3.1 三种删除策略</h2><ul>
+<li><p><strong>定时删除</strong>：在设置键的过期时间的同时，创建一个定时任务，当键达到过期时间时，立即执行对键的删除操作</p>
+</li>
+<li><p><strong>惰性删除</strong>：放任键过期不管，但在每次从键空间获取键时，都检查取得的键是否过期，如果过期的话，就删除该键，如果没有过期，就返回该键</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2019/12/09/bVHYqrMiQsEov31.png" alt="惰性删除"></p>
+<ul>
+<li><strong>定期删除</strong>：每隔一点时间，程序就对数据库进行一次检查，删除里面的过期键，至于要删除多少过期键，以及要检查多少个数据库，则由算法决定。</li>
+</ul>
+<h2 id="3-2-Redis对删除策略的选择"><a href="#3-2-Redis对删除策略的选择" class="headerlink" title="3.2 Redis对删除策略的选择"></a>3.2 Redis对删除策略的选择</h2><ul>
+<li><p>Redis服务器结合<strong>惰性删除</strong>和<strong>定期删除</strong>两种策略一起使用。</p>
+</li>
+<li><p>通过这两种策略之间的配合使用，使得服务器可以在合理使用CPU时间和浪费内存空间取得平衡点。</p>
+</li>
+</ul>
+<h1 id="4-过期键注意点"><a href="#4-过期键注意点" class="headerlink" title="4.过期键注意点"></a>4.过期键注意点</h1><h2 id="4-1-如果有大量的key需要设置同一时间过期，一般需要注意什么？"><a href="#4-1-如果有大量的key需要设置同一时间过期，一般需要注意什么？" class="headerlink" title="4.1 如果有大量的key需要设置同一时间过期，一般需要注意什么？"></a>4.1 如果有大量的key需要设置同一时间过期，一般需要注意什么？</h2><ul>
+<li><p>如果大量的key过期时间设置的过于集中，到过期的那个时间点，redis可能会出现短暂的卡顿现象。</p>
+</li>
+<li><p>严重的话会出现<strong>缓存雪崩</strong>，所以一般需要在时间上加一个随机值，使得过期时间分散一些，来避免缓存集中无效的现象。</p>
+</li>
+<li><p>造成缓存雪崩的场景：电商首页经常会使用定时任务刷新缓存，可能大量的数据失效时间都十分集中，如果失效时间一样，又刚好在失效的时间点大量用户涌入，就有可能造成缓存雪崩</p>
+</li>
+</ul>
+<h2 id="4-2-什么是缓存雪崩？"><a href="#4-2-什么是缓存雪崩？" class="headerlink" title="4.2 什么是缓存雪崩？"></a>4.2 什么是缓存雪崩？</h2><ul>
+<li><p>缓存雪崩可以理解为缓存同一时间大面积失效，大量请求直接请求到数据库，最后数据库承担不了巨大请求服务掉线。</p>
+</li>
+<li><p>举个简单的例子：如果所有首页的Key失效时间都是12小时，中午12点刷新的，我零点有个秒杀活动大量用户涌入，假设当时每秒 6000 个请求，本来缓存在可以扛住每秒 5000 个请求，但是缓存当时所有的Key都失效了。</p>
+</li>
+<li><p>缓存失效过程，画图理解：<br><img src="https://i.loli.net/2019/12/09/4npbmDGMexfwtBv.png" alt="缓存雪崩"></p>
+</li>
+</ul>
+<h1 id="5-RDB和AOF对过期键的处理"><a href="#5-RDB和AOF对过期键的处理" class="headerlink" title="5.RDB和AOF对过期键的处理"></a>5.RDB和AOF对过期键的处理</h1><h2 id="5-1-RDB"><a href="#5-1-RDB" class="headerlink" title="5.1 RDB"></a>5.1 RDB</h2><h3 id="5-1-1-生成RDB文件"><a href="#5-1-1-生成RDB文件" class="headerlink" title="5.1.1 生成RDB文件"></a>5.1.1 生成RDB文件</h3><ul>
+<li><p>程序会对数据库中的键进行检查，过期的键不会被保存到新创建的 RDB 文件中。</p>
+</li>
+<li><p>因此数据库中的过期键不会对生成新的 RDB 文件造成影响。</p>
+</li>
+</ul>
+<h3 id="5-1-2-载入-RDB-文件"><a href="#5-1-2-载入-RDB-文件" class="headerlink" title="5.1.2 载入 RDB 文件"></a>5.1.2 载入 RDB 文件</h3><p>这里需要分情况说明：</p>
+<ol>
+<li><p>如果服务器以<strong>主服务器模式运行</strong>，则在载入 RDB 文件时，程序会对文件中保存的键进行检查，过期键不会被载入到数据库中。所以过期键不会对载入 RDB 文件的主服务器造成影响。</p>
+</li>
+<li><p>如果服务器以<strong>从服务器模式运行</strong>，则在载入 RDB 文件时，不论键是否过期都会被载入到数据库中。但由于主从服务器在进行数据同步时，从服务器的数据会被清空。所以一般来说，过期键对载入 RDB 文件的从服务器也不会造成影响。</p>
+</li>
+</ol>
+<h2 id="5-2-AOF"><a href="#5-2-AOF" class="headerlink" title="5.2 AOF"></a>5.2 AOF</h2><h3 id="5-2-1-AOF-文件写入"><a href="#5-2-1-AOF-文件写入" class="headerlink" title="5.2.1 AOF 文件写入"></a>5.2.1 AOF 文件写入</h3><ul>
+<li><p>当服务器以 AOF 持久化模式运行时，如果数据库某个过期键还没被删除，那么 AOF 文件不会因为这个过期键而产生任何影响，依旧保留。</p>
+</li>
+<li><p>而当过期键被删除后，那么程序会向 AOF 文件追加一条 DEL 命令来显式地记录该键被删除。</p>
+</li>
+</ul>
+<h3 id="5-2-2-AOF-重写"><a href="#5-2-2-AOF-重写" class="headerlink" title="5.2.2 AOF 重写"></a>5.2.2 AOF 重写</h3><ul>
+<li>执行 AOF 重写过程中，也会被数据库的键进行检查，已过期的键不会被保存到重写后的 AOF 文件中。因此不会对 AOF 重写造成影响</li>
+</ul>
+<h1 id="6-主从复制对过期键的处理"><a href="#6-主从复制对过期键的处理" class="headerlink" title="6.主从复制对过期键的处理"></a>6.主从复制对过期键的处理</h1><ul>
+<li><p>当服务器运行在复制模式下，由主服务器来控制从服务器的删除过期键动作，目的是保证主从服务器数据的一致性。</p>
+</li>
+<li><p>那到底是怎么控制的呢？</p>
+</li>
+</ul>
+<ol>
+<li><p><strong>主服务器</strong>删除一个过期键后，会向所有<strong>从服务器</strong>发送一个 DEL 命令，告诉<strong>从服务器</strong>删除这个过期键 </p>
+</li>
+<li><p><strong>从服务器</strong>接受到命令后，删除过期键</p>
+</li>
+</ol>
+<p>PS:<strong>从服务器</strong>在接收到客户端对过期键的读命令时，依旧会返回该键对应的值给客户端，而不会将其删除。</p>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" alt="weixin-a"></p>
+
+      </div>
+      
+        <br>
+        
+
+
+  <section class='meta' id="footer-meta">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T12:28:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>更新于 2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>数据库</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Redis/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>Redis</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/2019/12/02/redis/redis-expire/&title=【Redis】：Redis过期时间是怎么设计的？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+Redis的数据是存储于内存之中，所以对内存的清理是非常重要的
+
+Redis提出了定期数据存储的设计，也就是数据在Redis上存储是有时间限制的
+
+本篇主要从过期键的设计来对Redis进行了解
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/2019/12/02/redis/redis-expire/&title=【Redis】：Redis过期时间是怎么设计的？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+Redis的数据是存储于内存之中，所以对内存的清理是非常重要的
+
+Redis提出了定期数据存储的设计，也就是数据在Redis上存储是有时间限制的
+
+本篇主要从过期键的设计来对Redis进行了解
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/2019/12/02/redis/redis-expire/&title=【Redis】：Redis过期时间是怎么设计的？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+Redis的数据是存储于内存之中，所以对内存的清理是非常重要的
+
+Redis提出了定期数据存储的设计，也就是数据在Redis上存储是有时间限制的
+
+本篇主要从过期键的设计来对Redis进行了解
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+      
+      
+          <div class="prev-next">
+              
+                  <section class="prev">
+                      <span class="art-item-left">
+                          <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;上一页</h6>
+                          <h4>
+                              <a href="/2019/12/15/redis/redis-advanced/" rel="prev" title="【Redis】：Redis为什么能那么快？">
+                                
+                                    【Redis】：Redis为什么能那么快？
+                                
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 数据库</a> <a class="tag" href="/tags/Redis/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Redis</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+              
+                  <section class="next">
+                      <span class="art-item-right" aria-hidden="true">
+                          <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                          <h4>
+                              <a href="/2019/11/24/redis/redis-persistence/" rel="prev" title="【Redis】：由浅入深对比Redis的两种持久化方式">
+                                  
+                                      【Redis】：由浅入深对比Redis的两种持久化方式
+                                  
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 数据库</a> <a class="tag" href="/tags/Redis/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Redis</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+          </div>
+      
+    </section>
+  </article>
+
+
+
+  <!-- 显示推荐文章和评论 -->
+
+
+
+  
+
+
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: '【Redis】：Redis过期时间是怎么设计的？',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class='l_side'>
+  
+    
+    
+      
+      
+        
+          
+          
+        
+          
+          
+            
+              
+  <section class='widget toc-wrapper'>
+    
+<header class='pure'>
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <!-- <div class='wrapper'><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer noopener" href="javascript:void(0)" target="_blank"><i class="fas fa-thumbtack fa-fw"></i></a></div> -->
+  
+</header>
+
+    <div class='content pure'>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Redis如何设置键的过期时间？"><span class="toc-text">1.Redis如何设置键的过期时间？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-Redis下的-Expire-Key"><span class="toc-text">2.Redis下的 Expire Key</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-Expire-Key-底层的数据结构"><span class="toc-text">2.1 Expire Key 底层的数据结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-设置过期时间的命令"><span class="toc-text">2.2 设置过期时间的命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-redisDb下expires的底层"><span class="toc-text">2.3 redisDb下expires的底层</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-过期键删除策略"><span class="toc-text">3.过期键删除策略</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-三种删除策略"><span class="toc-text">3.1 三种删除策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-Redis对删除策略的选择"><span class="toc-text">3.2 Redis对删除策略的选择</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-过期键注意点"><span class="toc-text">4.过期键注意点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-如果有大量的key需要设置同一时间过期，一般需要注意什么？"><span class="toc-text">4.1 如果有大量的key需要设置同一时间过期，一般需要注意什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-什么是缓存雪崩？"><span class="toc-text">4.2 什么是缓存雪崩？</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-RDB和AOF对过期键的处理"><span class="toc-text">5.RDB和AOF对过期键的处理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-RDB"><span class="toc-text">5.1 RDB</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-1-生成RDB文件"><span class="toc-text">5.1.1 生成RDB文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-2-载入-RDB-文件"><span class="toc-text">5.1.2 载入 RDB 文件</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-AOF"><span class="toc-text">5.2 AOF</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-1-AOF-文件写入"><span class="toc-text">5.2.1 AOF 文件写入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-2-AOF-重写"><span class="toc-text">5.2.2 AOF 重写</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-主从复制对过期键的处理"><span class="toc-text">6.主从复制对过期键的处理</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#微信公众号"><span class="toc-text">微信公众号</span></a></li></ol>
+    </div>
+  </section>
+
+
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="mailto:554882285@qq.com"
+            class="social fas fa-envelope flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://github.com/littlejoyo"
+            class="social fab fa-github flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="https://xaoxuu.com/wiki/material-x/" target="_blank" class="codename">Material X</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/app.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>

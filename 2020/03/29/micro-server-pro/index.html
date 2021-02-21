@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>【微服务】：何为服务监控和治理、容错隔离、Docker部署？ | JoyoHub</title>
+  
+  <meta name="keywords" content="Joyo,Java,Go,js,高并发，分布式，高性能，数据库，博客。">
+  
+  
+  <meta name="description" content="高并发，分布式，高性能，Java,Go,hexo博客文章归档。">
+  
+
+  
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.10.1/css/all.min.css">
+  
+
+  
+  <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class='cover post half'>
+      
+        
+  <h1 class='title'>JoyoHub</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder="" />
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class='menu navgation'>
+  <ul class='h-list'>
+    
+      
+        <li>
+          <a class="nav home" href="/"
+            
+            
+            id="home">
+            <i class='fas fa-rss fa-fw'></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="https://github.com/littlejoyo"
+            
+            
+            id="https:github.comlittlejoyo">
+            <i class='fas fa-code-branch fa-fw'></i>&nbsp;Github
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/archives/"
+            
+              rel="nofollow"
+            
+            
+            id="archives">
+            <i class='fas fa-archive fa-fw'></i>&nbsp;归档
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/code/"
+            
+              rel="nofollow"
+            
+            
+            id="code">
+            <i class='fas fa-battery-half fa-fw'></i>&nbsp;算法
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/"
+            
+              rel="nofollow"
+            
+            
+            id="friends">
+            <i class='fas fa-link fa-fw'></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/"
+            
+              rel="nofollow"
+            
+            
+            id="about">
+            <i class='fas fa-info-circle fa-fw'></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href='/' >
+        
+          JoyoHub
+        
+      </a>
+			<div class='menu navgation'>
+				<ul class='h-list'>
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/"
+                  
+                  
+                  id="home">
+									<i class='fas fa-grin fa-fw'></i>&nbsp;博文
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/categories/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="categories">
+									<i class='fas fa-folder-open fa-fw'></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/tags/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="tags">
+									<i class='fas fa-hashtag fa-fw'></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/archives/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="archives">
+									<i class='fas fa-archive fa-fw'></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索" />
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a class="fas fa-search fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+				
+				<li class='s-menu'><a class="fas fa-bars fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo flat-box"></a>
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a class="flat-btn fas fa-comments fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+          <li class='s-toc'><a class="flat-btn fas fa-list fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/"
+                
+                
+                id="home">
+								<i class='fas fa-clock fa-fw'></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/archives/"
+                
+                  rel="nofollow"
+                
+                
+                id="archives">
+								<i class='fas fa-archive fa-fw'></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/"
+                
+                
+                id="projects">
+								<i class='fas fa-code-branch fa-fw'></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/"
+                
+                  rel="nofollow"
+                
+                
+                id="friends">
+								<i class='fas fa-link fa-fw'></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="https://xaoxuu.com/wiki/material-x/"
+                
+                  rel="nofollow"
+                
+                
+                id="https:xaoxuu.comwikimaterial-x">
+								<i class='fas fa-book fa-fw'></i>&nbsp;主题文档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/"
+                
+                  rel="nofollow"
+                
+                
+                id="about">
+								<i class='fas fa-info-circle fa-fw'></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class='l_main'>
+  
+
+  <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    
+
+
+  <section class='meta'>
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/2020/03/29/micro-server-pro/">
+        【微服务】：何为服务监控和治理、容错隔离、Docker部署？
+      </a>
+    </h1>
+  
+
+
+      
+      <div class='new-meta-box'>
+        
+          
+        
+          
+            
+  <div class='new-meta-item author'>
+    
+      <a href="/https:/littlejoyo.github.io" rel="nofollow">
+        
+          <img src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+        
+        <p>Joyo</p>
+      </a>
+    
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2020-03-29</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/' rel="nofollow">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+      <p>微服务</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class='notlink'>
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+    <section class="article typo">
+      <div class="article-entry" itemprop="articleBody">
+        <ul>
+<li><p>微服务架构下对服务进行拆分，多服务下监控起到重要作用</p>
+</li>
+<li><p>服务之间调用过程，利用调用链监控设计可以追踪调用过程</p>
+</li>
+<li><p>微服务架构还需容错隔离来保证安全运行机制，结合容器部署技术来服务治理</p>
+</li>
+</ul>
+<a id="more"></a>
+
+<blockquote>
+<p>Github issues:<a href="https://github.com/littlejoyo/Blog/issues/" target="_blank" rel="noopener">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h1 id="1-微服务监控系统？"><a href="#1-微服务监控系统？" class="headerlink" title="1.微服务监控系统？"></a>1.微服务监控系统？</h1><h2 id="1-1-什么是监控系统？"><a href="#1-1-什么是监控系统？" class="headerlink" title="1.1 什么是监控系统？"></a>1.1 什么是监控系统？</h2><ul>
+<li><p>一旦请求服务出现异常，我们必须得知道是在哪个服务环节出了故障，就需要对每一个服务，以及各个指标都进行全面的监控</p>
+</li>
+<li><p>监控系统能为我们提供具体的指标数据进行追踪和跟进。</p>
+</li>
+</ul>
+<p>在微服务架构中，监控系统按照原理和作用大致可以分为三类：</p>
+<ul>
+<li>日志监控（Log）</li>
+<li>调用链调用监控（Tracing）</li>
+<li>度量监控（Metrics）</li>
+</ul>
+<h2 id="1-2-日志监控"><a href="#1-2-日志监控" class="headerlink" title="1.2 日志监控"></a>1.2 日志监控</h2><ul>
+<li><p>日志类比较常见，我们的框架代码、系统环境、以及业务逻辑中一般都会产出一些日志，这些日志我们通常把它记录后统一收集起来，方便在跟踪和丁文问题的需要时进行查询。</p>
+</li>
+<li><p>日志类记录的信息一般是一些事件、非结构化的一些文本内容。</p>
+</li>
+<li><p>日志的输出和处理的解决方案常用的有 ELK Stack 方案，用于实时搜索，分析和可视化日志数据。</p>
+</li>
+<li><p>开源实时日志分析ELK平台能够完美的解决我们上述的问题，ELK由ElasticSearch、Logstash和Kiabana三个开源工具组成。</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/03/29/nPp2CK7Z6A84Blk.png" alt="ELK"></p>
+<p><strong>组件介绍</strong></p>
+<ul>
+<li><p><code>Elasticsearch</code>是个开源分布式搜索引擎，它的特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，restful风格接口，多数据源，自动搜索负载等。</p>
+</li>
+<li><p><code>Logstash</code>是一个完全开源的工具，他可以对你的日志进行收集、过滤，并将其存储供以后使用（如，搜索）。</p>
+</li>
+<li><p><code>Kibana</code> 也是一个开源和免费的工具，它Kibana可以为 Logstash 和 ElasticSearch 提供的日志分析友好的 Web 界面，可以帮助您汇总、分析和搜索重要数据日志。</p>
+</li>
+<li><p><code>Kafka</code>：接收用户日志的消息队列</p>
+</li>
+</ul>
+<p><strong>工作流程图</strong></p>
+<p><img src="https://i.loli.net/2020/03/29/5aKedcPiqzv94FG.png" alt="ELK worker"></p>
+<ul>
+<li><p>Logstash收集AppServer产生的日志记录Log</p>
+</li>
+<li><p>将日志log存放到ElasticSearch集群中，而Kibana则从ES集群中查询数据生成图表</p>
+</li>
+<li><p>生成的日志图表返回给Browser进行渲染显示，分别支持各种终端进行显示</p>
+</li>
+</ul>
+<h2 id="1-3-调用链监控"><a href="#1-3-调用链监控" class="headerlink" title="1.3 调用链监控"></a>1.3 调用链监控</h2><h3 id="1-3-1-什么是调用链监控？"><a href="#1-3-1-什么是调用链监控？" class="headerlink" title="1.3.1 什么是调用链监控？"></a>1.3.1 什么是调用链监控？</h3><ul>
+<li><p>调用链监控是用来追踪微服务之前依赖的路径和问题定位。</p>
+</li>
+<li><p>主要原理就是子节点会记录父节点的id信息。例如阿里的鹰眼系统就是一个调用链监控系统。</p>
+</li>
+<li><p>一个请求从开始进入，在微服务中调用不同的服务节点后，再返回给客户端，在这个过程中通过调用链参数来追寻全链路的调用行程。通过这个方式可以很方便的知道请求在哪个环节出了故障，系统的瓶颈出现在哪一个环节，定位出优化点。</p>
+</li>
+</ul>
+<h3 id="1-3-2-为什么需要调用链监控？"><a href="#1-3-2-为什么需要调用链监控？" class="headerlink" title="1.3.2 为什么需要调用链监控？"></a>1.3.2 为什么需要调用链监控？</h3><ul>
+<li><p>「调用链监控」是在微服务架构中非常重要的一环。它除了能帮助我们定位问题以外，还能帮助项目成员清晰的去了解项目部署结构。</p>
+</li>
+<li><p>微服务如果达到了成百个服务调用，时间久了之后，项目的结构很可能就会出现超级混乱的调用，见下图：</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/03/29/XMxyWkLaQb4l3Tf.png" alt="微服务调用"></p>
+<ul>
+<li>在这种情况下，团队开发者甚至是架构师都不一定能对项目的网络结构有很清晰的了解，那就更别谈系统优化了。</li>
+</ul>
+<h3 id="1-3-3-调用链监控的作用"><a href="#1-3-3-调用链监控的作用" class="headerlink" title="1.3.3 调用链监控的作用"></a>1.3.3 调用链监控的作用</h3><p><strong>1.生成项目网络拓扑图</strong></p>
+<ul>
+<li><p>根据「调用链监控」中记录的链路信息，给项目生成一张网络调用的拓扑图。</p>
+</li>
+<li><p>通过这张图，我们就可以知道系统中的各个服务之间的调用关系是怎样的，以及系统依赖了哪些服务。</p>
+</li>
+<li><p>可以让架构师监控全局服务状态，便于架构师掌握系统的调用结构。</p>
+</li>
+</ul>
+<p><strong>2.快速定位问题</strong></p>
+<ul>
+<li><p>微服务架构下，问题定位就变得非常复杂了，一个请求可能会涉及到多个服务节点</p>
+</li>
+<li><p>有了调用链监控系统就能让开发人员快速的定位到问题和相应模块，提升解决问题效率</p>
+</li>
+</ul>
+<p><strong>3.优化系统</strong></p>
+<ul>
+<li><p>通过记录了请求在调用链上每一个环节的信息，可以通过得出的服务信息找出系统的瓶颈，做出针对性的优化。</p>
+</li>
+<li><p>还可以分析这个调用路径是否合理，是否调用了不必要的服务节点，是否有更近、响应更快的服务节点。</p>
+</li>
+<li><p>通过对调用链路的分析，我们就可以找出最优质的调用路径，从而提高系统的性能。</p>
+</li>
+</ul>
+<h3 id="1-3-4-调用链监控的原理"><a href="#1-3-4-调用链监控的原理" class="headerlink" title="1.3.4 调用链监控的原理"></a>1.3.4 调用链监控的原理</h3><blockquote>
+<p>主要原理就是子节点会记录父节点的id信息,要理解好三个核心的概念：Trace、Span、Annotation。</p>
+</blockquote>
+<p><strong>Trace</strong></p>
+<ul>
+<li><p>Trace是指一次请求调用的链路过程，trace id 是指这次请求调用的ID。</p>
+</li>
+<li><p>在一次请求中，会在网络的最开始生成一个全局唯一的用于标识此次请求的trace id，这个trace id在这次请求调用过程中无论经过多少个节点都会保持不变，并且在随着每一层的调用不停的传递。</p>
+</li>
+<li><p>最终，可以通过trace id将这一次用户请求在系统中的路径全部串起来。</p>
+</li>
+</ul>
+<p><strong>Span</strong></p>
+<ul>
+<li><p>Span是指一个模块的调用过程，一般用span id来标识。在一次请求的过程中会调用不同的节点/模块/服务，每一次调用都会生成一个新的span id来记录。</p>
+</li>
+<li><p>这样，就可以通过span id来定位当前请求在整个系统调用链中所处的位置，以及它的上下游节点分别是什么。</p>
+</li>
+</ul>
+<p><strong>Annotation</strong></p>
+<ul>
+<li>指附属信息，可以用于附属在每一个Span上自定义的数据。</li>
+</ul>
+<p><strong>具体流程：</strong></p>
+<p><img src="https://i.loli.net/2020/03/29/R6zOLnpecTSf1ja.png" alt="trace"></p>
+<ul>
+<li><p>从图中可见，一次请求只有一个唯一的trace id=12345，在请求过程中的任何环节都不会改变。</p>
+</li>
+<li><p>在这个请求的调用链中，SpanA调用了SpanB，然后SpanB又调用了SpanC和SpanD，每一次Span调用都会生成一个自己的span id，并且还会记录自己的上级span id是谁。</p>
+</li>
+<li><p>通过这些id，整个链路基本上就都能标识出来,记录了调用过程。</p>
+</li>
+</ul>
+<h3 id="1-3-5-调用链监控开源应用"><a href="#1-3-5-调用链监控开源应用" class="headerlink" title="1.3.5 调用链监控开源应用"></a>1.3.5 调用链监控开源应用</h3><p><strong>CAT</strong></p>
+<ul>
+<li><p>CAT是由大众点评开源的一款调用链监控系统，基于JAVA开发的,有很多互联网企业在使用，热度非常高。</p>
+</li>
+<li><p>它有一个非常强大和丰富的可视化报表界面，这一点其实对于一款调用链监控系统而来非常的重要。</p>
+</li>
+<li><p>在CAT提供的报表界面中有非常多的功能，几乎能看到你想要的任何维度的报表数据。</p>
+</li>
+<li><p>CAT有个很大的优势就是处理的实时性，CAT里大部分系统是分钟级统计</p>
+</li>
+</ul>
+<p><strong>Open Zipkin</strong></p>
+<ul>
+<li><p>Zipkin由Twitter开源，支持的语言非常多，基于 Google Dapper 的论文设计而来，国内外很多公司都在用，文档资料也很丰富。</p>
+</li>
+<li><p>用于收集服务的定时数据，以解决微服务架构中的延迟问题，包括数据的收集、存储、查找和展现。</p>
+</li>
+</ul>
+<p><strong>pinpoint</strong></p>
+<ul>
+<li><p>Pinpoint中的服务关系依赖图做得非常棒，超出市面上任何一款产品。</p>
+</li>
+<li><p>Pinpoint运用JavaAgent字节码增强技术，只需要加启动参数即可，因为采用字节码增强方式去埋点，所以在埋点的时候是不需要修改业务代码的，非侵入式的，非常适合项目已经完成之后再增加调用链监控的时候去使用的方案。</p>
+</li>
+<li><p>但是也是由于采用字节码增强的方式，所以它目前仅支持JAVA语言。</p>
+</li>
+</ul>
+<p><strong>方案选型比较</strong></p>
+<p><img src="https://i.loli.net/2020/03/29/Vx7ba81okc2t9Yy.png" alt="trace compare"></p>
+<h2 id="1-4-度量监控"><a href="#1-4-度量监控" class="headerlink" title="1.4 度量监控"></a>1.4 度量监控</h2><h2 id="1-4-1-什么是度量监控？"><a href="#1-4-1-什么是度量监控？" class="headerlink" title="1.4.1 什么是度量监控？"></a>1.4.1 什么是度量监控？</h2><ul>
+<li><p>度量类监控主要采用<strong>时序数据库</strong>的解决方案。</p>
+</li>
+<li><p>它是以事件发生时间以及当前数值的角度来记录的监控信息，是可以聚合运算的，用于查看一些指标数据和指标趋势。</p>
+</li>
+<li><p>所以这类监控主要不是用来查问题的，主要是用来看趋势的,基于时间序列数据库的监控系统是非常适合做监控告警使用的。</p>
+</li>
+</ul>
+<p>Metrics一般有5种基本的度量类型：</p>
+<p>1.Gauges（度量）<br>2.Counters（计数器）<br>3.Histograms（直方图）<br>4.Meters（TPS计算器）<br>5.Timers（计时器）</p>
+<h3 id="1-4-2-时序数据库有哪些？"><a href="#1-4-2-时序数据库有哪些？" class="headerlink" title="1.4.2 时序数据库有哪些？"></a>1.4.2 时序数据库有哪些？</h3><p><strong>Prometheus</strong></p>
+<ul>
+<li><p>Promethes是一款2012年开源的监控框架，其本质是时间序列数据库，由Google前员工所开发。</p>
+</li>
+<li><p>Promethes采用拉的模式（Pull）从应用中拉取数据，并还支持 Alert 模块可以实现监控预警。它的性能非常强劲，单机可以消费百万级时间序列。</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/03/29/cjDEAgxwfMu4qLP.png" alt="Promethes"></p>
+<ul>
+<li><p>从图的左下角可以看到，Prometheus 可以通过在应用里进行埋点后Pull到 Prometheus Server里，如果应用不支持埋点，也可以采用exporter方式进行数据采集。</p>
+</li>
+<li><p>从图的左上角可以看到，对于一些定时任务模块，因为是周期性运行的，所以采用拉的方式无法获取数据，那么Prometheus 也提供了一种推数据的方式，但是并不是推送到Prometheus Server中，而是中间搭建一个 Pushgateway，定时任务模块将metrics信息推送到这个Pushgateway中，然后Prometheus Server再依然采用拉的方式从Pushgateway中获取数据。</p>
+</li>
+<li><p>需要拉取的数据既可以采用静态方式配置在Prometheus Server中，也可以采用服务发现的方式（即图的中间上面的Service discovery所示）。</p>
+</li>
+<li><p><code>PromQL</code>：是Prometheus自带的查询语法，通过编写PromQL语句可以查询Prometheus里面的数据。</p>
+</li>
+<li><p><code>Alertmanager</code>：是用于数据的预警模块，支持通过多种方式去发送预警。</p>
+</li>
+<li><p><code>WebUI</code>：是用来展示数据和图形的，但是一般大多数是与Grafana结合，采用Grafana来展示。</p>
+</li>
+</ul>
+<p><strong>OpenTSDB</strong></p>
+<ul>
+<li><p>OpenTSDB是在2010年开源的一款分布式时序数据库，当然其主要用于监控方案中。</p>
+</li>
+<li><p>OpenTSDB采用的是Hbase的分布式存储，它获取数据的模式与Prometheus不同，它采用的是推模式（Push）。</p>
+</li>
+<li><p>在展示层，OpenTSDB自带有WebUI视图，也可以与Grafana很好的集成，提供丰富的展示界面。</p>
+</li>
+<li><p>但OpenTSDB并没有自带预警模块，需要自己去开发或者与第三方组件结合使用。</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/03/29/MS5FXVZ3oiBPNqY.png" alt="OpenTSDB"></p>
+<p><strong>InfluxDB</strong></p>
+<ul>
+<li><p>InfluxDB是在2013年开源的一款时序数据库，在这里我们主要还是用于做监控系统方案。</p>
+</li>
+<li><p>它收集数据也是采用推模式（Push）。在展示层，InfluxDB也是自带WebUI，也可以与Grafana集成。</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/03/29/yat1jsRrNpqAWHF.png" alt="InfluxDB"></p>
+<h2 id="1-5-微服务监控体系"><a href="#1-5-微服务监控体系" class="headerlink" title="1.5 微服务监控体系"></a>1.5 微服务监控体系</h2><ul>
+<li>监控是微服务治理的重要环节,架构采用分层监控，一般分为以下监控层次。如下图所示：</li>
+</ul>
+<p><fancybox><img src="https://i.loli.net/2020/03/29/sl9EcRQCDKjXTr6.png" alt="监控"></fancybox></p>
+<p><strong>系统层</strong></p>
+<ul>
+<li>系统层主要是指CPU、磁盘、内存、网络等服务器层面的监控，这些一般也是运维同学比较关注的对象。</li>
+</ul>
+<p><strong>应用层</strong></p>
+<ul>
+<li>应用层指的是服务角度的监控，比如接口、框架、某个服务的健康状态等，一般是服务开发或框架开发人员关注的对象。</li>
+</ul>
+<p><strong>用户层</strong></p>
+<ul>
+<li>这一层主要是与用户、与业务相关的一些监控，属于功能层面的，大多数是项目经理或产品经理会比较关注的对象。</li>
+</ul>
+<p><strong>监控指标</strong></p>
+<ul>
+<li><p><strong>延迟时间</strong>：主要是响应一个请求所消耗的延迟，比如某接口的HTTP请求平均响应时间为100ms。</p>
+</li>
+<li><p><strong>请求量</strong>：是指系统的容量吞吐能力，例如每秒处理多少次请求（QPS）作为指标。</p>
+</li>
+<li><p><strong>错误率</strong>：主要是用来监控错误发生的比例，比如将某接口一段时间内调用时失败的比例作为指标。</p>
+</li>
+</ul>
+<h1 id="2-微服务容错隔离"><a href="#2-微服务容错隔离" class="headerlink" title="2.微服务容错隔离"></a>2.微服务容错隔离</h1><h2 id="2-1-什么是容错隔离？"><a href="#2-1-什么是容错隔离？" class="headerlink" title="2.1 什么是容错隔离？"></a>2.1 什么是容错隔离？</h2><ul>
+<li><p>单体应用的架构下一旦程序发生了故障，那么整个应用可能就没法使用了，所以我们要把单体应用拆分成具有多个服务的微服务架构，来减少故障的影响范围。</p>
+</li>
+<li><p>但是在微服务架构下，有一个新的问题就是，由于服务数变多了，假设单个服务的故障率是不变的，那么整体微服务系统的故障率其实是提高了的。</p>
+</li>
+<li><p>比如：假设单个服务的故障率是0.01%，也就是可用性是99.99%，如果我们总共有10个微服务，那么我们整体的可用性就是99.99%的十次方，得到的就是99.90%的可用性（也就是故障率为0.1%）。可见，相对于之前的单体应用，整个系统可能发生故障的风险大幅提升。</p>
+</li>
+<li><p>当某个服务出现故障，我们要做的就是最大限度的隔离单个服务的风险，也就是「 容错隔离 」的方法。不仅保证了微服务架构的正常运行，也保证了系统的可用性和健壮性。</p>
+</li>
+</ul>
+<h2 id="2-2-常见的可用性风险有哪些？"><a href="#2-2-常见的可用性风险有哪些？" class="headerlink" title="2.2 常见的可用性风险有哪些？"></a>2.2 常见的可用性风险有哪些？</h2><p><strong>1.单机可用性风险</strong></p>
+<ul>
+<li><p>单机可用性风险指的是微服务部署所在的某一台机器出现了故障，造成的可用性风险。</p>
+</li>
+<li><p>这种风险发生率很高，因为单机器在运维中本身就容易发生各种故障，例如硬盘坏了、机器电源故障等等，这些都是时有发生的事情。</p>
+</li>
+<li><p>不过虽然这种风险发生率高，但危害有限，因为我们大多数服务并不只部署在一台机器上，可能多台都有，因此只需要做好监控，发现故障之后，及时的将这台故障机器从服务集群中剔除即可，等修复后再重新上线到集群里。</p>
+</li>
+</ul>
+<p><strong>2.单机房可用性风险</strong></p>
+<ul>
+<li><p>这种风险的概率比单机器的要低很多，但是也不是完全不可能发生，在实际情况中，还是有一定概率的。比如最为常见的就是通往机房的光纤被挖断，造成机房提供不了服务。</p>
+</li>
+<li><p>如果我们的服务全部都部署在单个机房，而机房又出故障了，但是现在大多数中大型项目都会采用多机房部署的方案，比如同城双活、异地多活等。</p>
+</li>
+<li><p>一旦某个机房出现了故障不可用了，立即采用切换路由的方式，把这个机房的流量切到其它机房里就能正常提供服务了</p>
+</li>
+</ul>
+<p><strong>3.跨机房集群可用性风险</strong></p>
+<ul>
+<li><p>跨机房集群只是保证了物理层面可用性的问题，如果存在代码故障问题，或者因为特殊原因用户流量激增，导致我们的服务扛不住了，那在跨机房集群的情况下一样会导致系统服务不可用。</p>
+</li>
+<li><p>所以我们就需要提前做好了「容错隔离」的一些方案，比如 限流、熔断 等等，用上这些方法还是可以保证一部分服务或者一部分用户的访问是正常。</p>
+</li>
+</ul>
+<h2 id="2-3-容错隔离的方案有哪些？"><a href="#2-3-容错隔离的方案有哪些？" class="headerlink" title="2.3 容错隔离的方案有哪些？"></a>2.3 容错隔离的方案有哪些？</h2><p><strong>1.超时</strong></p>
+<ul>
+<li><p>这是简单的容错方式。指在服务之间调用时，设置一个主动超时时间作为时间阈值</p>
+</li>
+<li><p>超过了这个时间阈值后，如果“被依赖的服务”还没有返回数据的话，“调用者”就主动放弃，防止因“被依赖的服务”故障无法返回结果造成服务无法处理请求的问题。</p>
+</li>
+</ul>
+<p><strong>2.限流</strong></p>
+<ul>
+<li><p>顾名思义，就是限制最大流量。系统能提供的最大并发有限，同时来的请求又太多，服务无法处理请求，就只好排队限流，</p>
+</li>
+<li><p>类比就跟生活中去景点排队买票、去商场吃饭排队等号的道理。</p>
+</li>
+<li><p>常见的限流算法有：计算器限流、漏桶算法、令牌漏桶算法、集群限流算法。</p>
+</li>
+</ul>
+<p><strong>3.降级</strong></p>
+<ul>
+<li><p>与限流类似，一样是流量太多，系统服务不过来。这个时候可将不是那么重要的功能模块进行降级处理，停止服务，这样可以释放出更多的资源供给核心功能的去用。</p>
+</li>
+<li><p>同时还可以对用户分层处理，优先处理重要用户的请求，比如VIP收费用户等。</p>
+</li>
+<li><p>例如淘宝双十一活动会对订单查询服务降级来保证购买下单服务的可用性</p>
+</li>
+</ul>
+<p><strong>4.延迟异步处理</strong></p>
+<ul>
+<li><p>这个方式是指设置一个流量缓冲池，所有的请求先进入这个缓冲池等待处理</p>
+</li>
+<li><p>真正的服务处理方按顺序从这个缓冲池中取出请求依次处理，这种方式可以减轻后端服务的压力，但是对用户来说体验上有延迟。</p>
+</li>
+<li><p>技术上一般会采用消息队列的异步和削峰作用来实现</p>
+</li>
+</ul>
+<p><strong>5.熔断</strong></p>
+<ul>
+<li><p>可以理解成就像电闸的保险丝一样，当流量过大或者错误率过大的时候，保险丝就熔断了，链路就断开了，不提供服务了。</p>
+</li>
+<li><p>当流量恢复正常，或者后端服务稳定了，保险丝会自动街上（熔断闭合），服务又可以正常提供了。这是一种很好的保护后端微服务的一种方式。</p>
+</li>
+<li><p>熔断技术中有个很重要的概念就是：断路器，可以参考下图：</p>
+</li>
+</ul>
+<p><fancybox><img src="https://i.loli.net/2020/03/29/DgRPk3ZotnFGNXA.png" alt="断路器"></fancybox></p>
+<blockquote>
+<p>断路器其实就是一个状态机原理，有三种状态：</p>
+</blockquote>
+<p><code>Closed</code>:闭合状态，也就是正常状态</p>
+<p><code>Open</code>:开启状态，也就是当后端服务出故障后链路断开，不提供服务的状态</p>
+<p><code>Half-Open</code>半闭合状态，就是允许一小部分流量进行尝试，尝试后发现服务正常就转为Closed状态，服务依旧不正常就转为Open状态。</p>
+<h2 id="2-4-开源容错隔离应用"><a href="#2-4-开源容错隔离应用" class="headerlink" title="2.4 开源容错隔离应用"></a>2.4 开源容错隔离应用</h2><p><strong>Hystrix原理图</strong></p>
+<p><fancybox><img src="https://i.loli.net/2020/03/29/BjfNCOsIi2Hc9u1.png" alt="Hystrix"></fancybox></p>
+<ul>
+<li><p>当我们使用了Hystrix之后，请求会被封装到HystrixCommand中，这也就是第一步。</p>
+</li>
+<li><p>第二步就是开始执行请求，Hystrix支持同步执行(图中.execute方法)、异步执行(图中.queue方法)和响应式执行(图中.observer)。</p>
+</li>
+<li><p>第三步判断缓存，如果存在与缓存中，则直接返回缓存结果。如果不在缓存中，则走第四步，判断 断路器 的状态是否是开启的，如果是开启状态，也就是短路了，那就进行失败返回，跳到第八步</p>
+</li>
+<li><p>第八步需要对失败返回的处理也需要再做一次判断，要么正常失败返回，返回相应信息，要么根本没有实现失败返回的处理逻辑，就直接报错。</p>
+</li>
+<li><p>如果 断路器 不是开启状态，那请求就继续走，进行第五步，判断线程/队列是否满了，如果满了，那么同样跳到第八步</p>
+</li>
+<li><p>如果线程没满，则走到第六步，执行远程调用逻辑，然后判断远程调用是否成功，调用发生异常了就挑到第八步，调用正常就挑到第九步正常返回信息。</p>
+</li>
+<li><p>图中的第七步，非常牛逼的一个模块，是来收集Hystrix流程中的各种信息来对系统做监控判断的。</p>
+</li>
+</ul>
+<p><strong>Hystrix断路器的原理图</strong></p>
+<p><fancybox><img src="https://i.loli.net/2020/03/29/nPvQUWqVaoCgKM1.png" alt="断路器"><br></fancybox></p>
+<ul>
+<li><p>Hystrix通过滑动时间窗口算法来实现断路器的，是以秒为单位的滑桶式统计，它总共包含10个桶，每秒钟一个生成一个新的桶，往前推移，旧的桶就废弃掉。</p>
+</li>
+<li><p>每一个桶中记录了所有服务调用的状态，调用次数、是否成功等信息，断路器的开关就是把这10个桶进行聚合计算后，来判断当前是应该开启还是闭合的。</p>
+</li>
+</ul>
+<h1 id="3-微服务的访问安全"><a href="#3-微服务的访问安全" class="headerlink" title="3.微服务的访问安全"></a>3.微服务的访问安全</h1><h2 id="3-1-什么是访问安全？"><a href="#3-1-什么是访问安全？" class="headerlink" title="3.1 什么是访问安全？"></a>3.1 什么是访问安全？</h2><ul>
+<li><p>访问安全就是要保证符合系统要求的请求才可以正常访问服务来响应数据，避免非正常服务对系统进行攻击和破坏</p>
+</li>
+<li><p>微服务会进行服务的拆分，服务也会随业务分为内部服务和外部服务，同时需要保证哪些服务可以直接访问，哪些不可以</p>
+</li>
+<li><p>总的来说，访问安全本质上就是要作为访问的认证。</p>
+</li>
+</ul>
+<h2 id="3-2-传统单机服务的访问安全机制"><a href="#3-2-传统单机服务的访问安全机制" class="headerlink" title="3.2 传统单机服务的访问安全机制"></a>3.2 传统单机服务的访问安全机制</h2><p>传统单体应用的访问示意图:</p>
+<p><img src="https://i.loli.net/2020/03/29/VvLINgCe6Mo5d9D.png" alt="单机"></p>
+<ul>
+<li><p>在应用服务器里面，会有一个auth模块（一般采用过滤器来实现），当有客户端请求进来时，所有的请求都必须首先经过这个auth来做身份验证，验证通过后，才将请求发到后面的业务逻辑。</p>
+</li>
+<li><p>通常客户端在第一次请求的时候会带上身份校验信息（用户名和密码），auth模块在验证信息无误后，就会返回Cookie存到客户端，之后每次客户端只需要在请求中携带Cookie来访问，而auth模块也只需要校验Cookie的合法性后决定是否放行。</p>
+</li>
+<li><p>可见，在传统单体应用中的安全架构还是蛮简单的，对外也只有一个入口，通过auth校验后，内部的用户信息都是内存/线程传递，逻辑并不是复杂，所以风险也在可控范围内。</p>
+</li>
+</ul>
+<h2 id="3-3-微服务如何实现访问安全？"><a href="#3-3-微服务如何实现访问安全？" class="headerlink" title="3.3 微服务如何实现访问安全？"></a>3.3 微服务如何实现访问安全？</h2><p>在微服务架构下，一般有以下三种方案：</p>
+<ul>
+<li>网关鉴权模式（API Gateway）</li>
+<li>服务自主鉴权模式</li>
+<li>API Token模式（OAuth2.0）</li>
+</ul>
+<h3 id="3-3-1-网关鉴权模式（API-Gateway）"><a href="#3-3-1-网关鉴权模式（API-Gateway）" class="headerlink" title="3.3.1 网关鉴权模式（API Gateway）"></a>3.3.1 网关鉴权模式（API Gateway）</h3><p><img src="https://i.loli.net/2020/03/29/7n6Kr3S2Gw1McEd.png" alt="网关"></p>
+<ul>
+<li><p>通过上图可见，因为在微服务的最前端一般会有一个API网关模块（API Gateway），所有外部请求访问微服务集群时，都会首先通过这个API Gateway，可以在这个模块里部署auth逻辑，实现统一集中鉴权，鉴权通过后，再把请求转发给后端各个服务。</p>
+</li>
+<li><p>这种模式的优点就是，由API Gateway集中处理了鉴权的逻辑，使得后端各微服务节点自身逻辑就简单了，只需要关注业务逻辑，无需关注安全性事宜。</p>
+</li>
+<li><p>这个模式的问题就是，API Gateway适用于身份验证和简单的路径授权（基于URL的），对于复杂数据/角色的授权访问权限，通过API Gateway很难去灵活的控制，毕竟这些逻辑都是存在后端服务上的，并非存储在API Gateway里。</p>
+</li>
+</ul>
+<h3 id="3-3-2-服务自主鉴权模式"><a href="#3-3-2-服务自主鉴权模式" class="headerlink" title="3.3.2 服务自主鉴权模式"></a>3.3.2 服务自主鉴权模式</h3><p><img src="https://i.loli.net/2020/03/29/KtaBTGe8rRz1xPk.png" alt="自主鉴权"></p>
+<ul>
+<li><p>服务自主鉴权就是指不通过前端的API Gateway来控制，而是由后端的每一个微服务节点自己去鉴权。</p>
+</li>
+<li><p>它的优点就是可以由更为灵活的访问授权策略，并且相当于微服务节点完全无状态化了。同时还可以避免API Gateway 中 auth 模块的性能瓶颈。</p>
+</li>
+<li><p>缺点就是由于每一个微服务都自主鉴权，当一个请求要经过多个微服务节点时，会进行重复鉴权，增加了很多额外的性能开销。</p>
+</li>
+</ul>
+<h3 id="3-3-3-API-Token模式（OAuth2-0）"><a href="#3-3-3-API-Token模式（OAuth2-0）" class="headerlink" title="3.3.3 API Token模式（OAuth2.0）"></a>3.3.3 API Token模式（OAuth2.0）</h3><p><img src="https://i.loli.net/2020/03/29/d3cQATgoXjFpCiv.png" alt="API Token"></p>
+<p>如图，这是一种采用基于令牌Token的授权方式。在这个模式下，是由授权服务器（图中Authorization Server）、API网关（图中API Gateway）、内部的微服务节点几个模块组成。</p>
+<p><strong>流程如下：</strong></p>
+<ul>
+<li><p>第一步：客户端应用首先使用账号密码或者其它身份信息去访问授权服务器（Authorization Server）获取 访问令牌（Access Token）。</p>
+</li>
+<li><p>第二步：拿到访问令牌（Access Token）后带着它再去访问API网关（图中API Gateway），API Gateway自己是无法判断这个Access Token是否合法的，所以走第三步。</p>
+</li>
+<li><p>第三步：API Gateway去调用Authorization Server校验一下Access Token的合法性。</p>
+</li>
+<li><p>第四步：如果验证完Access Token是合法的，那API Gateway就将Access Token换成JWT令牌返回。</p>
+</li>
+</ul>
+<blockquote>
+<p>注意：此处也可以不换成JWT而是直接返回原Access Token。但是换成JWT更好，因为Access Token是一串不可读无意义的字符串，每次验证Access Token是否合法都需要去访问Authorization Server才知道。但是JWT令牌是一个包含JOSN对象，有用户信息和其它数据的一个字符串，后面微服务节点拿到JWT之后，自己就可以做校验，减少了交互次数。</p>
+</blockquote>
+<ul>
+<li><p>第五步：API Gateway有了JWT之后，就将请求向后端微服务节点进行转发，同时会带上这个JWT。</p>
+</li>
+<li><p>第六步：微服务节点收到请求后，读取里面的JWT，然后通过加密算法验证这个JWT，验证通过后，就处理请求逻辑。</p>
+</li>
+</ul>
+<blockquote>
+<p>这里面就使用到了OAuth2.0的原理，不过这只是OAuth2.0各类模式中的一种。</p>
+</blockquote>
+<h2 id="3-4-OAuth2-0-的「-访问安全-」"><a href="#3-4-OAuth2-0-的「-访问安全-」" class="headerlink" title="3.4 OAuth2.0 的「 访问安全 」"></a>3.4 OAuth2.0 的「 访问安全 」</h2><h3 id="3-4-1-什么是OAuth2-0-？"><a href="#3-4-1-什么是OAuth2-0-？" class="headerlink" title="3.4.1 什么是OAuth2.0 ？"></a>3.4.1 什么是OAuth2.0 ？</h3><ul>
+<li><p>OAuth2.0是一种访问授权协议框架。它是基于Token令牌的授权方式，在不暴露用户密码的情况下，使应用方能够获取到用户数据的访问权限。</p>
+</li>
+<li><p>例如：你开发了一个视频网站，可以采用第三方微信登陆，那么只要用户在微信上对这个网站授权了，那这个网站就可以在无需用户密码的情况下获取用户在微信上的头像。</p>
+</li>
+</ul>
+<p>OAuth2.0 的流程如下图：</p>
+<p><img src="https://i.loli.net/2020/03/29/8LdoF7eMsVXx6rl.png" alt="OAuth2.0"></p>
+<h3 id="3-4-2-OAuth2-0-主要名词解释"><a href="#3-4-2-OAuth2-0-主要名词解释" class="headerlink" title="3.4.2 OAuth2.0 主要名词解释"></a>3.4.2 OAuth2.0 主要名词解释</h3><ul>
+<li><strong>资源服务器：</strong></li>
+</ul>
+<p>用户数据/资源存放的地方，在微服务架构中，服务就是资源服务器。在上面的例子中，微信头像存放的服务就是资源服务器。</p>
+<ul>
+<li><strong>资源拥有者：</strong></li>
+</ul>
+<p>是指用户，资源的拥有人。在上面的例子中某个微信头像的用户就是资源拥有者。</p>
+<ul>
+<li><strong>授权服务器：</strong></li>
+</ul>
+<p>是一个用来验证用户身份并颁发令牌的服务器。</p>
+<ul>
+<li><strong>客户端应用：</strong></li>
+</ul>
+<p>想要访问用户受保护资源的客户端/Web应用。在上面的例子中的视频网站就是客户端应用。</p>
+<ul>
+<li><strong>访问令牌：</strong></li>
+</ul>
+<p>Access Token，授予对资源服务器的访问权限额度令牌。</p>
+<ul>
+<li><strong>刷新令牌：</strong></li>
+</ul>
+<p>客户端应用用于获取新的 Access Token 的一种令牌。</p>
+<ul>
+<li><strong>客户凭证：</strong></li>
+</ul>
+<p>用户的账号密码，用于在 授权服务器 进行验证用户身份的凭证。</p>
+<h3 id="3-4-3-OAuth2-0有四种授权模式"><a href="#3-4-3-OAuth2-0有四种授权模式" class="headerlink" title="3.4.3 OAuth2.0有四种授权模式"></a>3.4.3 OAuth2.0有四种授权模式</h3><p><strong>1.授权码（Authorization Code）</strong></p>
+<ul>
+<li><p>授权码模式是指：客户端应用先去申请一个授权码，然后再拿着这个授权码去获取令牌的模式。</p>
+</li>
+<li><p>这也是目前最为常用的一种模式，安全性比较高，适用于我们常用的前后端分离项目。</p>
+</li>
+<li><p>通过前端跳转的方式去访问授权服务器获取授权码，然后后端再用这个授权码访问授权服务器以获取访问令牌。</p>
+</li>
+</ul>
+<p><strong>工作流程图：</strong></p>
+<p><img src="https://i.loli.net/2020/03/29/mbkNc5XzhoV3IRK.png" alt="授权码"></p>
+<ul>
+<li><p>第一步，客户端的前端页面(图中UserAgent)将用户跳转到 授权服务器(Authorization Server)里进行授权，授权完成后，返回 授权码(Authorization Code)</p>
+</li>
+<li><p>第二步，客户端的后端服务(图中Client)携带授权码(Authorization Code)去访问 授权服务器，然后获得正式的 访问令牌(Access Token)</p>
+</li>
+<li><p>页面的前端和后端分别做不同的逻辑，前端接触不到Access Token，保证了Access Token的安全性。</p>
+</li>
+</ul>
+<p><strong>2.简化式（Implicit）</strong></p>
+<ul>
+<li><p>简化模式是在项目是一个纯前端应用，在没有后端的情况下，采用的一种模式。</p>
+</li>
+<li><p>因为这种方式令牌是直接存在前端的，所以非常不安全，因此令牌的有限期设置就不能太长。</p>
+</li>
+</ul>
+<p><strong>工作流程图：</strong></p>
+<p><img src="https://i.loli.net/2020/03/29/2anYoEB91mtkZKI.png" alt="简化式"></p>
+<ul>
+<li><p>第一步：应用（纯前端的应用）将用户跳转到 授权服务器(Authorization Server)里进行授权，授权完成后，授权服务器 直接将 Access Token 返回给 前端应用，令牌存储在前端页面。</p>
+</li>
+<li><p>第二步：应用（纯前端的应用）携带 访问令牌(Access Token) 去访问资源，获取资源。</p>
+</li>
+<li><p>在整个过程中，虽然令牌是在前端URL中直接传递，但注意，令牌在HTTP协议中不是放在URL参数字段中的，而是放在URL锚点里。因为锚点数据不会被浏览器发到服务器，因此有一定的安全保障。</p>
+</li>
+</ul>
+<p><strong>3.用户名密码（Resource Owner Credentials）</strong></p>
+<p><img src="https://i.loli.net/2020/03/29/5cJfeES6rFU9aNQ.png" alt="用户名密码"></p>
+<ul>
+<li><p>这种方式最容易理解了，直接使用用户的用户名/密码作为授权方式去访问 授权服务器，从而获取Access Token</p>
+</li>
+<li><p>这个方式因为需要用户给出自己的密码，所以非常的不安全性。</p>
+</li>
+<li><p>一般仅在客户端应用与授权服务器、资源服务器是归属统一公司/团队，互相非常信任的情况下采用。</p>
+</li>
+</ul>
+<p><strong>4.客户端凭证（Client Credentials）</strong></p>
+<p><img src="https://i.loli.net/2020/03/29/eysi7DQpgLaUqKf.png" alt="客户端凭证"></p>
+<ul>
+<li>这是适用于服务器间通信的场景。客户端应用拿一个用户凭证去找授权服务器获取Access Token。</li>
+</ul>
+<h1 id="4-容器技术"><a href="#4-容器技术" class="headerlink" title="4.容器技术"></a>4.容器技术</h1><h2 id="4-1-为什么需要容器技术？"><a href="#4-1-为什么需要容器技术？" class="headerlink" title="4.1 为什么需要容器技术？"></a>4.1 为什么需要容器技术？</h2><ul>
+<li><p>传统的PaaS技术虽然也可以一键将本地应用部署到云上，并且也是采用隔离环境的形式去部署，但是其兼容性非常的不好。因为其主要原理就是将本地应用程序和启停脚本一同打包，然后上传到云服务器上，然后再在云服务器里通过脚本启动这个应用程序。</p>
+</li>
+<li><p>这样的做法，看起来很理想。但是在实际情况下，由于本地与云端的环境差异，导致上传到云端的应用运行的时候经常各种报错，需要各种修改配置和参数来做兼容服务环境。甚至在项目迭代过程中不同的版本代码都需要重新去做适配，非常耗费精力。</p>
+</li>
+<li><p>然而以Docker为代表的容器技术却通过一个小创新完美的解决了这个问题。</p>
+</li>
+<li><p>在 Docker 的方案中，它不仅打包了本地应用程序，而且还将本地环境（操作系统的一部分）也打包了，组成一个叫做「 Docker镜像 」的文件包。所以这个「 Docker镜像 」就包含了应用运行所需的全部依赖，我们可以直接基于这个「 Docker镜像 」在本地进行开发与测试，完成之后，再直接将这个「 Docker镜像 」一键上传到云端运行即可。</p>
+</li>
+<li><p>Docker 实现了本地与云端的环境完全一致，做到了真正的一次开发随处运行，避免了类似“我在本地正常运行，传到云端就不可以了”的说辞。</p>
+</li>
+</ul>
+<h2 id="4-2-什么是容器？"><a href="#4-2-什么是容器？" class="headerlink" title="4.2 什么是容器？"></a>4.2 什么是容器？</h2><p>先来看一下容器与虚拟机的对比区别：</p>
+<p><img src="https://i.loli.net/2020/03/29/qyTHu8ChZjDQkIF.png" alt="容器与虚拟机"></p>
+<ul>
+<li><p>虚拟机是在宿主机上基于 Hypervisor 软件虚拟出一套操作系统所需的硬件设备，再在这些虚拟硬件上安装操作系统 Guest OS，然后不同的应用程序就可以运行在不同的 Guest OS 上，应用之间也就相互独立、资源隔离了</p>
+</li>
+<li><p>但是由于需要 Hypervisor 来创建虚拟机，且每个虚拟机里需要完整的运行一套操作系统 Guest OS，因此这个方式会带来很多额外资源的开销。</p>
+</li>
+<li><p>Docker容器 中却没有 Hypervisor 这一层，虽然它需要在宿主机中运行 Docker Engine，但它的原理却完全不同于 Hypervisor，它并没有虚拟出硬件设备，更没有独立部署全套的操作系统 Guest OS。</p>
+</li>
+<li><p>Docker容器没有那么复杂的实现原理，它其实就是一个普通进程而已，只不过它是一种经过特殊处理过的普通进程。</p>
+</li>
+<li><p>我们启动容器的时候（docker run …），Docker Engine 只不过是启动了一个进程，这个进程就运行着我们容器里的应用。</p>
+</li>
+<li><p>但 Docker Engine 对这个进程做了一些特殊处理，通过这些特殊处理之后，这个进程所看到的外部环境就不再是宿主机的环境（它看不到宿主机中的其它进程了，以为自己是当前操作系统唯一一个进程），并且 Docker Engine 还对这个进程所使用得资源进行了限制，防止它对宿主机资源的无限使用。</p>
+</li>
+<li><p>对比下来就是，容器比虚拟机更加轻量级，花销也更小，更好地利用好主机的资源。</p>
+</li>
+</ul>
+<h2 id="4-3-容器是如何做到资源隔离和限制？"><a href="#4-3-容器是如何做到资源隔离和限制？" class="headerlink" title="4.3 容器是如何做到资源隔离和限制？"></a>4.3 容器是如何做到资源隔离和限制？</h2><p>Docker容器对这个进程的隔离主要采用2个核心技术点：</p>
+<ul>
+<li><p>Namespace 技术</p>
+</li>
+<li><p>Cgroups 技术</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/03/29/SBA1Z5LHwq4PNsu.png" alt="Docker容器核心"></p>
+<p>总结来说就是：Namespace 为容器进程开辟隔离进程，Cgroups限制容器进程之间抢夺资源，从此保证了容器之间独立运行和隔离。</p>
+<h3 id="Namespace-技术"><a href="#Namespace-技术" class="headerlink" title="Namespace 技术"></a>Namespace 技术</h3><ul>
+<li><p>Namespace 是Linux操作系统默认提供的API，包括 PID Namespace、Mount Namespace、IPC Namespace、Network Namespace等等。</p>
+</li>
+<li><p>以 PID Namespace 举例，它的功能是可以让我们在创建进程的时候，告诉Linux系统，我们要创建的进程需要一个新的独立的进程空间，并且这个进程在这个新的进程空间里的PID=1，也就是说这个进程只看得到这个新进程空间里的东西，看不到外面宿主机环境里的东西，也看不到其它进程。</p>
+</li>
+<li><p>不过这只是一个虚拟空间，事实上这个进程在宿主机里PID该是啥还是啥，没有变化，只不过在这个进程空间里，该进程以为自己的PID=1</p>
+</li>
+</ul>
+<blockquote>
+<p>举例:打个比方，就像是一个班级，每个人在这个班里都有一个编号，班里有90人，然后来了一位新同学，那他在班里的编号就是91，可是老师为了给这位同学特别照顾，所以在班里开辟了一块独立的看不到外面的小隔间，并告诉这个同学他的编号是1，由于这位同学在这个小空间里隔离着，所以他真的以为自己就是班上的第一位同学且编号为1，当然了，事实上这位同学在班上的编号依然是91。</p>
+</blockquote>
+<ul>
+<li><p>另外，Network Namespace 的技术原理也是类似的，让这个进程只能看到当前Namespace空间里的网络设备，看不到宿主机真实情况。同理，其它 Mount、IPC等 Namespace 也是这样。</p>
+</li>
+<li><p>Namespace 技术其实就是修改了应用进程的视觉范围，但应用进程的本质却没有变化。</p>
+</li>
+<li><p>不过，Docker容器里虽然带有一部分操作系统（文件系统相关），但它并没有内核，因此多个容器之间是共用宿主机的操作系统内核的。这一点与虚拟机的原理是完全不一样的。</p>
+</li>
+</ul>
+<h3 id="Cgroups-技术"><a href="#Cgroups-技术" class="headerlink" title="Cgroups 技术"></a>Cgroups 技术</h3><ul>
+<li><p>Cgroup 全称是 Control Group，其功能就是限制进程组所使用的最大资源（这些资源可以是 CPU、内存、磁盘等等）。</p>
+</li>
+<li><p>既然 Namespace 技术 只能改变一下进程组的视觉范围，并不能真实的对资源做出限制。那么为了防止容器（进程）之间互相抢资源，甚至某个容器把宿主机资源全部用完导致其它容器也宕掉的情况发生。因此，必须采用 Cgroup 技术对容器的资源进行限制。</p>
+</li>
+<li><p>Cgroup 技术也是Linux默认提供的功能，在Linux系统的 /sys/fs/cgroup 下面有一些子目录 cpu、memory等，Cgroup技术提供的功能就是可以基于这些目录实现对这些资源进行限制。</p>
+</li>
+</ul>
+<blockquote>
+<p>例如：在 /sys/fs/cgroup/cpu 下面创建一个 dockerContainer 子目录，系统就会自动在这个新建的目录下面生成一些配置文件，这些配置文件就是用来控制资源使用量的。例如可以在这些配置文件里面设置某个进程ID对CPU的最大使用率。</p>
+</blockquote>
+<ul>
+<li>Cgroup 对其它内存、磁盘等资源也是采用同样原理做限制。</li>
+</ul>
+<h2 id="4-4-什么是容器镜像？"><a href="#4-4-什么是容器镜像？" class="headerlink" title="4.4 什么是容器镜像？"></a>4.4 什么是容器镜像？</h2><ul>
+<li><p>一个基础的容器镜像其实就是一个 rootfs，它包含操作系统的文件系统（文件和目录），但并不包含操作系统的内核。</p>
+</li>
+<li><p>rootfs 是在容器里根目录上挂载的一个全新的文件系统，此文件系统与宿主机的文件系统无关，是一个完全独立的，用于给容器进行提供环境的文件系统。</p>
+</li>
+<li><p>对于一个Docker容器而言，需要基于 pivot_root 指令，将容器内的系统根目录切换到rootfs上，这样，有了这个 rootfs，容器就能够为进程构建出一个完整的文件系统，且实现了与宿主机的环境隔离，也正是有了rootfs，才能实现基于容器的本地应用与云端应用运行环境的一致。</p>
+</li>
+<li><p>另外，为了方便镜像的复用，Docker 在镜像中引入了层（Layer）的概念，可以将不同的镜像一层一层的迭在一起。这样，如果我们要做一个新的镜像，就可以基于之前已经做好的某个镜像的基础上继续做。</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/03/29/ThwnPSyGzmEfJCY.png" alt="容器分层"></p>
+<ul>
+<li><p>如上图，这个例子中最底层是操作系统引导，往上一层就是基础镜像层（Linux的文件系统），再往上就是我们需要的各种应用镜像，Docker 会把这些镜像联合挂载在一个挂载点上，这些镜像层都是只读的。只有最上面的容器层是可读可写的。</p>
+</li>
+<li><p>这种分层的方案其实是基于 联合文件系统UnionFS（Union File System）的技术实现的。它可以将不同的目录全部挂载在同一个目录下。</p>
+</li>
+</ul>
+<blockquote>
+<p>举个例子，假如有文件夹 test1 和 test2 ，这两个文件夹里面的文件 有相同的，也有不同的。然后我们可以采用联合挂载的方式，将这两个文件夹挂载到 test3 上，那么 test3 目录里就有了 test1 和 test2 的所有文件（相同的文件有去重，不同的文件都保留）。</p>
+</blockquote>
+<ul>
+<li>这个原理应用在Docker镜像中，比如有2个同学，同学A已经做好了一个基于Linux的Java环境的镜像，同学S想搭建一个Java Web环境，那么他就不必再去做Java环境的镜像了，可以直接基于同学A的镜像在上面增加Tomcat后生成新镜像即可。</li>
+</ul>
+<h2 id="4-5-容器技术在微服务的实践"><a href="#4-5-容器技术在微服务的实践" class="headerlink" title="4.5 容器技术在微服务的实践"></a>4.5 容器技术在微服务的实践</h2><p>随着微服务的流行，容器技术也相应的被大家重视起来。容器技术主要解决了以下两个问题：</p>
+<p>1.<strong>环境一致性问题</strong></p>
+<p>例如java的jar/war包部署会依赖于环境的问题（操着系统的版本，jdk版本问题）。</p>
+<p>2.<strong>镜像部署问题</strong></p>
+<p>例如java，ruby，nodejs等等的发布系统是不一样的，每个环境都得很麻烦的部署一遍，采用docker镜像，就屏蔽了这类问题。</p>
+<p><strong>部署实践</strong></p>
+<p>下图是Docker容器部署的一个完整过程:</p>
+<p><fancybox><img src="https://i.loli.net/2020/03/29/46ajcQOP3wqWH5B.png" alt="容器实践"></fancybox></p>
+<ul>
+<li>更重要的是，拥有如此多服务的集群环境迁移、复制也非常轻松，只需选择好各服务对应的Docker服务镜像、配置好相互之间访问地址就能很快搭建出一份完全一样的新集群。</li>
+</ul>
+<h2 id="4-6-容器调度"><a href="#4-6-容器调度" class="headerlink" title="4.6 容器调度"></a>4.6 容器调度</h2><p>目前基于容器的调度平台有：</p>
+<ul>
+<li>Kubernetes（K8S）</li>
+<li>mesos</li>
+<li>omega</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li><p>本文主要介绍了微服务架构下的服务监控、容错隔离、访问安全以及结合容器技术实现服务发布和部署</p>
+</li>
+<li><p>通过本文结合另一篇 <a href="https://joyohub.com/2020/03/28/micro-server/" target="_blank" rel="noopener">微服务：何为微服务、网关、服务发现/注册？</a>，可以对微服务架构进行较为全面的了解</p>
+</li>
+<li><p>初窥了微服务架构的模块，再深入就需要有针对性的技术实践才能加深了解</p>
+</li>
+</ul>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" alt="weixin-a"></p>
+
+      </div>
+      
+        <br>
+        
+
+
+  <section class='meta' id="footer-meta">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T12:28:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>更新于 2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>微服务</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E6%9E%B6%E6%9E%84/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>架构</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/2020/03/29/micro-server-pro/&title=【微服务】：何为服务监控和治理、容错隔离、Docker部署？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+微服务架构下对服务进行拆分，多服务下监控起到重要作用
+
+服务之间调用过程，利用调用链监控设计可以追踪调用过程
+
+微服务架构还需容错隔离来保证安全运行机制，结合容器部署技术来服务治理
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/2020/03/29/micro-server-pro/&title=【微服务】：何为服务监控和治理、容错隔离、Docker部署？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+微服务架构下对服务进行拆分，多服务下监控起到重要作用
+
+服务之间调用过程，利用调用链监控设计可以追踪调用过程
+
+微服务架构还需容错隔离来保证安全运行机制，结合容器部署技术来服务治理
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/2020/03/29/micro-server-pro/&title=【微服务】：何为服务监控和治理、容错隔离、Docker部署？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+微服务架构下对服务进行拆分，多服务下监控起到重要作用
+
+服务之间调用过程，利用调用链监控设计可以追踪调用过程
+
+微服务架构还需容错隔离来保证安全运行机制，结合容器部署技术来服务治理
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+      
+      
+          <div class="prev-next">
+              
+                  <section class="prev">
+                      <span class="art-item-left">
+                          <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;上一页</h6>
+                          <h4>
+                              <a href="/2020/04/03/mysql/mysql-length/" rel="prev" title="【Mysql数据库】：int(10)和int(11)有什么区别？">
+                                
+                                    【Mysql数据库】：int(10)和int(11)有什么区别？
+                                
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 数据库</a> <a class="tag" href="/tags/Mysql/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Mysql</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+              
+                  <section class="next">
+                      <span class="art-item-right" aria-hidden="true">
+                          <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                          <h4>
+                              <a href="/2020/03/28/micro-server/" rel="prev" title="【微服务】：何为微服务、网关、服务发现/注册？">
+                                  
+                                      【微服务】：何为微服务、网关、服务发现/注册？
+                                  
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 微服务</a> <a class="tag" href="/tags/%E6%9E%B6%E6%9E%84/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 架构</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+          </div>
+      
+    </section>
+  </article>
+
+
+
+  <!-- 显示推荐文章和评论 -->
+
+
+
+  
+
+
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: '【微服务】：何为服务监控和治理、容错隔离、Docker部署？',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class='l_side'>
+  
+    
+    
+      
+      
+        
+          
+          
+        
+          
+          
+            
+              
+  <section class='widget toc-wrapper'>
+    
+<header class='pure'>
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <!-- <div class='wrapper'><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer noopener" href="javascript:void(0)" target="_blank"><i class="fas fa-thumbtack fa-fw"></i></a></div> -->
+  
+</header>
+
+    <div class='content pure'>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-微服务监控系统？"><span class="toc-text">1.微服务监控系统？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-什么是监控系统？"><span class="toc-text">1.1 什么是监控系统？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-日志监控"><span class="toc-text">1.2 日志监控</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-调用链监控"><span class="toc-text">1.3 调用链监控</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-1-什么是调用链监控？"><span class="toc-text">1.3.1 什么是调用链监控？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-2-为什么需要调用链监控？"><span class="toc-text">1.3.2 为什么需要调用链监控？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-3-调用链监控的作用"><span class="toc-text">1.3.3 调用链监控的作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-4-调用链监控的原理"><span class="toc-text">1.3.4 调用链监控的原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-5-调用链监控开源应用"><span class="toc-text">1.3.5 调用链监控开源应用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-度量监控"><span class="toc-text">1.4 度量监控</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-4-1-什么是度量监控？"><span class="toc-text">1.4.1 什么是度量监控？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-2-时序数据库有哪些？"><span class="toc-text">1.4.2 时序数据库有哪些？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-5-微服务监控体系"><span class="toc-text">1.5 微服务监控体系</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-微服务容错隔离"><span class="toc-text">2.微服务容错隔离</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-什么是容错隔离？"><span class="toc-text">2.1 什么是容错隔离？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-常见的可用性风险有哪些？"><span class="toc-text">2.2 常见的可用性风险有哪些？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-容错隔离的方案有哪些？"><span class="toc-text">2.3 容错隔离的方案有哪些？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-开源容错隔离应用"><span class="toc-text">2.4 开源容错隔离应用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-微服务的访问安全"><span class="toc-text">3.微服务的访问安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-什么是访问安全？"><span class="toc-text">3.1 什么是访问安全？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-传统单机服务的访问安全机制"><span class="toc-text">3.2 传统单机服务的访问安全机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-微服务如何实现访问安全？"><span class="toc-text">3.3 微服务如何实现访问安全？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-1-网关鉴权模式（API-Gateway）"><span class="toc-text">3.3.1 网关鉴权模式（API Gateway）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-2-服务自主鉴权模式"><span class="toc-text">3.3.2 服务自主鉴权模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-3-API-Token模式（OAuth2-0）"><span class="toc-text">3.3.3 API Token模式（OAuth2.0）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-OAuth2-0-的「-访问安全-」"><span class="toc-text">3.4 OAuth2.0 的「 访问安全 」</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-1-什么是OAuth2-0-？"><span class="toc-text">3.4.1 什么是OAuth2.0 ？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-2-OAuth2-0-主要名词解释"><span class="toc-text">3.4.2 OAuth2.0 主要名词解释</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-3-OAuth2-0有四种授权模式"><span class="toc-text">3.4.3 OAuth2.0有四种授权模式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-容器技术"><span class="toc-text">4.容器技术</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-为什么需要容器技术？"><span class="toc-text">4.1 为什么需要容器技术？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-什么是容器？"><span class="toc-text">4.2 什么是容器？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-容器是如何做到资源隔离和限制？"><span class="toc-text">4.3 容器是如何做到资源隔离和限制？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Namespace-技术"><span class="toc-text">Namespace 技术</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Cgroups-技术"><span class="toc-text">Cgroups 技术</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-什么是容器镜像？"><span class="toc-text">4.4 什么是容器镜像？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-容器技术在微服务的实践"><span class="toc-text">4.5 容器技术在微服务的实践</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-容器调度"><span class="toc-text">4.6 容器调度</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#微信公众号"><span class="toc-text">微信公众号</span></a></li></ol>
+    </div>
+  </section>
+
+
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="mailto:554882285@qq.com"
+            class="social fas fa-envelope flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://github.com/littlejoyo"
+            class="social fab fa-github flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="https://xaoxuu.com/wiki/material-x/" target="_blank" class="codename">Material X</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/app.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>

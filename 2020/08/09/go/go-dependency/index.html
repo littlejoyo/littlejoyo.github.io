@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>【Go语言】：依赖管理之vendor和Go Modules | JoyoHub</title>
+  
+  <meta name="keywords" content="Joyo,Java,Go,js,高并发，分布式，高性能，数据库，博客。">
+  
+  
+  <meta name="description" content="高并发，分布式，高性能，Java,Go,hexo博客文章归档。">
+  
+
+  
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.10.1/css/all.min.css">
+  
+
+  
+  <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class='cover post half'>
+      
+        
+  <h1 class='title'>JoyoHub</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder="" />
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class='menu navgation'>
+  <ul class='h-list'>
+    
+      
+        <li>
+          <a class="nav home" href="/"
+            
+            
+            id="home">
+            <i class='fas fa-rss fa-fw'></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="https://github.com/littlejoyo"
+            
+            
+            id="https:github.comlittlejoyo">
+            <i class='fas fa-code-branch fa-fw'></i>&nbsp;Github
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/archives/"
+            
+              rel="nofollow"
+            
+            
+            id="archives">
+            <i class='fas fa-archive fa-fw'></i>&nbsp;归档
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/code/"
+            
+              rel="nofollow"
+            
+            
+            id="code">
+            <i class='fas fa-battery-half fa-fw'></i>&nbsp;算法
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/"
+            
+              rel="nofollow"
+            
+            
+            id="friends">
+            <i class='fas fa-link fa-fw'></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/"
+            
+              rel="nofollow"
+            
+            
+            id="about">
+            <i class='fas fa-info-circle fa-fw'></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href='/' >
+        
+          JoyoHub
+        
+      </a>
+			<div class='menu navgation'>
+				<ul class='h-list'>
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/"
+                  
+                  
+                  id="home">
+									<i class='fas fa-grin fa-fw'></i>&nbsp;博文
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/categories/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="categories">
+									<i class='fas fa-folder-open fa-fw'></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/tags/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="tags">
+									<i class='fas fa-hashtag fa-fw'></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/archives/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="archives">
+									<i class='fas fa-archive fa-fw'></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索" />
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a class="fas fa-search fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+				
+				<li class='s-menu'><a class="fas fa-bars fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo flat-box"></a>
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a class="flat-btn fas fa-comments fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+          <li class='s-toc'><a class="flat-btn fas fa-list fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/"
+                
+                
+                id="home">
+								<i class='fas fa-clock fa-fw'></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/archives/"
+                
+                  rel="nofollow"
+                
+                
+                id="archives">
+								<i class='fas fa-archive fa-fw'></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/"
+                
+                
+                id="projects">
+								<i class='fas fa-code-branch fa-fw'></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/"
+                
+                  rel="nofollow"
+                
+                
+                id="friends">
+								<i class='fas fa-link fa-fw'></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="https://xaoxuu.com/wiki/material-x/"
+                
+                  rel="nofollow"
+                
+                
+                id="https:xaoxuu.comwikimaterial-x">
+								<i class='fas fa-book fa-fw'></i>&nbsp;主题文档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/"
+                
+                  rel="nofollow"
+                
+                
+                id="about">
+								<i class='fas fa-info-circle fa-fw'></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class='l_main'>
+  
+
+  <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    
+
+
+  <section class='meta'>
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/2020/08/09/go/go-dependency/">
+        【Go语言】：依赖管理之vendor和Go Modules
+      </a>
+    </h1>
+  
+
+
+      
+      <div class='new-meta-box'>
+        
+          
+        
+          
+            
+  <div class='new-meta-item author'>
+    
+      <a href="/https:/littlejoyo.github.io" rel="nofollow">
+        
+          <img src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+        
+        <p>Joyo</p>
+      </a>
+    
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2020-08-09</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/Go/' rel="nofollow">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+      <p>Go</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class='notlink'>
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+    <section class="article typo">
+      <div class="article-entry" itemprop="articleBody">
+        <ul>
+<li><p>Go的依赖管理曾经是饱受诟病的大问题，随着版本的更迭正逐渐完善起来</p>
+</li>
+<li><p>现在主要的解决方案有vendor模式和Go Modules 两种管理方式</p>
+</li>
+<li><p>如果不引入依赖管理单靠GOPATH的话，那么就无法解决项目多版本的问题</p>
+</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="1-GOPATH的问题"><a href="#1-GOPATH的问题" class="headerlink" title="1.GOPATH的问题"></a>1.GOPATH的问题</h1><ul>
+<li><p>Go提供了GOPATH路径，Go依赖的所有的第三方库都放在GOPATH这个目录下</p>
+</li>
+<li><p>但是呢，在GOPATH下每个被依赖到的项目只能保存一个版本的代码</p>
+</li>
+<li><p>如果存在被依赖的项目存在<code>版本V1</code>和<code>版本V2</code>，当需要用到某个指定版本时，都需要手动去切换，若切换频率高那将是噩梦般存在，严重影响工作效率</p>
+</li>
+</ul>
+<h1 id="2-vendor机制"><a href="#2-vendor机制" class="headerlink" title="2.vendor机制"></a>2.vendor机制</h1><h2 id="2-1-什么是vendor"><a href="#2-1-什么是vendor" class="headerlink" title="2.1 什么是vendor"></a>2.1 什么是vendor</h2><p>基于vendor机制下，在执行 <code>go build</code> 或 <code>go run</code> 命令时，会按照以下顺序去查找包：</p>
+<ol>
+<li>当前包下的 vendor 目录</li>
+<li>向上级目录查找，直到找到 src 下的 vendor 目录</li>
+<li>在 GOROOT 目录下查找</li>
+<li>在 GOPATH 下面查找依赖包</li>
+</ol>
+<h2 id="2-2-govendor-工具"><a href="#2-2-govendor-工具" class="headerlink" title="2.2 govendor 工具"></a>2.2 govendor 工具</h2><blockquote>
+<p>govendor 是一个基于 vendor 目录机制的包管理工具</p>
+</blockquote>
+<ul>
+<li><p>支持从项目源码中分析出依赖的包，并从 <code>$GOPATH</code> 复制到项目的 <code>vendor</code> 目录下</p>
+</li>
+<li><p>支持包的指定版本，并用 <code>vendor/vendor.json</code> 进行包和版本管理,在json文件可以清晰看到引入的依赖包目录</p>
+</li>
+<li><p>支持用 <code>govendor add/update</code> 命令从 <code>$GOPATH</code> 中复制依赖包</p>
+</li>
+<li><p>如果忽略了 <code>vendor</code> 文件，可用 <code>govendor sync</code> 恢复依赖包</p>
+</li>
+<li><p>可直接用 <code>govendor fetch</code> 添加或更新依赖包</p>
+</li>
+<li><p>可用 <code>govendor migrate</code> 从其他 vendor 包管理工具中一键迁移到 govendor</p>
+</li>
+<li><p>支持 Linux，macOS，Windows所有操作系统</p>
+</li>
+</ul>
+<h2 id="2-3-安装-govendor"><a href="#2-3-安装-govendor" class="headerlink" title="2.3 安装 govendor"></a>2.3 安装 govendor</h2><blockquote>
+<p>如果 Go 版本为 1.5，则必须手动设置环境变量 set GO15VENDOREXPERIMENT=1(应该没人还用这么低版本的Go的吧~)</p>
+</blockquote>
+<ol>
+<li>拉取代码</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 拉取govendor代码并安装</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> get -u github.com/kardianos/govendor</span></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>设置PATH</li>
+</ol>
+<p>将 <code>$GOPATH/bin</code> 添加到 PATH 中(大部分在搭建Go开发环境就设置了)</p>
+<p>Linux/macOS 如下设置：<code>export PATH=&quot;$GOPATH/bin:$PATH&quot;</code></p>
+<ol start="3">
+<li>查看命令</li>
+</ol>
+<p>在本地的<code>$GOPATH/bin/</code>下发现 <code>govendor</code> 执行文件说明安装成功了</p>
+<h2 id="2-4-初始化并使用"><a href="#2-4-初始化并使用" class="headerlink" title="2.4 初始化并使用"></a>2.4 初始化并使用</h2><ul>
+<li><p>进入Go项目目录下，然后执行<code>govendor init</code> 初始化</p>
+</li>
+<li><p>项目根目录下即会自动生成 <code>vendor</code> 目录和 <code>vendor.json</code> 文件。</p>
+</li>
+</ul>
+<p>此时 vendor.json 文件内容为：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">	<span class="string">"comment"</span>: <span class="string">""</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">	<span class="string">"ignore"</span>: <span class="string">"test"</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="string">"package"</span>: [],</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">	<span class="string">"rootPath"</span>: <span class="string">"govendor-example"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>常用命令</strong></p>
+<ul>
+<li><p>将已被引用且在 <code>$GOPATH</code> 下的所有包复制到 <code>vendor</code> 目录</p>
+<p>  <code>govendor add +external</code></p>
+</li>
+<li><p>从 <code>$GOPATH</code> 中复制指定包到 <code>vendor</code> 目录</p>
+<p>  <code>govendor add github.com/golang/protobuf</code></p>
+</li>
+<li><p>列出代码中所有被引用到的包及其状态</p>
+<p>  <code>$ govendor list</code></p>
+</li>
+<li><p>列出一个包被哪些包引用</p>
+<p>  <code>govendor list -v fmt</code></p>
+</li>
+<li><p>从远程仓库添加或更新某个包(不会在 <code>$GOPATH</code> 也存一份)</p>
+<p>  <code>govendor fetch golang.org/x/net/context</code></p>
+</li>
+<li><p>安装指定版本的包</p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">govendor fetch golang.org/x/net/context@a4bbce9fcae005b22ae5443f6af064d80a6f5a55</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">govendor fetch golang.org/x/net/context@v1   # Get latest v1.*.* tag or branch.</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">govendor fetch golang.org/x/net/context@=v1  # Get the tag or branch named <span class="string">"v1"</span>.</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>只格式化项目自身代码(vendor 目录下的不变动)</p>
+<p>  <code>govendor fmt +local</code></p>
+</li>
+<li><p>只构建编译项目内部的包</p>
+<p>  <code>govendor install +local</code></p>
+</li>
+<li><p>只测试项目内部的测试案例</p>
+<p>  <code>govendor test +local</code></p>
+</li>
+<li><p>拉取所有依赖的包到 vendor 目录(包括 $GOPATH 存在或不存在的包)</p>
+<p>  <code>govendor fetch +out</code></p>
+</li>
+<li><p>包已在 vendor 目录，但想从 <code>$GOPATH</code> 更新</p>
+<p>  <code>govendor update +vendor</code></p>
+</li>
+<li><p>已修改了 <code>$GOPATH</code> 里的某个包，现在想将已修改且未提交的包更新到 <code>vendor</code></p>
+<p>  <code>govendor update -uncommitted &lt;updated-package-import-path&gt;</code></p>
+</li>
+<li><p><code>vendor.json</code> 中记录了依赖包信息，该如何拉取更新</p>
+<p>  <code>govendor sync</code></p>
+</li>
+</ul>
+<blockquote>
+<p>各子命令详细用法可通过 govendor COMMAND -h 或阅读 github.com/kardianos/govendor/context 查看源码包如何实现的。</p>
+</blockquote>
+<h2 id="2-5-govendor-子命令"><a href="#2-5-govendor-子命令" class="headerlink" title="2.5 govendor 子命令"></a>2.5 govendor 子命令</h2><table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">init</td>
+<td>创建 vendor 目录和 vendor.json 文件</td>
+</tr>
+<tr>
+<td align="center">list</td>
+<td>列出过滤依赖包及其状态</td>
+</tr>
+<tr>
+<td align="center">add</td>
+<td>从 $GOPATH 复制包到项目 vendor 目录</td>
+</tr>
+<tr>
+<td align="center">update</td>
+<td>从 $GOPATH 更新依赖包到项目 vendor 目录</td>
+</tr>
+<tr>
+<td align="center">remove</td>
+<td>从 vendor 目录移除依赖的包</td>
+</tr>
+<tr>
+<td align="center">status</td>
+<td>列出所有缺失、过期和修改过的包</td>
+</tr>
+<tr>
+<td align="center">fetch</td>
+<td>从远程仓库添加或更新包到项目 vendor 目录(不会存储到 $GOPATH)</td>
+</tr>
+<tr>
+<td align="center">sync</td>
+<td>根据 vendor.json 拉取相匹配的包到 vendor 目录</td>
+</tr>
+<tr>
+<td align="center">migrate</td>
+<td>从其他基于 vendor 实现的包管理工具中一键迁移</td>
+</tr>
+<tr>
+<td align="center">get</td>
+<td>与 go get 类似，将包下载到 $GOPATH，再将依赖包复制到 vendor 目录</td>
+</tr>
+<tr>
+<td align="center">license</td>
+<td>列出所有依赖包的 LICENSE</td>
+</tr>
+<tr>
+<td align="center">shell</td>
+<td>可一次性运行多个 govendor 命令</td>
+</tr>
+</tbody></table>
+<h2 id="2-6-govendor-状态参数"><a href="#2-6-govendor-状态参数" class="headerlink" title="2.6 govendor 状态参数"></a>2.6 govendor 状态参数</h2><table>
+<thead>
+<tr>
+<th align="center">状态</th>
+<th align="center">缩写</th>
+<th align="center">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">+local</td>
+<td align="center">l</td>
+<td align="center">本地包，即项目内部编写的包</td>
+</tr>
+<tr>
+<td align="center">+external</td>
+<td align="center">e</td>
+<td align="center">外部包，即在 GOPATH 中、却不在项目 vendor 目录</td>
+</tr>
+<tr>
+<td align="center">+vendor</td>
+<td align="center">v</td>
+<td align="center">已在 vendor 目录下的包</td>
+</tr>
+<tr>
+<td align="center">+std</td>
+<td align="center">s</td>
+<td align="center">标准库里的包</td>
+</tr>
+<tr>
+<td align="center">+excluded</td>
+<td align="center">x</td>
+<td align="center">明确被排除的外部包</td>
+</tr>
+<tr>
+<td align="center">+unused</td>
+<td align="center">u</td>
+<td align="center">未使用的包，即在 vendor 目录下，但项目中并未引用到</td>
+</tr>
+<tr>
+<td align="center">+missing</td>
+<td align="center">m</td>
+<td align="center">被引用了但却找不到的包</td>
+</tr>
+<tr>
+<td align="center">+program</td>
+<td align="center">p</td>
+<td align="center">主程序包，即可被编译为执行文件的包</td>
+</tr>
+<tr>
+<td align="center">+outside</td>
+<td align="center"></td>
+<td align="center">相当于状态为 +external +missing</td>
+</tr>
+<tr>
+<td align="center">+all</td>
+<td align="center"></td>
+<td align="center">所有包</td>
+</tr>
+</tbody></table>
+<h1 id="3-Go-Modules"><a href="#3-Go-Modules" class="headerlink" title="3.Go Modules"></a>3.Go Modules</h1><h2 id="3-1-什么是Go-Modules？"><a href="#3-1-什么是Go-Modules？" class="headerlink" title="3.1 什么是Go Modules？"></a>3.1 什么是Go Modules？</h2><ul>
+<li><p>Go Modules是Go1.11版本之后官方推出的版本管理工具，<strong>并且从Go1.13版本开始，Go Modules成为了Go语言默认的依赖管理工具</strong>。</p>
+</li>
+<li><p>Go Modules 出现的目的之一就是为了解决 GOPATH 的问题，也可以说准备抛弃 GOPATH</p>
+</li>
+</ul>
+<h2 id="3-2-Go-Modules准备工作"><a href="#3-2-Go-Modules准备工作" class="headerlink" title="3.2 Go Modules准备工作"></a>3.2 Go Modules准备工作</h2><ol>
+<li><p>升级go版本至少为 Go 1.11，最好是升级到Go 1.13</p>
+</li>
+<li><p>开启<code>GO111MODULE</code>，它有三个可选值：off、on、auto，默认值是auto:</p>
+<ul>
+<li><p><strong>GO111MODULE=off</strong>：禁用模块支持，编译时会从GOPATH和vendor文件夹中查找包。</p>
+</li>
+<li><p><strong>GO111MODULE=on</strong>：启用模块支持，编译时会忽略GOPATH和vendor文件夹，只根据 go.mod下载依赖。</p>
+</li>
+<li><p><strong>GO111MODULE=auto</strong>：当项目在$GOPATH/src外且项目根目录有go.mod文件时，开启模块支持。</p>
+</li>
+</ul>
+</li>
+</ol>
+<ol start="3">
+<li>设置GOPROXY</li>
+</ol>
+<ul>
+<li><p>Go1.11之后设置GOPROXY命令为：<code>export GOPROXY=https://goproxy.cn</code></p>
+</li>
+<li><p>Go1.13之后GOPROXY默认值为<code>https://proxy.golang.org</code>，在国内是无法访问的，推荐修改为goproxy.cn</p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> env -w GOPROXY=https:<span class="comment">//goproxy.cn,direct</span></span></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><p>创建项目，进入项目根目录下执行：<code>go mod init</code> 生成 <strong>go.mod</strong>文件</p>
+</li>
+<li><p>忘记GOPATH的存在，开始去适应Go Modules的工作模式</p>
+</li>
+</ol>
+<blockquote>
+<p>注意：Go Modules 从远程拉取的包都会存放在 $GOPATH/pkg/mod/下</p>
+</blockquote>
+<h2 id="3-3-go-mod"><a href="#3-3-go-mod" class="headerlink" title="3.3 go.mod"></a>3.3 go.mod</h2><p>go.mod文件记录了项目所有的依赖信息，其结构大致如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">module github.com&#x2F;littlejoyo&#x2F;studygo</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">go 1.13</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">require (</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	github.com&#x2F;DeanThompson&#x2F;ginpprof v0.0.0-20190408063150-3be636683586</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	github.com&#x2F;gin-gonic&#x2F;gin v1.4.0</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">	github.com&#x2F;go-sql-driver&#x2F;mysql v1.4.1</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	google.golang.org&#x2F;appengine v1.6.1 &#x2F;&#x2F; indirect</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">replace(</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">	github.com&#x2F;go-sql-driver&#x2F;mysql v1.4.1 &#x3D;&gt; ..&#x2F;myproject</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">)</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>module：用来定义包名</p>
+</li>
+<li><p>require：用来定义依赖包及版本</p>
+</li>
+<li><p>indirect：表示间接引用</p>
+</li>
+<li><p>replace：表示依赖包指向本地项目，进行取代作用，在国内访问<code>golang.org/x</code>的各个包都需要翻墙，你可以在go.mod中使用replace替换成github上对应的库。</p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">replace (</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">	golang.org/x/crypto v0<span class="number">.0</span><span class="number">.0</span><span class="number">-20180820150726</span><span class="number">-614</span>d502a4dac =&gt; github.com/golang/crypto v0<span class="number">.0</span><span class="number">.0</span><span class="number">-20180820150726</span><span class="number">-614</span>d502a4dac</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">	golang.org/x/net v0<span class="number">.0</span><span class="number">.0</span><span class="number">-20180821023952</span><span class="number">-922</span>f4815f713 =&gt; github.com/golang/net v0<span class="number">.0</span><span class="number">.0</span><span class="number">-20180826012351</span><span class="number">-8</span>a410e7b638d</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	golang.org/x/text v0<span class="number">.3</span><span class="number">.0</span> =&gt; github.com/golang/text v0<span class="number">.3</span><span class="number">.0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">)</span></pre></td></tr></table></figure>
+
+<p>依赖包会通过go get进行拉取，默认下载最新依赖的包，并且会在go.mod里面记录下版本号</p>
+<ul>
+<li><p>如果有tag,则会拉取最的tag包,比如上面跟在路径后面的<code>v1.4.0</code></p>
+</li>
+<li><p>没有tag则会使用某个固定commit，比如上面的<code>v0.0.0-20190408063150-3be636683586</code></p>
+</li>
+<li><p>当然也可以通过直接指定来获取对应版本的包,上面是默认的拉取规则</p>
+</li>
+</ul>
+<h2 id="3-4-常用go-mod命令"><a href="#3-4-常用go-mod命令" class="headerlink" title="3.4 常用go mod命令"></a>3.4 常用go mod命令</h2><ul>
+<li><p>下载依赖的module到本地cache（默认为$GOPATH/pkg/mod目录）<br>  <code>go mod download</code></p>
+</li>
+<li><p>编辑go.mod文件<br>  <code>go mod edit</code></p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> mod edit -fmt # 格式化<span class="keyword">go</span>.mod文件</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> mod edit -require=golang.org/x/text # 添加依赖项</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> mod edit -droprequire=golang.org/x/text # 移除依赖项</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> mod graph #打印模块依赖图</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> help mod edit 更多用法</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>初始化当前文件夹, 创建go.mod文件<br>  <code>go mod init</code></p>
+</li>
+<li><p>增加缺少的module，删除无用的module(常用)<br>  <code>go mod tidy</code></p>
+</li>
+<li><p>将依赖复制到vendor下<br>  <code>go mod vendor</code></p>
+</li>
+<li><p>校验依赖<br>  <code>go mod verify</code></p>
+</li>
+<li><p>解释为什么需要依赖<br>  <code>go mod why</code> </p>
+</li>
+</ul>
+<h2 id="3-5-其他关键词解释"><a href="#3-5-其他关键词解释" class="headerlink" title="3.5 其他关键词解释"></a>3.5 其他关键词解释</h2><h3 id="3-5-1-go-sum"><a href="#3-5-1-go-sum" class="headerlink" title="3.5.1 go.sum"></a>3.5.1 go.sum</h3><ul>
+<li><p>go.sum 详细罗列了当前项目直接或间接依赖的所有模块版本，并写明了那些模块版本的 SHA-256 哈希值</p>
+</li>
+<li><p>主要作用是以备 Go 在今后的操作中保证项目所依赖的那些模块版本不会被篡改。</p>
+</li>
+</ul>
+<h3 id="3-5-2-GOSUMDB"><a href="#3-5-2-GOSUMDB" class="headerlink" title="3.5.2 GOSUMDB"></a>3.5.2 GOSUMDB</h3><ul>
+<li><p>GOSUMDB是一个 Go checksum database的缩写，用于使 Go 在拉取模块版本时(无论是从源站拉取还是通过 Go module proxy 拉取)保证拉取到的模块版本数据未经篡改</p>
+</li>
+<li><p>主要用于保护 Go 不会从任何源头拉到被篡改过的非法 Go 模块版本</p>
+</li>
+<li><p>GOSUMDB也可以是“off”即禁止 Go 在后续操作中校验模块版本</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">格式 1：&lt;SUMDB_NAME&gt;+&lt;PUBLIC_KEY&gt;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">格式 2：&lt;SUMDB_NAME&gt;+&lt;PUBLIC_KEY&gt; &lt;SUMDB_URL&gt;</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>拥有默认值：<code>sum.golang.org</code> (之所以没有按照上面的格式是因为 Go 对默认值做了特殊处理)。</p>
+</li>
+<li><p><code>sum.golang.org</code> 在中国无法访问，故而更加建议将 GOPROXY 设置为 <code>goproxy.cn</code>，因为 goproxy.cn 支持代理 sum.golang.org</p>
+</li>
+</ul>
+<h3 id="3-5-3-GOPRIVATE"><a href="#3-5-3-GOPRIVATE" class="headerlink" title="3.5.3 GOPRIVATE"></a>3.5.3 GOPRIVATE</h3><blockquote>
+<p>一起看下这三个环境变量：GONOPROXY/GONOSUMDB/GOPRIVATE</p>
+</blockquote>
+<ul>
+<li><p>当GOPROXY 指定的 Go module proxy 或由 GOSUMDB 指定 Go checksum database 都无法访问到的模块时的时候，这三个环境变量就派上用场了</p>
+</li>
+<li><p>它们三个的值都是一个以英文逗号 “,” 分割的模块路径前缀，匹配规则同 path.Match。</p>
+</li>
+<li><p>其中 <code>GOPRIVATE</code> 较为特殊，它的值将作为 <strong>GONOPROXY</strong> 和 <strong>GONOSUMDB</strong> 的默认值，所以再修改的时候重点关注 <code>GOPRIVATE</code> 即可。</p>
+</li>
+<li><p>在使用上来讲，比如 <code>GOPRIVATE=*.corp.example.com</code> 表示所有模块路径以 <strong>corp.example.com</strong> 的下一级域名 (如 <strong>team1.corp.example.com</strong>) 为前缀的模块版本都将不经过 <strong>Go module proxy</strong> 和 <strong>Go checksum database</strong></p>
+</li>
+</ul>
+<blockquote>
+<p>需要注意匹配的时候，是不包括 corp.example.com 本身。</p>
+</blockquote>
+<h3 id="3-5-4-GOPROXY"><a href="#3-5-4-GOPROXY" class="headerlink" title="3.5.4 GOPROXY"></a>3.5.4 GOPROXY</h3><ul>
+<li><p>用于设置 Go 模块代理，其作用是使 Go 在拉取模块版本时，直接通过镜像站点来快速拉取</p>
+</li>
+<li><p>GOPROXY默认值是<code>proxy.golang.org</code>，国内无法访问，所以开启 Go Modules 必需设置镜像代理地址</p>
+</li>
+<li><p>国内常用的镜像代理地址如下：</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">命令</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">goproxy.io</td>
+<td>一个全球代理为 Go 模块而生</td>
+</tr>
+<tr>
+<td align="center">mirrors.aliyun.com/goproxy</td>
+<td>阿里镜像代理</td>
+</tr>
+<tr>
+<td align="center">goproxy.cn</td>
+<td>七牛云赞助支持</td>
+</tr>
+</tbody></table>
+<h2 id="3-6-Go-module-导入本地包"><a href="#3-6-Go-module-导入本地包" class="headerlink" title="3.6 Go module 导入本地包"></a>3.6 Go module 导入本地包</h2><h3 id="3-6-1-处于同一项目下"><a href="#3-6-1-处于同一项目下" class="headerlink" title="3.6.1 处于同一项目下"></a>3.6.1 处于同一项目下</h3><ul>
+<li><p>在一个项目（project）下我们是可以定义多个包（package）的。</p>
+</li>
+<li><p>现在animal/main.go中调用了dog这个包。</p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">animal</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">├── <span class="keyword">go</span>.mod</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">├── main.<span class="keyword">go</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">└── dog</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    └── dog.<span class="keyword">go</span></span></pre></td></tr></table></figure>
+
+<ul>
+<li>animal/go.mod 的定义</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">module animal</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> <span class="number">1.13</span></span></pre></td></tr></table></figure>
+
+<ul>
+<li>如何在 <code>animal/main.go</code> 中导入 <code>dog</code> 包？</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="string">"fmt"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">	<span class="string">"animal/dog"</span>  <span class="comment">// 导入同一项目下的dog包</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">	dog.Walk()</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	fmt.Println(<span class="string">"dog is walking!"</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h3 id="3-6-2-不在同一项目"><a href="#3-6-2-不在同一项目" class="headerlink" title="3.6.2 不在同一项目"></a>3.6.2 不在同一项目</h3><ul>
+<li>目录结构如下：</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">├── animal</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">│   ├── <span class="keyword">go</span>.mod</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">│   └── main.<span class="keyword">go</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">└── dog</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    ├── <span class="keyword">go</span>.mod</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    └── dog.<span class="keyword">go</span></span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>因为这两个包不在同一个项目路径下，如果你想要导入本地包，<strong>并且这些包也没有发布到远程的github或其他代码仓库地址。</strong></p>
+</li>
+<li><p>这个时候我们就需要在<code>go.mod</code>文件中使用<code>replace</code>指令，进行本地包的指向</p>
+</li>
+<li><p>在调用方，也就是animal/go.mod中按如下方式指定使用相对路径来寻找mypackage这个包</p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">module moduledemo</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span> <span class="number">1.13</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">require <span class="string">"animal"</span> v0<span class="number">.0</span><span class="number">.0</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">replace <span class="string">"dog"</span> =&gt; <span class="string">"../dog"</span></span></pre></td></tr></table></figure>
+
+<ul>
+<li>此时，animal包就能找到本地的dog包的代码</li>
+</ul>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" alt="weixin-a"></p>
+
+      </div>
+      
+        <br>
+        
+
+
+  <section class='meta' id="footer-meta">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T13:13:57+08:00">
+  <a class='notlink'>
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>更新于 2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Go/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>Go</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/2020/08/09/go/go-dependency/&title=【Go语言】：依赖管理之vendor和Go Modules | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+Go的依赖管理曾经是饱受诟病的大问题，随着版本的更迭正逐渐完善起来
+
+现在主要的解决方案有vendor模式和Go Modules 两种管理方式
+
+如果不引入依赖管理单靠GOPATH的话，那么就无法解决项目多版本的问题
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/2020/08/09/go/go-dependency/&title=【Go语言】：依赖管理之vendor和Go Modules | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+Go的依赖管理曾经是饱受诟病的大问题，随着版本的更迭正逐渐完善起来
+
+现在主要的解决方案有vendor模式和Go Modules 两种管理方式
+
+如果不引入依赖管理单靠GOPATH的话，那么就无法解决项目多版本的问题
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/2020/08/09/go/go-dependency/&title=【Go语言】：依赖管理之vendor和Go Modules | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+Go的依赖管理曾经是饱受诟病的大问题，随着版本的更迭正逐渐完善起来
+
+现在主要的解决方案有vendor模式和Go Modules 两种管理方式
+
+如果不引入依赖管理单靠GOPATH的话，那么就无法解决项目多版本的问题
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+      
+      
+          <div class="prev-next">
+              
+              
+                  <section class="next">
+                      <span class="art-item-right" aria-hidden="true">
+                          <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                          <h4>
+                              <a href="/2020/07/26/redis/redis-lua-tx/" rel="prev" title="【Redis】：Redis事务、Lua事务和管道的实践探究">
+                                  
+                                      【Redis】：Redis事务、Lua事务和管道的实践探究
+                                  
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 数据库</a> <a class="tag" href="/tags/Redis/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Redis</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+          </div>
+      
+    </section>
+  </article>
+
+
+
+  <!-- 显示推荐文章和评论 -->
+
+
+
+  
+
+
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: '【Go语言】：依赖管理之vendor和Go Modules',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class='l_side'>
+  
+    
+    
+      
+      
+        
+          
+          
+        
+          
+          
+            
+              
+  <section class='widget toc-wrapper'>
+    
+<header class='pure'>
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <!-- <div class='wrapper'><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer noopener" href="javascript:void(0)" target="_blank"><i class="fas fa-thumbtack fa-fw"></i></a></div> -->
+  
+</header>
+
+    <div class='content pure'>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-GOPATH的问题"><span class="toc-text">1.GOPATH的问题</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-vendor机制"><span class="toc-text">2.vendor机制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-什么是vendor"><span class="toc-text">2.1 什么是vendor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-govendor-工具"><span class="toc-text">2.2 govendor 工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-安装-govendor"><span class="toc-text">2.3 安装 govendor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-初始化并使用"><span class="toc-text">2.4 初始化并使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-govendor-子命令"><span class="toc-text">2.5 govendor 子命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-govendor-状态参数"><span class="toc-text">2.6 govendor 状态参数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-Go-Modules"><span class="toc-text">3.Go Modules</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-什么是Go-Modules？"><span class="toc-text">3.1 什么是Go Modules？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-Go-Modules准备工作"><span class="toc-text">3.2 Go Modules准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-go-mod"><span class="toc-text">3.3 go.mod</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-常用go-mod命令"><span class="toc-text">3.4 常用go mod命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-其他关键词解释"><span class="toc-text">3.5 其他关键词解释</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-1-go-sum"><span class="toc-text">3.5.1 go.sum</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-2-GOSUMDB"><span class="toc-text">3.5.2 GOSUMDB</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-3-GOPRIVATE"><span class="toc-text">3.5.3 GOPRIVATE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-4-GOPROXY"><span class="toc-text">3.5.4 GOPROXY</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-6-Go-module-导入本地包"><span class="toc-text">3.6 Go module 导入本地包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-1-处于同一项目下"><span class="toc-text">3.6.1 处于同一项目下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-6-2-不在同一项目"><span class="toc-text">3.6.2 不在同一项目</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#微信公众号"><span class="toc-text">微信公众号</span></a></li></ol>
+    </div>
+  </section>
+
+
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="mailto:554882285@qq.com"
+            class="social fas fa-envelope flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://github.com/littlejoyo"
+            class="social fab fa-github flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="https://xaoxuu.com/wiki/material-x/" target="_blank" class="codename">Material X</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/app.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>

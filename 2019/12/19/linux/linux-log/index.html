@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>【Linux】：如何优雅的查看生产日志？ | JoyoHub</title>
+  
+  <meta name="keywords" content="Joyo,Java,Go,js,高并发，分布式，高性能，数据库，博客。">
+  
+  
+  <meta name="description" content="高并发，分布式，高性能，Java,Go,hexo博客文章归档。">
+  
+
+  
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.10.1/css/all.min.css">
+  
+
+  
+  <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class='cover post half'>
+      
+        
+  <h1 class='title'>JoyoHub</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder="" />
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class='menu navgation'>
+  <ul class='h-list'>
+    
+      
+        <li>
+          <a class="nav home" href="/"
+            
+            
+            id="home">
+            <i class='fas fa-rss fa-fw'></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="https://github.com/littlejoyo"
+            
+            
+            id="https:github.comlittlejoyo">
+            <i class='fas fa-code-branch fa-fw'></i>&nbsp;Github
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/archives/"
+            
+              rel="nofollow"
+            
+            
+            id="archives">
+            <i class='fas fa-archive fa-fw'></i>&nbsp;归档
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/code/"
+            
+              rel="nofollow"
+            
+            
+            id="code">
+            <i class='fas fa-battery-half fa-fw'></i>&nbsp;算法
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/"
+            
+              rel="nofollow"
+            
+            
+            id="friends">
+            <i class='fas fa-link fa-fw'></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/"
+            
+              rel="nofollow"
+            
+            
+            id="about">
+            <i class='fas fa-info-circle fa-fw'></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href='/' >
+        
+          JoyoHub
+        
+      </a>
+			<div class='menu navgation'>
+				<ul class='h-list'>
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/"
+                  
+                  
+                  id="home">
+									<i class='fas fa-grin fa-fw'></i>&nbsp;博文
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/categories/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="categories">
+									<i class='fas fa-folder-open fa-fw'></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/tags/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="tags">
+									<i class='fas fa-hashtag fa-fw'></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/archives/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="archives">
+									<i class='fas fa-archive fa-fw'></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索" />
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a class="fas fa-search fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+				
+				<li class='s-menu'><a class="fas fa-bars fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo flat-box"></a>
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a class="flat-btn fas fa-comments fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+          <li class='s-toc'><a class="flat-btn fas fa-list fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/"
+                
+                
+                id="home">
+								<i class='fas fa-clock fa-fw'></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/archives/"
+                
+                  rel="nofollow"
+                
+                
+                id="archives">
+								<i class='fas fa-archive fa-fw'></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/"
+                
+                
+                id="projects">
+								<i class='fas fa-code-branch fa-fw'></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/"
+                
+                  rel="nofollow"
+                
+                
+                id="friends">
+								<i class='fas fa-link fa-fw'></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="https://xaoxuu.com/wiki/material-x/"
+                
+                  rel="nofollow"
+                
+                
+                id="https:xaoxuu.comwikimaterial-x">
+								<i class='fas fa-book fa-fw'></i>&nbsp;主题文档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/"
+                
+                  rel="nofollow"
+                
+                
+                id="about">
+								<i class='fas fa-info-circle fa-fw'></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class='l_main'>
+  
+
+  <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    
+
+
+  <section class='meta'>
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/2019/12/19/linux/linux-log/">
+        【Linux】：如何优雅的查看生产日志？
+      </a>
+    </h1>
+  
+
+
+      
+      <div class='new-meta-box'>
+        
+          
+        
+          
+            
+  <div class='new-meta-item author'>
+    
+      <a href="/https:/littlejoyo.github.io" rel="nofollow">
+        
+          <img src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+        
+        <p>Joyo</p>
+      </a>
+    
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2019-12-19</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/Linux/' rel="nofollow">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+      <p>服务器&nbsp;/&nbsp;Linux</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class='notlink'>
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+    <section class="article typo">
+      <div class="article-entry" itemprop="articleBody">
+        <ul>
+<li><p>我们都知道，生产环境下的日志迭代速度是非常快</p>
+</li>
+<li><p>倘若仅使用cat命令来查看日志文件，不但无法查看实时日志，严重的甚至还可能影响服务器的运行</p>
+</li>
+<li><p>本篇重点介绍：如何使用Linux命令优雅的查看日志，快速查询到想要的日志内容！</p>
+</li>
+</ul>
+<a id="more"></a>
+
+<blockquote>
+<p>Github issues:<a href="https://github.com/littlejoyo/Blog/issues/" target="_blank" rel="noopener">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h1 id="1-tail-命令"><a href="#1-tail-命令" class="headerlink" title="1.tail 命令"></a>1.tail 命令</h1><blockquote>
+<p>tail 命令可以查看实时日志的更新，当日志有更新的时候，实时打印到控制台显示。</p>
+</blockquote>
+<h2 id="1-1-常用命令"><a href="#1-1-常用命令" class="headerlink" title="1.1 常用命令"></a>1.1 常用命令</h2><ul>
+<li><p><code>tail -f online.log</code> : 把生产日志文件里的最尾部的内容显示在屏幕上，并且不断刷新，只要文件更新就可以看到最新的文件内容。(停止显示：ctrl+c)</p>
+</li>
+<li><p><code>tail online.log</code> : 显示 online.log 文件的最后 10 行</p>
+</li>
+<li><p><code>tail -n 10 online.log</code> : 显示文件 online.log 的最后 10 行日志</p>
+</li>
+<li><p><code>tail -n +10 online.log</code> : 显示第10行之后的所有日志内容</p>
+</li>
+<li><p><code>tail -100f online.log</code> : 实时监控100行日志内容（不停刷新，保持100条日志）</p>
+</li>
+<li><p><code>tail -c 10 online.log</code> : 显示日志文件 online.log 的最后10个字符</p>
+</li>
+</ul>
+<h2 id="1-2-tail-参数说明"><a href="#1-2-tail-参数说明" class="headerlink" title="1.2 tail 参数说明"></a>1.2 tail 参数说明</h2><table>
+<thead>
+<tr>
+<th align="center">参数</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">-f</td>
+<td align="center">循环读取</td>
+</tr>
+<tr>
+<td align="center">-q</td>
+<td align="center">不显示处理信息</td>
+</tr>
+<tr>
+<td align="center">-v</td>
+<td align="center">显示详细的处理信息</td>
+</tr>
+<tr>
+<td align="center">-c &lt;行数&gt;</td>
+<td align="center">显示的字符数</td>
+</tr>
+<tr>
+<td align="center">-n &lt;行数&gt;</td>
+<td align="center">显示文件的尾部n行内容</td>
+</tr>
+</tbody></table>
+<h1 id="2-head命令"><a href="#2-head命令" class="headerlink" title="2.head命令"></a>2.head命令</h1><blockquote>
+<p>head命令的用法和tail命令相似，但是前者从头部开始扫描内容，后者是从尾部开始输出内容</p>
+</blockquote>
+<h2 id="2-1-常用命令"><a href="#2-1-常用命令" class="headerlink" title="2.1 常用命令"></a>2.1 常用命令</h2><ul>
+<li><p><code>head online.log</code> : 显示 online.log 文件的从头开始的前10 行日志内容</p>
+</li>
+<li><p><code>head -n 10 online.log</code> : 显示文件 online.log 的从首行开始的 10 行日志</p>
+</li>
+<li><p><code>head -n +100 online.log</code> : 显示第100行之前的所有日志内容</p>
+</li>
+<li><p><code>head -c 10 online.log</code> : 显示日志文件 online.log 的最开始的10个字符</p>
+</li>
+</ul>
+<h1 id="3-grep-命令"><a href="#3-grep-命令" class="headerlink" title="3.grep 命令"></a>3.grep 命令</h1><blockquote>
+<p>Linux grep 命令用于查找文件里符合条件的字符串。</p>
+</blockquote>
+<h2 id="3-1-常用命令"><a href="#3-1-常用命令" class="headerlink" title="3.1 常用命令"></a>3.1 常用命令</h2><ul>
+<li><p><code>grep &#39;12:00:00&#39; online.log</code> : 打印符合<code>12:00:00</code>匹配行的日志内容</p>
+</li>
+<li><p><code>grep -n &#39;12:00:00&#39; online.log</code> : 打印符合<code>12:00:00</code>匹配行的日志内容并显示日志行数</p>
+</li>
+<li><p><code>grep -n -A 3 &#39;12:00:00&#39; online.log</code> : 打印匹配行的日志内容和之后3行的日志</p>
+</li>
+<li><p><code>grep -n -B 3 &#39;12:00:00&#39; online.log</code> : 打印匹配行的日志内容和之前3行的日志</p>
+</li>
+<li><p><code>grep -n -C 3 &#39;12:00:00&#39; online.log</code> : 打印匹配行的日志内容和前后各3行的日志</p>
+</li>
+<li><p><code>grep -e &#39;正则表达式&#39; online.log</code> : 从online.log中查找与正则表达式匹配的行</p>
+</li>
+<li><p><code>grep –i &quot;被查找的字符串&quot; oneline.log</code> : 查找时不区分大小写</p>
+</li>
+<li><p><code>grep &#39;123&#39; online.log | grep &#39;456&#39;</code> : 显示既匹配 ‘123’又匹配 ‘456’的行</p>
+</li>
+</ul>
+<h2 id="3-2-grep-参数说明"><a href="#3-2-grep-参数说明" class="headerlink" title="3.2 grep 参数说明"></a>3.2 grep 参数说明</h2><p><a href="https://www.linuxcool.com/grep" target="_blank" rel="noopener">grep命令和参数介绍</a></p>
+<h1 id="4-sed-命令"><a href="#4-sed-命令" class="headerlink" title="4.sed 命令"></a>4.sed 命令</h1><blockquote>
+<p>Linux sed 命令是利用脚本来处理文本文件。此处只说明如何用来查看具体时间段的日志内容。</p>
+</blockquote>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">sed -n '/起始时间/,/结束时间/p' 日志文件</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">例如：</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">sed -n '/2019-12-17 12:00:00/,/2019-12-17 12:10:10/p'  online.log</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">// 查看2019-12-17 12:00:00-12:10:10 时间段内的日志内容</span></pre></td></tr></table></figure>
+
+<p><a href="https://www.linuxcool.com/sed" target="_blank" rel="noopener">sed命令和参数介绍</a></p>
+<h1 id="5-less-命令-和-more-命令"><a href="#5-less-命令-和-more-命令" class="headerlink" title="5.less 命令 和 more 命令"></a>5.less 命令 和 more 命令</h1><blockquote>
+<p>less和more都可以对读取文件内容并进行分页处理，但是两者最大的区别就是less更加的灵活。</p>
+</blockquote>
+<h2 id="5-1-more"><a href="#5-1-more" class="headerlink" title="5.1 more"></a>5.1 more</h2><ul>
+<li><p>more功能类似 cat ，cat命令是整个文件的内容从上到下显示在屏幕上。 more会以一页一页的显示方便使用者逐页阅读。</p>
+</li>
+<li><p>让画面在显示满一页时暂停，此时可按空格健继续显示下一个画面，或按Q键停止显示。</p>
+</li>
+<li><p>more不可以回去，就是不可以向前，只能向后，况且只能使用Enter和Space向后翻动。</p>
+</li>
+<li><p>more会读取整个文件的内容进行分页处理，加载速度低于less</p>
+</li>
+</ul>
+<h2 id="5-2-less"><a href="#5-2-less" class="headerlink" title="5.2 less"></a>5.2 less</h2><h3 id="5-2-1-less-命令介绍"><a href="#5-2-1-less-命令介绍" class="headerlink" title="5.2.1 less 命令介绍"></a>5.2.1 less 命令介绍</h3><ul>
+<li><p>less 工具也是对文件或其它输出进行分页显示的工具，应该说是linux正统查看文件内容的工具，功能极其强大。</p>
+</li>
+<li><p>less与more最大的不同就是能够前后翻页，不必读取整个文件，加载速度比more更快。</p>
+</li>
+</ul>
+<h3 id="5-2-2-less命令用法"><a href="#5-2-2-less命令用法" class="headerlink" title="5.2.2 less命令用法"></a>5.2.2 less命令用法</h3><ul>
+<li><p><code>less -N online.log</code> : 查看online.log文件并显示行号，支持前后翻页</p>
+</li>
+<li><p><code>less -N +10g online.log</code> : 定位到online.log文件的第10行开始显示内容</p>
+</li>
+<li><p>less查看文件后，<code>/2019-12-19 10:00:00</code> : 自动高亮显示查找到的内容，后续n下一个，N上一个</p>
+</li>
+<li><p><code>cat -n online.log | grep &#39;debug&#39; | less</code> : 分页显示过滤到的内容（less和more一般都会搭配管道符<code>|</code> 一起使用）</p>
+</li>
+</ul>
+<h3 id="5-2-3-less命令参数"><a href="#5-2-3-less命令参数" class="headerlink" title="5.2.3 less命令参数"></a>5.2.3 less命令参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>详解</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>d</td>
+<td>向下翻页</td>
+</tr>
+<tr>
+<td>u</td>
+<td>向上翻页</td>
+</tr>
+<tr>
+<td>g</td>
+<td>跳到首行</td>
+</tr>
+<tr>
+<td>G</td>
+<td>跳到底部</td>
+</tr>
+<tr>
+<td>？查找内容</td>
+<td>向上查找匹配的内容并高亮显示</td>
+</tr>
+<tr>
+<td>/ 查找内容</td>
+<td>向下查找匹配的内容并高亮显示</td>
+</tr>
+<tr>
+<td>n</td>
+<td>下一个</td>
+</tr>
+<tr>
+<td>N</td>
+<td>上一个</td>
+</tr>
+<tr>
+<td>q</td>
+<td>退出less命令</td>
+</tr>
+</tbody></table>
+<p><a href="https://www.linuxcool.com/less" target="_blank" rel="noopener">less命令和参数介绍</a></p>
+<h1 id="6-总结"><a href="#6-总结" class="headerlink" title="6.总结"></a>6.总结</h1><ul>
+<li><p><code>tail</code> 、<code>grep</code>、<code>sed</code> 、<code>less</code> 等命令都可以实现日志的查看</p>
+</li>
+<li><p>不要再单纯使用<code>cat</code> 去查看日志文件，学会以上的命令灵活变通，根据需求选择合适的命令</p>
+</li>
+<li><p>大部分情况下，都会再加入管道符 <code>|</code> 进行多重条件的筛选，所以命令的应用会变得更加的灵活 </p>
+</li>
+<li><p>管道符 <code>|</code> 的作用 ：<code>命令1|命令2</code> （将命令1的输出内容作为命令2的输入）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">cat -n online.log | grep 'abc' | less</span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" alt="weixin-a"></p>
+
+      </div>
+      
+        <br>
+        
+
+
+  <section class='meta' id="footer-meta">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T12:28:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>更新于 2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Linux/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>Linux</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>服务器</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E6%97%A5%E5%BF%97/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>日志</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/2019/12/19/linux/linux-log/&title=【Linux】：如何优雅的查看生产日志？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+我们都知道，生产环境下的日志迭代速度是非常快
+
+倘若仅使用cat命令来查看日志文件，不但无法查看实时日志，严重的甚至还可能影响服务器的运行
+
+本篇重点介绍：如何使用Linux命令优雅的查看日志，快速查询到想要的日志内容！
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/2019/12/19/linux/linux-log/&title=【Linux】：如何优雅的查看生产日志？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+我们都知道，生产环境下的日志迭代速度是非常快
+
+倘若仅使用cat命令来查看日志文件，不但无法查看实时日志，严重的甚至还可能影响服务器的运行
+
+本篇重点介绍：如何使用Linux命令优雅的查看日志，快速查询到想要的日志内容！
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/2019/12/19/linux/linux-log/&title=【Linux】：如何优雅的查看生产日志？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+我们都知道，生产环境下的日志迭代速度是非常快
+
+倘若仅使用cat命令来查看日志文件，不但无法查看实时日志，严重的甚至还可能影响服务器的运行
+
+本篇重点介绍：如何使用Linux命令优雅的查看日志，快速查询到想要的日志内容！
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+      
+      
+          <div class="prev-next">
+              
+                  <section class="prev">
+                      <span class="art-item-left">
+                          <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;上一页</h6>
+                          <h4>
+                              <a href="/2019/12/25/interface-idempotency/" rel="prev" title="【分布式】：分布式下如何保证接口的幂等性？">
+                                
+                                    【分布式】：分布式下如何保证接口的幂等性？
+                                
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 分布式</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+              
+                  <section class="next">
+                      <span class="art-item-right" aria-hidden="true">
+                          <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                          <h4>
+                              <a href="/2019/12/17/mysql/database-explain/" rel="prev" title="【Mysql数据库】：数据库索引查询利器EXPLAIN">
+                                  
+                                      【Mysql数据库】：数据库索引查询利器EXPLAIN
+                                  
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 数据库</a> <a class="tag" href="/tags/Mysql/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Mysql</a> <a class="tag" href="/tags/%E7%B4%A2%E5%BC%95/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 索引</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+          </div>
+      
+    </section>
+  </article>
+
+
+
+  <!-- 显示推荐文章和评论 -->
+
+
+
+  
+
+
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: '【Linux】：如何优雅的查看生产日志？',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class='l_side'>
+  
+    
+    
+      
+      
+        
+          
+          
+        
+          
+          
+            
+              
+  <section class='widget toc-wrapper'>
+    
+<header class='pure'>
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <!-- <div class='wrapper'><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer noopener" href="javascript:void(0)" target="_blank"><i class="fas fa-thumbtack fa-fw"></i></a></div> -->
+  
+</header>
+
+    <div class='content pure'>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-tail-命令"><span class="toc-text">1.tail 命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-常用命令"><span class="toc-text">1.1 常用命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-tail-参数说明"><span class="toc-text">1.2 tail 参数说明</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-head命令"><span class="toc-text">2.head命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-常用命令"><span class="toc-text">2.1 常用命令</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-grep-命令"><span class="toc-text">3.grep 命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-常用命令"><span class="toc-text">3.1 常用命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-grep-参数说明"><span class="toc-text">3.2 grep 参数说明</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-sed-命令"><span class="toc-text">4.sed 命令</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-less-命令-和-more-命令"><span class="toc-text">5.less 命令 和 more 命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-more"><span class="toc-text">5.1 more</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-less"><span class="toc-text">5.2 less</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-1-less-命令介绍"><span class="toc-text">5.2.1 less 命令介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-2-less命令用法"><span class="toc-text">5.2.2 less命令用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-3-less命令参数"><span class="toc-text">5.2.3 less命令参数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-总结"><span class="toc-text">6.总结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#微信公众号"><span class="toc-text">微信公众号</span></a></li></ol>
+    </div>
+  </section>
+
+
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="mailto:554882285@qq.com"
+            class="social fas fa-envelope flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://github.com/littlejoyo"
+            class="social fab fa-github flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="https://xaoxuu.com/wiki/material-x/" target="_blank" class="codename">Material X</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/app.js"></script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>
