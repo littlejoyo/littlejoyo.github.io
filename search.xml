@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>【Go语言】：搭建各系统的Go开发环境</title>
+      <link href="/2021/02/24/go/go-install/"/>
+      <url>/2021/02/24/go/go-install/</url>
+      
+        <content type="html"><![CDATA[<ul><li><p>记录Windows、Linux、Mac系统都如何搭建Go开发环境</p></li><li><p>设置GOPROXY环境变量解决包拉取过慢和失败的问题</p></li><li><p>解释go工作区各个文件路径代表的意义</p></li></ul><a id="more"></a><h1 id="1-Go安装包的下载"><a href="#1-Go安装包的下载" class="headerlink" title="1.Go安装包的下载"></a>1.Go安装包的下载</h1><p>安装包下载地址：<a href="https://golang.google.cn/dl/" target="_blank" rel="noopener">https://golang.google.cn/dl/</a></p><ul><li><p>windows: 下载.msi可执行程序</p></li><li><p>Mac：下载.pkg可执行程序</p></li><li><p>Linux：下载tar.gz压缩文件</p></li></ul><p><img src="https://i.loli.net/2021/02/24/PNMK5T8Yy3HSrjo.png" alt="image.png"></p><h1 id="2-安装和配置环境变量"><a href="#2-安装和配置环境变量" class="headerlink" title="2.安装和配置环境变量"></a>2.安装和配置环境变量</h1><h2 id="2-1-windows"><a href="#2-1-windows" class="headerlink" title="2.1 windows"></a>2.1 windows</h2><h3 id="2-1-1-安装"><a href="#2-1-1-安装" class="headerlink" title="2.1.1 安装"></a>2.1.1 安装</h3><ul><li><p>双击下载下来的.msi文件，点击“下一步”进行安装</p></li><li><p>安装路径可以选择为“D:\Go\”</p></li></ul><h3 id="2-1-2-配置环境变量"><a href="#2-1-2-配置环境变量" class="headerlink" title="2.1.2 配置环境变量"></a>2.1.2 配置环境变量</h3><ul><li><p>依次执行，右键【我的电脑】-【属性】-【高级系统设置】-【环境变量】</p></li><li><p>在【系统变量】中新建以下项目并设置对应的值</p></li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">GOROOT：D:\Go</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">GOPATH：D:\mycoding\gocoding</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">GOPROXY：https:&#x2F;&#x2F;goproxy.cn,direct</span></pre></td></tr></table></figure><ul><li><p>GOROOT：设置Go的安装路径</p></li><li><p>GOPATH：设置Go的工作空间，里面需要包含bin、pkg、src三个文件夹</p></li><li><p>GOPROXY：设置Go的国内代理地址，用于拉取go的依赖包</p></li><li><p>最后再打开CMD命令行窗口执行 <code>SET GO111MODULE=on</code> ，确保GOPOOXY生效</p></li></ul><p><img src="https://i.loli.net/2021/02/24/GWiAqSxneXDlBF1.png" alt="image.png"></p><p><img src="https://i.loli.net/2021/02/24/EsvxzSr7UahZwGg.png" alt="image.png"></p><p><img src="https://i.loli.net/2021/02/24/MBb6y4xKpLFfCeW.png" alt="image.png"></p><h3 id="2-2-3-验证"><a href="#2-2-3-验证" class="headerlink" title="2.2.3 验证"></a>2.2.3 验证</h3><ul><li><p>打开CMD命令行，输入<code>go env</code>查看go环境变量，查看上面设置的项是否生效</p></li><li><p>输入<code>go version</code>，如能正常返回go的版本，说明Go环境搭建成功</p></li></ul><p><img src="https://i.loli.net/2021/02/24/4BsmD2CzGdFRKTJ.png" alt="image.png"></p><p><img src="https://i.loli.net/2021/02/24/vgUxFpGdPwfZzQ4.png" alt="image.png"></p><h2 id="2-2-Linux和mac"><a href="#2-2-Linux和mac" class="headerlink" title="2.2 Linux和mac"></a>2.2 Linux和mac</h2><h3 id="2-2-1-Linux下安装"><a href="#2-2-1-Linux下安装" class="headerlink" title="2.2.1 Linux下安装"></a>2.2.1 Linux下安装</h3><ul><li>两个选择，可以下载.tar.gz压缩文件后上传到Linux服务器，也可以直接在Linux利用<code>wget</code>命令下载</li></ul><p><code>wget https://dl.google.com/go/go1.14.3.linux-amd64.tar.gz</code></p><ul><li>将下载好的压缩文件解压到<code>/usr/local</code>目录下</li></ul><p><code>tar -zxvf go1.14.3.linux-amd64.tar.gz -C /usr/local</code></p><ul><li>新建<code>/usr/local/goworkspace</code>作为go的开发工作区路径，包含bin、pkg、src三个文件夹</li></ul><h3 id="2-2-2-Mac下安装"><a href="#2-2-2-Mac下安装" class="headerlink" title="2.2.2 Mac下安装"></a>2.2.2 Mac下安装</h3><ul><li>下载可执行文件版，直接点击下一步安装即可，默认会将go安装到<code>/usr/local/go</code>目录下。</li></ul><h3 id="2-2-2-配置环境变量"><a href="#2-2-2-配置环境变量" class="headerlink" title="2.2.2 配置环境变量"></a>2.2.2 配置环境变量</h3><ul><li><p>Linux下有两个文件可以配置环境变量，其中<code>/etc/profile</code>中设备的环境变量是对所有用户生效的；</p></li><li><p>$HOME/.profile是对当前用户生效的，根据自己的情况自行选择一个文件打开，添加如下两行代码，保存退出。</p></li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">export GOROOT&#x3D;&#x2F;usr&#x2F;local&#x2F;go</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">export PATH&#x3D;$PATH:$GOROOT&#x2F;bin</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">export GOPATH&#x3D;&#x2F;usr&#x2F;local&#x2F;goworkspace</span></pre></td></tr></table></figure><ul><li><p>修改<code>/etc/profile</code>或者<code>$HOME/.profile</code>后使用source命令加载<code>$HOME/.profile</code>文件即可生效。</p></li><li><p>然后执行下面的命令追加环境变量，分别是开启GO111MODULE和GOPROXY</p></li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">go env -w GO111MODULE&#x3D;on &#x2F;&#x2F;开启mod</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">go env -w GOPROXY&#x3D;https:&#x2F;&#x2F;goproxy.cn,direct &#x2F;&#x2F;设置七牛云goproxy代理</span></pre></td></tr></table></figure><ul><li>最后同样执行<code>go version</code>和<code>go env</code>进行检验</li></ul><p><img src="https://i.loli.net/2021/02/28/2urkchYLf6EI38q.png" alt="image.png"></p><h1 id="3-go工作区文件解释"><a href="#3-go工作区文件解释" class="headerlink" title="3.go工作区文件解释"></a>3.go工作区文件解释</h1><ul><li><p>bin：主要存放编译后的二进制文件，比如<code>go install</code>执行后生成的文件就会存放该文件之下</p></li><li><p>pkg：主要存放编译后的库文件，比如开启了<code>gomodule</code>机制后，<code>go get</code>拉取的项目代码在<code>/pkg/mod</code>路径下</p></li><li><p>src：主要存放我们自己编写程序的源代码</p></li></ul><p><img src="https://i.loli.net/2021/02/28/AUcFPeNzipwWVky.png" alt="image.png"></p><h1 id="4-注意事项"><a href="#4-注意事项" class="headerlink" title="4.注意事项"></a>4.注意事项</h1><ul><li><p>补充说明：Go1.11版本之后，开启go mod模式之后就不再强制需要配置GOPATH了。</p></li><li><p>GOPATH机制正慢慢被官方淡化，甚至后期会进行摒弃，因为涉及到版本切换的缺点，已被<code>gomodule</code>取代</p></li><li><p>目前建议大家使用最新的Go语言版本并且打开go mod模式，然后你可以将代码文件存放在任意位置。</p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> Go </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Go </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>【Go语言】：依赖管理之vendor和Go Modules</title>
       <link href="/2020/08/09/go/go-dependency/"/>
       <url>/2020/08/09/go/go-dependency/</url>
@@ -620,9 +645,9 @@
             
             <tag> Linux </tag>
             
-            <tag> 日志 </tag>
-            
             <tag> 服务器 </tag>
+            
+            <tag> 日志 </tag>
             
         </tags>
       
