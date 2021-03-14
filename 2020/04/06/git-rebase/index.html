@@ -716,7 +716,7 @@ git rebase和git merge都是Git用来合并分支代码基本命令
                       <span class="art-item-left">
                           <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;上一页</h6>
                           <h4>
-                              <a href="/2020/04/10/network-osi/" rel="prev" title="【计算机网络】：OSI七层模型和各种协议介绍">
+                              <a href="/2020/04/10/network/network-osi/" rel="prev" title="【计算机网络】：OSI七层模型和各种协议介绍">
                                 
                                     【计算机网络】：OSI七层模型和各种协议介绍
                                 
@@ -762,7 +762,19 @@ git rebase和git merge都是Git用来合并分支代码基本命令
 
 
 
-  
+  <article class="post white-box comments">
+    <section class="article typo">
+      <h4><i class="fas fa-comments fa-fw" aria-hidden="true"></i>&nbsp;评论</h4>
+      
+      
+      
+        <section id="comments">
+          <div id="gitalk-container"></div>
+        </section>
+      
+      
+    </section>
+  </article>
 
 
 
@@ -985,14 +997,31 @@ git rebase和git merge都是Git用来合并分支代码基本命令
 
 
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: "6428b70706cc5c089758",
+      clientSecret: "acb9d963f91bf7731c5ee1ebd80b7a172ba7f7de",
+      repo: "littlejoyo.github.io",
+      owner: "littlejoyo",
+      admin: "littlejoyo",
+      
+        id: location.pathname,      // Ensure uniqueness and length less than 50
+      
+      distractionFreeMode: false  // Facebook-like distraction free mode
+    });
+    gitalk.render('gitalk-container');
+  </script>
 
 
 
 
-  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/app.js"></script>
+
+  <script src="/js/app.js"></script>
 
 
-  <script src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-material-x@19.9/js/search.js"></script>
+  <script src="/js/search.js"></script>
 
 
 
