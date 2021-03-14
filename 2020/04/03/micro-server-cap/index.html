@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>【微服务】：分布式系统的CAP理论 | JoyoHub</title>
+  
+  <meta name="keywords" content="Joyo,Java,Go,js,高并发，分布式，高性能，数据库，博客。">
+  
+  
+  <meta name="description" content="高并发，分布式，高性能，Java,Go,hexo博客文章归档。">
+  
+
+  
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.10.1/css/all.min.css">
+  
+
+  
+  <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class='cover post half'>
+      
+        
+  <h1 class='title'>JoyoHub</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder="" />
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class='menu navgation'>
+  <ul class='h-list'>
+    
+      
+        <li>
+          <a class="nav home" href="/"
+            
+            
+            id="home">
+            <i class='fas fa-rss fa-fw'></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="https://github.com/littlejoyo"
+            
+            
+            id="https:github.comlittlejoyo">
+            <i class='fas fa-code-branch fa-fw'></i>&nbsp;Github
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/archives/"
+            
+              rel="nofollow"
+            
+            
+            id="archives">
+            <i class='fas fa-archive fa-fw'></i>&nbsp;归档
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/code/"
+            
+              rel="nofollow"
+            
+            
+            id="code">
+            <i class='fas fa-battery-half fa-fw'></i>&nbsp;算法
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/"
+            
+              rel="nofollow"
+            
+            
+            id="friends">
+            <i class='fas fa-link fa-fw'></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/"
+            
+              rel="nofollow"
+            
+            
+            id="about">
+            <i class='fas fa-info-circle fa-fw'></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href='/' >
+        
+          JoyoHub
+        
+      </a>
+			<div class='menu navgation'>
+				<ul class='h-list'>
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/"
+                  
+                  
+                  id="home">
+									<i class='fas fa-grin fa-fw'></i>&nbsp;博文
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/categories/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="categories">
+									<i class='fas fa-folder-open fa-fw'></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/tags/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="tags">
+									<i class='fas fa-hashtag fa-fw'></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/archives/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="archives">
+									<i class='fas fa-archive fa-fw'></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索" />
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a class="fas fa-search fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+				
+				<li class='s-menu'><a class="fas fa-bars fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo flat-box"></a>
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a class="flat-btn fas fa-comments fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+          <li class='s-toc'><a class="flat-btn fas fa-list fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/"
+                
+                
+                id="home">
+								<i class='fas fa-clock fa-fw'></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/archives/"
+                
+                  rel="nofollow"
+                
+                
+                id="archives">
+								<i class='fas fa-archive fa-fw'></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/"
+                
+                
+                id="projects">
+								<i class='fas fa-code-branch fa-fw'></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/"
+                
+                  rel="nofollow"
+                
+                
+                id="friends">
+								<i class='fas fa-link fa-fw'></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="https://xaoxuu.com/wiki/material-x/"
+                
+                  rel="nofollow"
+                
+                
+                id="https:xaoxuu.comwikimaterial-x">
+								<i class='fas fa-book fa-fw'></i>&nbsp;主题文档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/"
+                
+                  rel="nofollow"
+                
+                
+                id="about">
+								<i class='fas fa-info-circle fa-fw'></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class='l_main'>
+  
+
+  <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    
+
+
+  <section class='meta'>
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/2020/04/03/micro-server-cap/">
+        【微服务】：分布式系统的CAP理论
+      </a>
+    </h1>
+  
+
+
+      
+      <div class='new-meta-box'>
+        
+          
+        
+          
+            
+  <div class='new-meta-item author'>
+    
+      <a href="/https:/littlejoyo.github.io" rel="nofollow">
+        
+          <img src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+        
+        <p>Joyo</p>
+      </a>
+    
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2020-04-03</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/' rel="nofollow">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+      <p>微服务</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class='notlink'>
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+    <section class="article typo">
+      <div class="article-entry" itemprop="articleBody">
+        <ul>
+<li><p>随着分布式事务的出现，传统的单机事务模型（ACID）已经无法胜任</p>
+</li>
+<li><p>尤其是对于一个高访问量、高并发的互联网分布式系统来说，要做的改变更多</p>
+</li>
+<li><p>本文主要介绍分布式系统公认的定理————CAP理论</p>
+</li>
+</ul>
+<a id="more"></a>
+
+<blockquote>
+<p>Github issues:<a href="https://github.com/littlejoyo/Blog/issues/" target="_blank" rel="noopener">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h1 id="1-单机事务的ACID理论"><a href="#1-单机事务的ACID理论" class="headerlink" title="1.单机事务的ACID理论"></a>1.单机事务的ACID理论</h1><blockquote>
+<p>ACID是数据库（MySQL）单机事务正确执行所必须满足的四个特性的首字母缩写。</p>
+</blockquote>
+<h3 id="Atomicity（原子性）"><a href="#Atomicity（原子性）" class="headerlink" title="Atomicity（原子性）"></a>Atomicity（原子性）</h3><ul>
+<li><p>一个事务的所有操作，要么全部完成，要么全部不完成。</p>
+</li>
+<li><p>所谓事务，是指由一系列数据操作所组成的完整逻辑过程。</p>
+</li>
+</ul>
+<blockquote>
+<p>比如银行转账事务由两个操作组成：从源账户扣除金额，以及向目标账户增加金额。</p>
+</blockquote>
+<h3 id="Consistency（一致性）"><a href="#Consistency（一致性）" class="headerlink" title="Consistency（一致性）"></a>Consistency（一致性）</h3><ul>
+<li>指事务开始之前和事务结束之后，数据的完整性约束没有被破坏。</li>
+</ul>
+<p><strong>包含两层含义：</strong></p>
+<ul>
+<li><p>a)数据库机制层面，事务执行前后，数据能符合设置的约束，如唯一约束、外键约束；</p>
+</li>
+<li><p>b)业务层面，由应用开发人员保证业务一致性。还是以银行转账为例，A、B两个账号，转账之前和之后，A、B两个账号余额总额必须一致。</p>
+</li>
+</ul>
+<h3 id="Isolation（隔离性）"><a href="#Isolation（隔离性）" class="headerlink" title="Isolation（隔离性）"></a>Isolation（隔离性）</h3><ul>
+<li>数据库能够防止由于多个并发事务交叉执行而导致数据的不一致。</li>
+</ul>
+<h3 id="Durability（持久性）"><a href="#Durability（持久性）" class="headerlink" title="Durability（持久性）"></a>Durability（持久性）</h3><ul>
+<li>指事务结束后，对数据的修改是永久的，不会回滚到之前的状态。</li>
+</ul>
+<h1 id="2-什么是CAP理论？"><a href="#2-什么是CAP理论？" class="headerlink" title="2.什么是CAP理论？"></a>2.什么是CAP理论？</h1><h2 id="2-1-概念"><a href="#2-1-概念" class="headerlink" title="2.1 概念"></a>2.1 概念</h2><blockquote>
+<p>ACID只适用于单机事务，但是在分布式系统中，ACID已经不适合应用了，因此为分布式系统提出了CAP理论。</p>
+</blockquote>
+<p>一个分布式系统最多只能同时满足一致性（Consistency）、可用性（Availability）和分区容错性（Partition tolerance）这三项中的两项。</p>
+<h2 id="2-2-CAP理论分析"><a href="#2-2-CAP理论分析" class="headerlink" title="2.2 CAP理论分析"></a>2.2 CAP理论分析</h2><h3 id="Consistency-一致性"><a href="#Consistency-一致性" class="headerlink" title="Consistency 一致性"></a>Consistency 一致性</h3><ul>
+<li><p>强调集群节点中数据的一致性</p>
+</li>
+<li><p>在分布式中一致性又包括强一致性和弱一致性，强一致性就是指在任何时刻任何节点看到的数据都是一样的；</p>
+</li>
+<li><p>弱一致性一般实现是最终一致性，即刚开始可能存在差异，但随着时间的推移，最终数据保持一致。</p>
+</li>
+</ul>
+<p><strong>1、强一致性</strong></p>
+<ul>
+<li><p>最强的一致性模型，要求任何读取操作都能读取到最新的值</p>
+</li>
+<li><p>换句话说，要求任何写入操作立即同步给所有进程</p>
+</li>
+</ul>
+<p><strong>2、弱一致性</strong></p>
+<ul>
+<li><p>这种一致性级别约束了系统在写入成功后，不承诺立即可以读到写入的值，也不承诺多久之后数据能够达到一致</p>
+</li>
+<li><p>但会尽可能地保证到某个时间级别（比如秒级别）后，数据能够达到一致状态。</p>
+</li>
+</ul>
+<p><strong>3、最终一致性</strong></p>
+<ul>
+<li><p>最终一致性是弱一致性的一个特例，系统会保证在一定时间内，能够达到一个数据一致的状态。</p>
+</li>
+<li><p>这里之所以将最终一致性单独提出来，是因为它是弱一致性中非常推崇的一种一致性模型，也是业界在大型分布式系统的数据一致性上比较推崇的模型。</p>
+</li>
+</ul>
+<h3 id="Availability-可用性"><a href="#Availability-可用性" class="headerlink" title="Availability 可用性"></a>Availability 可用性</h3><ul>
+<li><p>强调集群在任何时间内都正常使用</p>
+</li>
+<li><p>好的可用性主要是指系统能够很好的为用户服务，不出现用户操作失败或者访问超时等用户体验不好的情况。</p>
+</li>
+<li><p>可用性通常情况下可用性和分布式数据冗余，负载均衡等有着很大的关联。</p>
+</li>
+</ul>
+<h3 id="Partition-Tolerance-分区容错性"><a href="#Partition-Tolerance-分区容错性" class="headerlink" title="Partition Tolerance 分区容错性"></a>Partition Tolerance 分区容错性</h3><ul>
+<li><p>即使某一部分集群坏掉，另一部分仍能正常工作。</p>
+</li>
+<li><p>分布式系统在遇到某节点或网络分区故障的时候，仍然能够对外提供满足一致性或可用性的服务。</p>
+</li>
+<li><p>一般来说分布式集群都会保证P优先，即集群部分节点坏死不影响整个集群的使用，然后再去追求C和A。</p>
+</li>
+<li><p>因为如果放弃P——分区可用性，那不如就直接使用多个传统数据库了。</p>
+</li>
+</ul>
+<h1 id="3-CAP理论证明"><a href="#3-CAP理论证明" class="headerlink" title="3.CAP理论证明"></a>3.CAP理论证明</h1><h2 id="3-1-场景模拟"><a href="#3-1-场景模拟" class="headerlink" title="3.1 场景模拟"></a>3.1 场景模拟</h2><p><img src="https://i.loli.net/2020/04/05/WYAy9enKRwIVG2a.png" alt="CAP-1"></p>
+<p>上图表示网络中有两个节点N1和N2，可以简单的理解<code>N1</code>和<code>N2</code>分别是两台计算机，他们之间网络可以连通，<code>N1</code>中有一个应用程序<strong>A</strong>，和一个数据库<strong>V</strong>，<code>N2</code>也有一个应用程序<strong>B</strong>和一个数据库<strong>V</strong>。</p>
+<p>现在，A和B是分布式系统的两个部分，V是分布式系统的数据存储的两个子数据库。</p>
+<ul>
+<li><p>在满足一致性的时候，<code>N1</code>和<code>N2</code>中的数据是一样的，<strong>V0=V0</strong>。</p>
+</li>
+<li><p>在满足可用性的时候，用户不管是请求<code>N1</code>或者<code>N2</code>，都会得到立即响应。</p>
+</li>
+<li><p>在满足分区容错性的情况下，<code>N1</code>和<code>N2</code>有任何一方宕机，或者网络不通的时候，都不会影响<code>N1</code>和<code>N2</code>彼此之间的正常运作。</p>
+</li>
+</ul>
+<h2 id="3-2-分布式系统正常运转的流程"><a href="#3-2-分布式系统正常运转的流程" class="headerlink" title="3.2 分布式系统正常运转的流程"></a>3.2 分布式系统正常运转的流程</h2><p><img src="https://i.loli.net/2020/04/05/fjVG5C1QMmHbZKe.png" alt="CAP-2"></p>
+<p>上图是分布式系统正常运转的流程，用户向<code>N1</code>机器请求数据更新，程序<strong>A</strong>更新数据库<strong>V0</strong>为<strong>V1</strong>，分布式系统将数据进行同步操作M，将<strong>V1</strong>同步的<code>N2</code>中<strong>V0</strong>，使得<code>N2</code>中的数据<strong>V0</strong>也更新为<strong>V1</strong>，<code>N2</code>中的数据再响应<code>N2</code>的请求。</p>
+<p>根据上面可以定义：</p>
+<ul>
+<li><p><code>N1</code>和<code>N2</code>的数据库V之间的数据是否一样为一致性；</p>
+</li>
+<li><p>外部对<code>N1</code>和<code>N2</code>的请求响应为可用性；</p>
+</li>
+<li><p><code>N1</code>和<code>N2</code>之间的网络环境为分区容错性。</p>
+</li>
+</ul>
+<p>这是正常运作的场景，也是理想的场景，然而现实是残酷的，当错误发生的时候，一致性和可用性还有分区容错性，是否能同时满足，还是说要进行取舍呢？</p>
+<h2 id="3-3-网络调用失败情况"><a href="#3-3-网络调用失败情况" class="headerlink" title="3.3 网络调用失败情况"></a>3.3 网络调用失败情况</h2><p><img src="https://i.loli.net/2020/04/05/d6SjoEgkw5PlpBD.png" alt="CAP-3"></p>
+<p>假设在<code>N1</code>和<code>N2</code>之间网络断开的时候，有用户向<code>N1</code>发送数据更新请求，那<code>N1</code>中的数据V0将被更新为V1</p>
+<p>由于网络是断开的，所以分布式系统同步操作M，所以<code>N2</code>中的数据依旧是V0；这个时候，有用户向<code>N2</code>发送数据读取请求，由于数据还没有进行同步，应用程序没办法立即给用户返回最新的数据V1，怎么办呢？</p>
+<p><strong>可供选择的做法：</strong></p>
+<p>1.牺牲数据一致性，响应旧的数据V0给用户；</p>
+<p>2.牺牲可用性，阻塞等待，直到网络连接恢复，数据更新操作M完成之后，再给用户响应最新的数据V1。</p>
+<blockquote>
+<p>这个过程，证明了要满足<strong>分区容错性</strong>的分布式系统，只能在<strong>一致性</strong>和<strong>可用性</strong>两者中，选择其中一个。</p>
+</blockquote>
+<h1 id="4-CAP权衡"><a href="#4-CAP权衡" class="headerlink" title="4.CAP权衡"></a>4.CAP权衡</h1><blockquote>
+<p>通过CAP理论，我们知道无法同时满足一致性、可用性和分区容错性这三个特性，那要舍弃哪个呢？</p>
+</blockquote>
+<p><strong>CA without P：</strong></p>
+<ul>
+<li><p>如果不要求P（不允许分区容错），则C（强一致性）和A（可用性）是可以保证的。</p>
+</li>
+<li><p>但其实分区不是你想不想的问题，而是始终会存在，因此CA的系统更多的是允许分区后各子系统依然保持CA。</p>
+</li>
+</ul>
+<p><strong>CP without A：</strong></p>
+<ul>
+<li><p>如果不要求A（可用），相当于每个请求都需要在Server之间强一致，而P（分区）会导致同步时间无限延长，如此CP也是可以保证的。</p>
+</li>
+<li><p>很多传统的数据库分布式事务都属于这种模式。</p>
+</li>
+</ul>
+<p><strong>AP wihtout C：</strong></p>
+<ul>
+<li><p>保留高可用并允许分区，则需放弃一致性。</p>
+</li>
+<li><p>一旦分区发生，节点之间可能会失去联系，为了高可用，每个节点只能用本地数据提供服务，而这样会导致全局数据的不一致性。</p>
+</li>
+<li><p>现在众多的NoSQL都属于此类。</p>
+</li>
+</ul>
+<p><strong>应用场景：</strong></p>
+<ul>
+<li><p>对于多数大型互联网应用的场景，主机众多、部署分散，而且现在的集群规模越来越大，所以节点故障、网络故障是常态，而且要保证服务可用性达到N个9，即保证P和A，舍弃C（退而求其次保证最终一致性）。</p>
+</li>
+<li><p>虽然某些地方会影响客户体验，但没达到造成用户流程的严重程度。</p>
+</li>
+<li><p>对于涉及到钱财这样不能有一丝让步的场景，C必须保证。<br>网络发生故障宁可停止服务，这是保证CA，舍弃P。</p>
+</li>
+</ul>
+<h1 id="5-BASE理论"><a href="#5-BASE理论" class="headerlink" title="5.BASE理论"></a>5.BASE理论</h1><blockquote>
+<p>BASE理论是对CAP理论的延伸,核心思想是即使无法做到强一致性(Strong Consistency),但应用可以采用适合的方式达到最终一致性(Eventual Consitency)。</p>
+</blockquote>
+<h3 id="基本可用-Basically-Available"><a href="#基本可用-Basically-Available" class="headerlink" title="基本可用(Basically Available)"></a>基本可用(Basically Available)</h3><ul>
+<li><p><strong>基本可用</strong>是指分布式系统在出现故障的时候,允许损失部分可用性,即保证核心可用。</p>
+</li>
+<li><p>电商大促时,为了应对访问量激增,部分用户可能会被引导到降级页面,服务层也可能只提供<strong>降级服务</strong>。这就是损失部分可用性的体现。</p>
+</li>
+</ul>
+<h3 id="软状态-Soft-State"><a href="#软状态-Soft-State" class="headerlink" title="软状态( Soft State)"></a>软状态( Soft State)</h3><p><strong>什么是软状态呢？</strong></p>
+<p>相对于原子性而言，要求多个节点的数据副本都是一致的，这是一种“硬状态”。</p>
+<ul>
+<li><p><strong>软状态</strong>指的是：允许系统中的数据存在<strong>中间状态</strong>，并认为该状态不影响系统的整体可用性，即允许系统在多个不同节点的数据副本存在数据延时。</p>
+</li>
+<li><p>分布式存储中一般一份数据至少会有三个副本,允许不同节点间副本同步的延时就是软状态的体现。</p>
+</li>
+<li><p><code>mysql replication</code>的异步复制也是一种体现。</p>
+</li>
+</ul>
+<h3 id="最终一致性-Eventual-Consistency"><a href="#最终一致性-Eventual-Consistency" class="headerlink" title="最终一致性( Eventual Consistency)"></a>最终一致性( Eventual Consistency)</h3><ul>
+<li><p><strong>最终一致性</strong>是指系统中的所有数据副本经过一定时间后,最终能够达到一致的状态。</p>
+</li>
+<li><p>弱一致性和强一致性相反,最终一致性是弱一致性的一种特殊情况。</p>
+</li>
+</ul>
+<blockquote>
+<p>BASE和ACID代表两种截然相反的设计理念，ACID注重一致性，是传统关系型数据库（MySQL）的设计思路，BASE关注高可用性。</p>
+</blockquote>
+<p>当今大规模、跨数据中心的分布式系统（如云计算）大多同时采用这两种设计理念，并在两者之间寻求平衡。</p>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" alt="weixin-a"></p>
+
+      </div>
+      
+        <br>
+        
+
+
+  <section class='meta' id="footer-meta">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T12:28:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>更新于 2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>微服务</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E6%9E%B6%E6%9E%84/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>架构</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/2020/04/03/micro-server-cap/&title=【微服务】：分布式系统的CAP理论 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+随着分布式事务的出现，传统的单机事务模型（ACID）已经无法胜任
+
+尤其是对于一个高访问量、高并发的互联网分布式系统来说，要做的改变更多
+
+本文主要介绍分布式系统公认的定理————CAP理论
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/2020/04/03/micro-server-cap/&title=【微服务】：分布式系统的CAP理论 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+随着分布式事务的出现，传统的单机事务模型（ACID）已经无法胜任
+
+尤其是对于一个高访问量、高并发的互联网分布式系统来说，要做的改变更多
+
+本文主要介绍分布式系统公认的定理————CAP理论
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/2020/04/03/micro-server-cap/&title=【微服务】：分布式系统的CAP理论 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+随着分布式事务的出现，传统的单机事务模型（ACID）已经无法胜任
+
+尤其是对于一个高访问量、高并发的互联网分布式系统来说，要做的改变更多
+
+本文主要介绍分布式系统公认的定理————CAP理论
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+      
+      
+          <div class="prev-next">
+              
+                  <section class="prev">
+                      <span class="art-item-left">
+                          <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;上一页</h6>
+                          <h4>
+                              <a href="/2020/04/06/git-rebase/" rel="prev" title="【Git】：git rebase和git merge有什么区别？">
+                                
+                                    【Git】：git rebase和git merge有什么区别？
+                                
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/Git/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Git</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+              
+                  <section class="next">
+                      <span class="art-item-right" aria-hidden="true">
+                          <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                          <h4>
+                              <a href="/2020/04/03/mysql/mysql-length/" rel="prev" title="【Mysql数据库】：int(10)和int(11)有什么区别？">
+                                  
+                                      【Mysql数据库】：int(10)和int(11)有什么区别？
+                                  
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 数据库</a> <a class="tag" href="/tags/Mysql/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Mysql</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+          </div>
+      
+    </section>
+  </article>
+
+
+
+  <!-- 显示推荐文章和评论 -->
+
+
+
+  <article class="post white-box comments">
+    <section class="article typo">
+      <h4><i class="fas fa-comments fa-fw" aria-hidden="true"></i>&nbsp;评论</h4>
+      
+      
+      
+        <section id="comments">
+          <div id="gitalk-container"></div>
+        </section>
+      
+      
+    </section>
+  </article>
+
+
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: '【微服务】：分布式系统的CAP理论',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class='l_side'>
+  
+    
+    
+      
+      
+        
+          
+          
+        
+          
+          
+            
+              
+  <section class='widget toc-wrapper'>
+    
+<header class='pure'>
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <!-- <div class='wrapper'><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer noopener" href="javascript:void(0)" target="_blank"><i class="fas fa-thumbtack fa-fw"></i></a></div> -->
+  
+</header>
+
+    <div class='content pure'>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-单机事务的ACID理论"><span class="toc-text">1.单机事务的ACID理论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Atomicity（原子性）"><span class="toc-text">Atomicity（原子性）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Consistency（一致性）"><span class="toc-text">Consistency（一致性）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Isolation（隔离性）"><span class="toc-text">Isolation（隔离性）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Durability（持久性）"><span class="toc-text">Durability（持久性）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-什么是CAP理论？"><span class="toc-text">2.什么是CAP理论？</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-概念"><span class="toc-text">2.1 概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-CAP理论分析"><span class="toc-text">2.2 CAP理论分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Consistency-一致性"><span class="toc-text">Consistency 一致性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Availability-可用性"><span class="toc-text">Availability 可用性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Partition-Tolerance-分区容错性"><span class="toc-text">Partition Tolerance 分区容错性</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-CAP理论证明"><span class="toc-text">3.CAP理论证明</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-场景模拟"><span class="toc-text">3.1 场景模拟</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-分布式系统正常运转的流程"><span class="toc-text">3.2 分布式系统正常运转的流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-网络调用失败情况"><span class="toc-text">3.3 网络调用失败情况</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-CAP权衡"><span class="toc-text">4.CAP权衡</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-BASE理论"><span class="toc-text">5.BASE理论</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基本可用-Basically-Available"><span class="toc-text">基本可用(Basically Available)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#软状态-Soft-State"><span class="toc-text">软状态( Soft State)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#最终一致性-Eventual-Consistency"><span class="toc-text">最终一致性( Eventual Consistency)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#微信公众号"><span class="toc-text">微信公众号</span></a></li></ol>
+    </div>
+  </section>
+
+
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="mailto:554882285@qq.com"
+            class="social fas fa-envelope flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://github.com/littlejoyo"
+            class="social fab fa-github flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="" target="_blank" class="codename">Material X</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: "6428b70706cc5c089758",
+      clientSecret: "acb9d963f91bf7731c5ee1ebd80b7a172ba7f7de",
+      repo: "littlejoyo.github.io",
+      owner: "littlejoyo",
+      admin: "littlejoyo",
+      
+        id: location.pathname,      // Ensure uniqueness and length less than 50
+      
+      distractionFreeMode: false  // Facebook-like distraction free mode
+    });
+    gitalk.render('gitalk-container');
+  </script>
+
+
+
+
+
+  <script src="/js/app.js"></script>
+
+
+  <script src="/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>

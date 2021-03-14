@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>【Git】：git rebase和git merge有什么区别？ | JoyoHub</title>
+  
+  <meta name="keywords" content="Joyo,Java,Go,js,高并发，分布式，高性能，数据库，博客。">
+  
+  
+  <meta name="description" content="高并发，分布式，高性能，Java,Go,hexo博客文章归档。">
+  
+
+  
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.10.1/css/all.min.css">
+  
+
+  
+  <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class='cover post half'>
+      
+        
+  <h1 class='title'>JoyoHub</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder="" />
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class='menu navgation'>
+  <ul class='h-list'>
+    
+      
+        <li>
+          <a class="nav home" href="/"
+            
+            
+            id="home">
+            <i class='fas fa-rss fa-fw'></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="https://github.com/littlejoyo"
+            
+            
+            id="https:github.comlittlejoyo">
+            <i class='fas fa-code-branch fa-fw'></i>&nbsp;Github
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/archives/"
+            
+              rel="nofollow"
+            
+            
+            id="archives">
+            <i class='fas fa-archive fa-fw'></i>&nbsp;归档
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/code/"
+            
+              rel="nofollow"
+            
+            
+            id="code">
+            <i class='fas fa-battery-half fa-fw'></i>&nbsp;算法
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/"
+            
+              rel="nofollow"
+            
+            
+            id="friends">
+            <i class='fas fa-link fa-fw'></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/"
+            
+              rel="nofollow"
+            
+            
+            id="about">
+            <i class='fas fa-info-circle fa-fw'></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href='/' >
+        
+          JoyoHub
+        
+      </a>
+			<div class='menu navgation'>
+				<ul class='h-list'>
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/"
+                  
+                  
+                  id="home">
+									<i class='fas fa-grin fa-fw'></i>&nbsp;博文
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/categories/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="categories">
+									<i class='fas fa-folder-open fa-fw'></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/tags/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="tags">
+									<i class='fas fa-hashtag fa-fw'></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/archives/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="archives">
+									<i class='fas fa-archive fa-fw'></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索" />
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a class="fas fa-search fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+				
+				<li class='s-menu'><a class="fas fa-bars fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo flat-box"></a>
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a class="flat-btn fas fa-comments fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+          <li class='s-toc'><a class="flat-btn fas fa-list fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/"
+                
+                
+                id="home">
+								<i class='fas fa-clock fa-fw'></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/archives/"
+                
+                  rel="nofollow"
+                
+                
+                id="archives">
+								<i class='fas fa-archive fa-fw'></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/"
+                
+                
+                id="projects">
+								<i class='fas fa-code-branch fa-fw'></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/"
+                
+                  rel="nofollow"
+                
+                
+                id="friends">
+								<i class='fas fa-link fa-fw'></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="https://xaoxuu.com/wiki/material-x/"
+                
+                  rel="nofollow"
+                
+                
+                id="https:xaoxuu.comwikimaterial-x">
+								<i class='fas fa-book fa-fw'></i>&nbsp;主题文档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/"
+                
+                  rel="nofollow"
+                
+                
+                id="about">
+								<i class='fas fa-info-circle fa-fw'></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class='l_main'>
+  
+
+  <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    
+
+
+  <section class='meta'>
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/2020/04/06/git-rebase/">
+        【Git】：git rebase和git merge有什么区别？
+      </a>
+    </h1>
+  
+
+
+      
+      <div class='new-meta-box'>
+        
+          
+        
+          
+            
+  <div class='new-meta-item author'>
+    
+      <a href="/https:/littlejoyo.github.io" rel="nofollow">
+        
+          <img src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+        
+        <p>Joyo</p>
+      </a>
+    
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2020-04-06</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/Git/' rel="nofollow">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+      <p>Git</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class='notlink'>
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+    <section class="article typo">
+      <div class="article-entry" itemprop="articleBody">
+        <ul>
+<li><p>git rebase和git merge都是Git用来合并分支代码基本命令</p>
+</li>
+<li><p>在 Git 工作流中，两者作用一致，但是原理上却不相同</p>
+</li>
+<li><p>另外，git rebase为什么在某些场景下会被限制使用呢？</p>
+</li>
+</ul>
+<a id="more"></a>
+
+<blockquote>
+<p>Github issues:<a href="https://github.com/littlejoyo/Blog/issues/" target="_blank" rel="noopener">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h1 id="1-场景模拟"><a href="#1-场景模拟" class="headerlink" title="1.场景模拟"></a>1.场景模拟</h1><p>假设当前我们有master和feature分支，当你在专用分支上开发新 feature 时，然后另一个团队成员在 master 分支提交了新的 commits，这种属于正常的Git工作场景。如下图：</p>
+<p><img src="https://i.loli.net/2020/04/06/yFckAlPCj3n2o59.png" alt="git-work"></p>
+<p>现在，假设在 master 分支上的新提交与你正在开发的 feature 相关，需要master分支将新提交的记录合并到你的 feature 分支中。</p>
+<p>当我们需要对分支代码进行合并的时候，一般会使用下面两个命令：</p>
+<ul>
+<li><p>git merge </p>
+</li>
+<li><p>git rebase</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>git rebase</strong>和<strong>git merge</strong>这两个命令都旨在将更改代码从一个分支合并到另一个分支，但二者的合并方式却有很大的不同。</p>
+</blockquote>
+<h1 id="2-git-merge"><a href="#2-git-merge" class="headerlink" title="2.git merge"></a>2.git merge</h1><p>使用git merge 命令将 <code>master</code> 分支合并到 <code>feature</code>分支中：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">git checkout feature</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">git <span class="keyword">merge</span> <span class="keyword">master</span></span></pre></td></tr></table></figure>
+
+<p>缩写为一句代码就是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">git <span class="keyword">merge</span> feature <span class="keyword">master</span></span></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/04/06/S5YmfCK7wW1JxTB.png" alt="git-merge"></p>
+<p>由上图可知，git merge 会在 <code>feature</code> 分支中新增一个新的 <strong>merge commit</strong>，然后将两个分支的历史联系在一起</p>
+<ul>
+<li><p>使用 merge 是很好的方式，因为它是一种<strong>非破坏性的</strong>操作，对现有分支不会以任何方式被更改。</p>
+</li>
+<li><p>另一方面，这也意味着 <code>feature</code> 分支每次需要合并上游更改时，它都将产生一个额外的合并提交。</p>
+</li>
+<li><p>如果master 提交非常活跃，这可能会严重污染你的 <code>feature</code> 分支历史记录。不过这个问题可以使用高级选项 <code>git log</code> 来缓解</p>
+</li>
+</ul>
+<h1 id="3-git-rebase"><a href="#3-git-rebase" class="headerlink" title="3.git rebase"></a>3.git rebase</h1><p>使用git rebase 命令将 <code>master</code> 分支合并到 <code>feature</code>分支中：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">git checkout feature</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">git rebase master</span></pre></td></tr></table></figure>
+
+<p>缩写为一句代码就是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">git rebase feature master</span></pre></td></tr></table></figure>
+
+<p><img src="https://i.loli.net/2020/04/06/F1qIGKTNDW6aRul.png" alt="git-rebase"></p>
+<ul>
+<li><p>rebase 会将整个 <code>feature</code> 分支移动到 <code>master</code> 分支的<strong>顶端</strong>，从而有效地整合了所有 master 分支上的提交。</p>
+</li>
+<li><p>但是，与 merge 提交方式不同，rebase 通过为原始分支中的每个提交创建全新的 commits 来重写项目历史记录,特点是仍然会在<code>feature</code>分支上形成线性提交</p>
+</li>
+<li><p>rebase 的主要好处是可以获得更清晰的项目历史。首先，它消除了 git merge 所需的不必要的合并提交；其次，正如你在上图中所看到的，rebase 会产生完美线性的项目历史记录，你可以在 feature分支上没有任何分叉的情况下一直追寻到项目的初始提交。</p>
+</li>
+</ul>
+<p><strong>git rebase原理再深入：</strong></p>
+<p>将<code>master</code>分支代码合并到<code>feature</code>上：</p>
+<p><img src="https://i.loli.net/2020/04/06/kdAPQeMRN7DhyrY.png" alt="rebase"></p>
+<ul>
+<li><p>这边需要强调一个概念：<strong>reapply(重放)</strong>，使用rebase并不是简单地好像你用<strong>ctrl-x/ctrl-v</strong>进行剪切复制一样</p>
+</li>
+<li><p>rebase会依次地将你所要操作的分支的所有提交应用到目标分支上</p>
+</li>
+</ul>
+<p>合并过程如下图：</p>
+<p><img src="https://i.loli.net/2020/04/06/SogmKiIswFJG3V6.png" alt="git-rebase-1"></p>
+<p>从上图可以看出，在对特征分支进行rebase之后，其等效于创建了新的提交。并且老的提交也没有被销毁，只是简单地不能再被访问或者使用。</p>
+<blockquote>
+<p>实际上在执行rebase的时候，有两个隐含的注意点：</p>
+</blockquote>
+<p>1.在重放之前的提交的时候，<strong>Git会创建新的提交</strong>，也就是说即使你重放的提交与之前的一模一样Git也会将之<strong>当做新的独立的提交</strong>进行处理。</p>
+<p>2.<strong>Git rebase并不会删除老的提交</strong>，也就是说你在对某个分支执行了rebase操作之后，老的提交仍然会存放在.git文件夹的objects目录下。</p>
+<p>如果想要在线进行Git工作场景的模拟，可以到此<a href="https://learngitbranching.js.org/?locale=zh_CN" target="_blank" rel="noopener">Git Online</a></p>
+<h1 id="4-如何选择git-merge和git-rebase"><a href="#4-如何选择git-merge和git-rebase" class="headerlink" title="4.如何选择git merge和git rebase?"></a>4.如何选择git merge和git rebase?</h1><p>根据上面的对比可知:</p>
+<ul>
+<li><p><strong>git merge</strong>优点是分支代码合并后不破坏原分支的代码提交记录，缺点就是会产生额外的提交记录并进行两条分支的合并，</p>
+</li>
+<li><p><strong>git rebase</strong> 优点是无须新增提交记录到目标分支，rebase后可以将对象分支的提交历史续上目标分支上，形成线性提交历史记录，进行review的时候更加直观</p>
+</li>
+<li><p>git merge 如果有多人进行开发并进行分支合并，会形成复杂的合并分支图，如下图：</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/04/06/6dW3fTI27B1Xbro.png" alt="git-merge"></p>
+<blockquote>
+<p>问题：既然rebase如此有用，那么可以使用rebase完全取代merge吗？ 答案：不能！</p>
+</blockquote>
+<p>git rebase的黄金原则：</p>
+<ul>
+<li><strong>不能在一个共享的分支上进行Git rebase操作。</strong></li>
+</ul>
+<p><strong>总结：</strong></p>
+<ul>
+<li><p>融合代码到公共分支的时使用<code>git merge</code>,而不用<code>git rebase</code></p>
+</li>
+<li><p>融合代码到个人分支的时候使用<code>git rebase</code>，可以不污染分支的提交记录，形成简洁的线性提交历史记录。</p>
+</li>
+</ul>
+<h1 id="5-rebase的黄金原则"><a href="#5-rebase的黄金原则" class="headerlink" title="5.rebase的黄金原则"></a>5.rebase的黄金原则</h1><blockquote>
+<p>问题：为什么不能再一个共享的分支上进行Git rebase操作呢？</p>
+</blockquote>
+<p>所谓共享的分支，即是指那些存在于远端并且允许团队中的其他人进行Pull操作的分支，比如我们Git工作的master分支就是最常见的公共分支。</p>
+<p>假设现在Bob和Anna在同一个项目组中工作，项目所属的仓库和分支大概是下图这样：</p>
+<p><img src="https://i.loli.net/2020/04/06/CeRwsKUWxoOmbnV.png" alt="rebase-1"></p>
+<p>现在Bob为了图一时方便打破了原则，正巧这时Anna在特征分支上进行了新的提交，此时的结构图大概是这样的：</p>
+<p><img src="https://i.loli.net/2020/04/06/xWeQj5HPCcyTIAd.png" alt="rebase-2"></p>
+<p>当Bob推送自己的分支到远端的时候，现在的分支情况如下：</p>
+<p><img src="https://i.loli.net/2020/04/06/Eb3Ch4UeVBWaxjH.png" alt="rebase-3"></p>
+<p>然后呢，当Anna也进行推送的时候，她会得到如下的提醒，Git提醒Anna她本地的版本与远程分支并不一致，需要向远端服务器拉取代码进行同步：</p>
+<p><img src="https://i.loli.net/2020/04/06/IcByegf5CYwOL63.png" alt="rebase-4"></p>
+<p>在Anna提交之前，分支中的Commit序列是如下这样的：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">A<span class="comment">--B--C--D'   origin/feature // GitHub</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">A<span class="comment">--B--D--E    feature        // Anna</span></span></pre></td></tr></table></figure>
+
+<p>在进行Pull操作之后，Git会进行自动地合并操作，结果大概是这样的：</p>
+<p><img src="https://i.loli.net/2020/04/06/nSuZJRONGkIsHxa.png" alt="rebase-5"></p>
+<p>这个第M个提交即代表着合并的提交，也就是Anna本地的分支与Github上的特征分支最终合并的点，现在Anna解决了所有的合并冲突并且可以Push她的代码，在Bob进行Pull之后，每个人的Git Commit结构为：</p>
+<p><img src="https://i.loli.net/2020/04/06/1gymbXko7IhKWfF.png" alt="rebase-6"></p>
+<p>看到上面这个混乱的流线图，相信你对于Rebase和所谓的黄金准则也有了更形象深入的理解。</p>
+<blockquote>
+<p>假设下还有一哥们Emma，第三个开发人员，在他进行了本地Commit并且Push到远端之后，仓库变为了：</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/04/06/3jsGSy7Qei4g8a2.png" alt="rebase-7"></p>
+<ul>
+<li><p>这还只是仅有几个人，一个特征分支的项目因为误用rebase产生的后果。如果你团队中的每个人都对公共分支进行rebase操作，那么后果就是乱成一片。</p>
+</li>
+<li><p>另外，相信你也注意到，在远端的仓库中存有大量的重复的Commit信息，这会大大浪费我们的存储空间。</p>
+</li>
+<li><p>因此，<strong>不能在一个共享的分支上进行Git rebase操作,避免出现项目分支代码提交记录错乱和浪费存储空间的现象。</strong></p>
+</li>
+</ul>
+<h1 id="6-使用rebase合并多次提交记录"><a href="#6-使用rebase合并多次提交记录" class="headerlink" title="6.使用rebase合并多次提交记录"></a>6.使用rebase合并多次提交记录</h1><blockquote>
+<p>rebase和merge不同的作用还有一个就是合并分支多次提交记录。</p>
+</blockquote>
+<p>在分支开发的过程中，我们常常会出现为了调试程序而多次提交代码记录，但是这些记录的共同目的都是为了解决某一个需求，所以，是否可以将这些记录合并起来为一个新的记录会更方便进行代码的review呢？</p>
+<p><strong>git rebase提供了合并记录的作用</strong></p>
+<p>下面是一个合并的案例过程：</p>
+<p>1.尝试合并分支的最近 4 次提交纪录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">git rebase -i HEAD~4</span></pre></td></tr></table></figure>
+
+<p>2.这时候，会自动进入 vi 编辑模式：</p>
+<p><img src="https://i.loli.net/2020/04/07/qiQa7GHzO2wUhIp.png" alt="rebase-x"></p>
+<p>进入编辑模式，第一列为操作指令，第二列为commit号，第三列为commit信息。</p>
+<ul>
+<li><p>pick：保留该commit；</p>
+</li>
+<li><p>reword：保留该commit但是修改commit信息；</p>
+</li>
+<li><p>edit：保留该commit但是要修改commit内容；</p>
+</li>
+<li><p>squash：将该commit和前一个commit合并；</p>
+</li>
+<li><p>fixup：将该commit和前一个commit合并，并不保留该commit的commit信息；</p>
+</li>
+<li><p>exec：执行shell命令；</p>
+</li>
+<li><p>drop：删除该commit。</p>
+</li>
+</ul>
+<p>按照如上命令来修改你的提交记录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">p 799770a add article</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">s 72530e4 add article</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">s 53284b1 add article</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">s 9f6e388 add article</span></pre></td></tr></table></figure>
+
+<p>成功合并了四条记录为一条：</p>
+<p><img src="https://i.loli.net/2020/04/07/3YI6kjyh7ltDcmC.png" alt="success"></p>
+<p>如果保存的时候，你碰到了这个错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">error: cannot &#39;squash&#39; without a previous commit</span></pre></td></tr></table></figure>
+
+<p>说明你在合并记录的时候顺序错误了，压缩顺序应该是从下往上，而不是从上往下，否则就会触发上面的错误。也就是以新记录为准。</p>
+<p>例如上面的例子写成了这样就是出现错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">s 799770a add article</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">s 72530e4 add article</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">s 53284b1 add article</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">p 9f6e388 add article</span></pre></td></tr></table></figure>
+
+<p>中途出现异常退出了 vi窗口，执行下面命令可以返回编辑窗口：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">git rebase --edit-todo</span></pre></td></tr></table></figure>
+
+<p>继续编辑合并记录的操作，修改完保存一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">git rebase --continue</span></pre></td></tr></table></figure>
+
+<h1 id="7-git-pull-–rebase的应用"><a href="#7-git-pull-–rebase的应用" class="headerlink" title="7.git pull –rebase的应用"></a>7.git pull –rebase的应用</h1><h2 id="7-1-场景介绍"><a href="#7-1-场景介绍" class="headerlink" title="7.1 场景介绍"></a>7.1 场景介绍</h2><p>同事都基于git flow工作流的话都会从<code>develop</code>拉出分支进行并行开发，这里的分支可能是多到数十个，然后彼此在进行自己的逻辑编写，时间可能需要几天或者几周。</p>
+<p>在这期间你可能需要时不时的需要pull下远程develop分支上的同事的提交。这是个好的习惯，这样下去就可以避免你在一个无用的代码上进行长期的开发，回头来看这些代码不是新的代码。甚至是会面临很多冲突需要解决，而这个时候你可能还需要对冲突的部分代码进行测试和问题解决，你在有些时候pull代码的时候会有这样的一个提示：</p>
+<p><img src="https://i.loli.net/2020/04/07/lwtOEmdH9BI5fja.png" alt="pull"></p>
+<p>通常习惯性的你可能会，”esc ：wq“，直接默认commit注释。然后你的commit log就多了一笔很不好看的log。</p>
+<p><img src="https://i.loli.net/2020/04/07/noC7k4KzTswPUqm.png" alt="log"></p>
+<h2 id="7-2-如何移除多余的merge-commit"><a href="#7-2-如何移除多余的merge-commit" class="headerlink" title="7.2 如何移除多余的merge commit"></a>7.2 如何移除多余的merge commit</h2><blockquote>
+<p>很简单，只要你在pull时候需要习惯性的加上—rebase参数，这样可以避免很多问题。</p>
+</blockquote>
+<p><code>git pull --rebase</code>可以免去分支中出现大量的merge commit，基本原理就像上面rebase一样，合并过程会直接融合到目标分支的顶端，形成线性历史提交。</p>
+<h2 id="7-3-分析过程"><a href="#7-3-分析过程" class="headerlink" title="7.3 分析过程"></a>7.3 分析过程</h2><p>1.正常情况下的分支commit路线并且当前develop分支上有三个commit。</p>
+<p>2.现在我们两个项目开始启动，需要分别拉出两个分支独立开发，提交过程如图：</p>
+<p><img src="https://i.loli.net/2020/04/07/yLIcez1GkDOJ6aF.png" alt="pull"></p>
+<p>3.我们分别checkout –b 出来两个分支，独立开发互不干扰。正常情况下，如果这两个分支的改动都没有冲突的时候，一切都很顺利的。</p>
+<p>4.我在develop_newfeature_authorcheck里修改了点东西，push到develop。然后checkout 到develop_newfeature_apiwrapper。</p>
+<p>5.当我再git pull，这将会把develop_newfeature_authorcheck分支的修改直接拉下来于本地代码merge，且产生一个commit，也就是merge commit。</p>
+<p><img src="https://i.loli.net/2020/04/07/BgW9QrZYuCFxMOV.png" alt="pull"></p>
+<p>6.使用<code>git pull –rebase</code>产生的提交结果就完全不一样,rebase并不会产生一个commit提交，而是会将你的E commit附加到D commit的结尾处。在看commit log时，不会多出你所不知道的commit出来。其实此处的F commmit是无意义的，它只是一个merge commit。</p>
+<p><img src="https://i.loli.net/2020/04/07/6Ghz8mYrNgCEH9L.png" alt="pull"></p>
+<blockquote>
+<p>很明显，git pull –rebase 会使commit看起来很自然,因为代码都有一个前后依赖，看起来更加的直观。</p>
+</blockquote>
+<h3 id="注意："><a href="#注意：" class="headerlink" title="注意："></a>注意：</h3><p>在公共的分支上，例如<code>master</code>仍然要遵守rebase黄金原则，不用使用<code>git pull --rabase</code>进行代码的拉取，更改代码的历史提交记录。</p>
+<p>参考资料：<a href="https://segmentfault.com/a/1190000005937408" target="_blank" rel="noopener">https://segmentfault.com/a/1190000005937408</a></p>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" alt="weixin-a"></p>
+
+      </div>
+      
+        <br>
+        
+
+
+  <section class='meta' id="footer-meta">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T12:28:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>更新于 2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Git/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>Git</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/2020/04/06/git-rebase/&title=【Git】：git rebase和git merge有什么区别？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+git rebase和git merge都是Git用来合并分支代码基本命令
+
+在 Git 工作流中，两者作用一致，但是原理上却不相同
+
+另外，git rebase为什么在某些场景下会被限制使用呢？
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/2020/04/06/git-rebase/&title=【Git】：git rebase和git merge有什么区别？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+git rebase和git merge都是Git用来合并分支代码基本命令
+
+在 Git 工作流中，两者作用一致，但是原理上却不相同
+
+另外，git rebase为什么在某些场景下会被限制使用呢？
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/2020/04/06/git-rebase/&title=【Git】：git rebase和git merge有什么区别？ | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+git rebase和git merge都是Git用来合并分支代码基本命令
+
+在 Git 工作流中，两者作用一致，但是原理上却不相同
+
+另外，git rebase为什么在某些场景下会被限制使用呢？
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+      
+      
+          <div class="prev-next">
+              
+                  <section class="prev">
+                      <span class="art-item-left">
+                          <h6><i class="fas fa-chevron-left" aria-hidden="true"></i>&nbsp;上一页</h6>
+                          <h4>
+                              <a href="/2020/04/10/network/network-osi/" rel="prev" title="【计算机网络】：OSI七层模型和各种协议介绍">
+                                
+                                    【计算机网络】：OSI七层模型和各种协议介绍
+                                
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E7%BD%91%E7%BB%9C/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 网络</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+              
+                  <section class="next">
+                      <span class="art-item-right" aria-hidden="true">
+                          <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                          <h4>
+                              <a href="/2020/04/03/micro-server-cap/" rel="prev" title="【微服务】：分布式系统的CAP理论">
+                                  
+                                      【微服务】：分布式系统的CAP理论
+                                  
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 微服务</a> <a class="tag" href="/tags/%E6%9E%B6%E6%9E%84/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> 架构</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+          </div>
+      
+    </section>
+  </article>
+
+
+
+  <!-- 显示推荐文章和评论 -->
+
+
+
+  <article class="post white-box comments">
+    <section class="article typo">
+      <h4><i class="fas fa-comments fa-fw" aria-hidden="true"></i>&nbsp;评论</h4>
+      
+      
+      
+        <section id="comments">
+          <div id="gitalk-container"></div>
+        </section>
+      
+      
+    </section>
+  </article>
+
+
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: '【Git】：git rebase和git merge有什么区别？',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class='l_side'>
+  
+    
+    
+      
+      
+        
+          
+          
+        
+          
+          
+            
+              
+  <section class='widget toc-wrapper'>
+    
+<header class='pure'>
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <!-- <div class='wrapper'><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer noopener" href="javascript:void(0)" target="_blank"><i class="fas fa-thumbtack fa-fw"></i></a></div> -->
+  
+</header>
+
+    <div class='content pure'>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-场景模拟"><span class="toc-text">1.场景模拟</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-git-merge"><span class="toc-text">2.git merge</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-git-rebase"><span class="toc-text">3.git rebase</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-如何选择git-merge和git-rebase"><span class="toc-text">4.如何选择git merge和git rebase?</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-rebase的黄金原则"><span class="toc-text">5.rebase的黄金原则</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-使用rebase合并多次提交记录"><span class="toc-text">6.使用rebase合并多次提交记录</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-git-pull-–rebase的应用"><span class="toc-text">7.git pull –rebase的应用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#7-1-场景介绍"><span class="toc-text">7.1 场景介绍</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-2-如何移除多余的merge-commit"><span class="toc-text">7.2 如何移除多余的merge commit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-3-分析过程"><span class="toc-text">7.3 分析过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#注意："><span class="toc-text">注意：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#微信公众号"><span class="toc-text">微信公众号</span></a></li></ol>
+    </div>
+  </section>
+
+
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="mailto:554882285@qq.com"
+            class="social fas fa-envelope flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://github.com/littlejoyo"
+            class="social fab fa-github flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="" target="_blank" class="codename">Material X</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: "6428b70706cc5c089758",
+      clientSecret: "acb9d963f91bf7731c5ee1ebd80b7a172ba7f7de",
+      repo: "littlejoyo.github.io",
+      owner: "littlejoyo",
+      admin: "littlejoyo",
+      
+        id: location.pathname,      // Ensure uniqueness and length less than 50
+      
+      distractionFreeMode: false  // Facebook-like distraction free mode
+    });
+    gitalk.render('gitalk-container');
+  </script>
+
+
+
+
+
+  <script src="/js/app.js"></script>
+
+
+  <script src="/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>

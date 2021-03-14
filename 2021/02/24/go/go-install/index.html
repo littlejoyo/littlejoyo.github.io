@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>【Go语言】：搭建各系统的Go开发环境 | JoyoHub</title>
+  
+  <meta name="keywords" content="Joyo,Java,Go,js,高并发，分布式，高性能，数据库，博客。">
+  
+  
+  <meta name="description" content="高并发，分布式，高性能，Java,Go,hexo博客文章归档。">
+  
+
+  
+
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <!-- meta -->
+  
+
+  <!-- link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.10.1/css/all.min.css">
+  
+
+  
+  <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  
+    <link rel="stylesheet" href="/style.css">
+  
+
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+
+  
+  
+</head>
+
+<body>
+  
+  
+  <div class="cover-wrapper">
+    <cover class='cover post half'>
+      
+        
+  <h1 class='title'>JoyoHub</h1>
+
+
+  <div class="m_search">
+    <form name="searchform" class="form u-search-form">
+      <input type="text" class="input u-search-input" placeholder="" />
+      <i class="icon fas fa-search fa-fw"></i>
+    </form>
+  </div>
+
+<div class='menu navgation'>
+  <ul class='h-list'>
+    
+      
+        <li>
+          <a class="nav home" href="/"
+            
+            
+            id="home">
+            <i class='fas fa-rss fa-fw'></i>&nbsp;博文
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="https://github.com/littlejoyo"
+            
+            
+            id="https:github.comlittlejoyo">
+            <i class='fas fa-code-branch fa-fw'></i>&nbsp;Github
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/archives/"
+            
+              rel="nofollow"
+            
+            
+            id="archives">
+            <i class='fas fa-archive fa-fw'></i>&nbsp;归档
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/code/"
+            
+              rel="nofollow"
+            
+            
+            id="code">
+            <i class='fas fa-battery-half fa-fw'></i>&nbsp;算法
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/friends/"
+            
+              rel="nofollow"
+            
+            
+            id="friends">
+            <i class='fas fa-link fa-fw'></i>&nbsp;友链
+          </a>
+        </li>
+      
+        <li>
+          <a class="nav home" href="/about/"
+            
+              rel="nofollow"
+            
+            
+            id="about">
+            <i class='fas fa-info-circle fa-fw'></i>&nbsp;关于
+          </a>
+        </li>
+      
+    
+  </ul>
+</div>
+
+      
+    </cover>
+    <header class="l_header pure">
+  <div id="loading-bar-wrapper">
+    <div id="loading-bar" class="pure"></div>
+  </div>
+
+	<div class='wrapper'>
+		<div class="nav-main container container--flex">
+      <a class="logo flat-box" href='/' >
+        
+          JoyoHub
+        
+      </a>
+			<div class='menu navgation'>
+				<ul class='h-list'>
+          
+  					
+  						<li>
+								<a class="nav flat-box" href="/"
+                  
+                  
+                  id="home">
+									<i class='fas fa-grin fa-fw'></i>&nbsp;博文
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/categories/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="categories">
+									<i class='fas fa-folder-open fa-fw'></i>&nbsp;分类
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/tags/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="tags">
+									<i class='fas fa-hashtag fa-fw'></i>&nbsp;标签
+								</a>
+							</li>
+      			
+  						<li>
+								<a class="nav flat-box" href="/archives/"
+                  
+                    rel="nofollow"
+                  
+                  
+                  id="archives">
+									<i class='fas fa-archive fa-fw'></i>&nbsp;归档
+								</a>
+							</li>
+      			
+      		
+				</ul>
+			</div>
+
+			
+				<div class="m_search">
+					<form name="searchform" class="form u-search-form">
+						<input type="text" class="input u-search-input" placeholder="搜索" />
+						<i class="icon fas fa-search fa-fw"></i>
+					</form>
+				</div>
+			
+			<ul class='switcher h-list'>
+				
+					<li class='s-search'><a class="fas fa-search fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+				
+				<li class='s-menu'><a class="fas fa-bars fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+			</ul>
+		</div>
+
+		<div class='nav-sub container container--flex'>
+			<a class="logo flat-box"></a>
+			<ul class='switcher h-list'>
+				<li class='s-comment'><a class="flat-btn fas fa-comments fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+          <li class='s-toc'><a class="flat-btn fas fa-list fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a></li>
+        
+			</ul>
+		</div>
+	</div>
+</header>
+	<aside class="menu-phone">
+    <header>
+		<nav class="menu navgation">
+      <ul>
+        
+          
+            <li>
+							<a class="nav flat-box" href="/"
+                
+                
+                id="home">
+								<i class='fas fa-clock fa-fw'></i>&nbsp;近期文章
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/archives/"
+                
+                  rel="nofollow"
+                
+                
+                id="archives">
+								<i class='fas fa-archive fa-fw'></i>&nbsp;文章归档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/projects/"
+                
+                
+                id="projects">
+								<i class='fas fa-code-branch fa-fw'></i>&nbsp;开源项目
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/friends/"
+                
+                  rel="nofollow"
+                
+                
+                id="friends">
+								<i class='fas fa-link fa-fw'></i>&nbsp;我的友链
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="https://xaoxuu.com/wiki/material-x/"
+                
+                  rel="nofollow"
+                
+                
+                id="https:xaoxuu.comwikimaterial-x">
+								<i class='fas fa-book fa-fw'></i>&nbsp;主题文档
+							</a>
+            </li>
+          
+            <li>
+							<a class="nav flat-box" href="/about/"
+                
+                  rel="nofollow"
+                
+                
+                id="about">
+								<i class='fas fa-info-circle fa-fw'></i>&nbsp;关于小站
+							</a>
+            </li>
+          
+       
+      </ul>
+		</nav>
+    </header>
+	</aside>
+<script>setLoadingBarProgress(40);</script>
+
+  </div>
+
+
+  <div class="l_body">
+    <div class='body-wrapper'>
+      <div class='l_main'>
+  
+
+  <article id="post" class="post white-box article-type-post" itemscope itemprop="blogPost">
+    
+
+
+  <section class='meta'>
+    
+    
+    <div class="meta" id="header-meta">
+      
+        
+  
+    <h1 class="title">
+      <a href="/2021/02/24/go/go-install/">
+        【Go语言】：搭建各系统的Go开发环境
+      </a>
+    </h1>
+  
+
+
+      
+      <div class='new-meta-box'>
+        
+          
+        
+          
+            
+  <div class='new-meta-item author'>
+    
+      <a href="/https:/littlejoyo.github.io" rel="nofollow">
+        
+          <img src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+        
+        <p>Joyo</p>
+      </a>
+    
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+    <p>2021-02-24</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  
+  <div class='new-meta-item category'>
+    <a href='/categories/Go/' rel="nofollow">
+      <i class="fas fa-folder-open" aria-hidden="true"></i>
+      <p>Go</p>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  
+    <div class="new-meta-item browse busuanzi">
+      <a class='notlink'>
+        <i class="fas fa-eye" aria-hidden="true"></i>
+        <p>
+          <span id="busuanzi_value_page_pv">
+            <i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i>
+          </span>
+        </p>
+      </a>
+    </div>
+  
+
+
+          
+        
+          
+            
+
+          
+        
+      </div>
+      
+        <hr>
+      
+    </div>
+  </section>
+
+
+    <section class="article typo">
+      <div class="article-entry" itemprop="articleBody">
+        <ul>
+<li><p>记录Windows、Linux、Mac系统都如何搭建Go开发环境</p>
+</li>
+<li><p>设置GOPROXY环境变量解决包拉取过慢和失败的问题</p>
+</li>
+<li><p>解释go工作区各个文件路径代表的意义</p>
+</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="1-Go安装包的下载"><a href="#1-Go安装包的下载" class="headerlink" title="1.Go安装包的下载"></a>1.Go安装包的下载</h1><p>安装包下载地址：<a href="https://golang.google.cn/dl/" target="_blank" rel="noopener">https://golang.google.cn/dl/</a></p>
+<ul>
+<li><p>windows: 下载.msi可执行程序</p>
+</li>
+<li><p>Mac：下载.pkg可执行程序</p>
+</li>
+<li><p>Linux：下载tar.gz压缩文件</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/02/24/PNMK5T8Yy3HSrjo.png" alt="image.png"></p>
+<h1 id="2-安装和配置环境变量"><a href="#2-安装和配置环境变量" class="headerlink" title="2.安装和配置环境变量"></a>2.安装和配置环境变量</h1><h2 id="2-1-windows"><a href="#2-1-windows" class="headerlink" title="2.1 windows"></a>2.1 windows</h2><h3 id="2-1-1-安装"><a href="#2-1-1-安装" class="headerlink" title="2.1.1 安装"></a>2.1.1 安装</h3><ul>
+<li><p>双击下载下来的.msi文件，点击“下一步”进行安装</p>
+</li>
+<li><p>安装路径可以选择为“D:\Go\”</p>
+</li>
+</ul>
+<h3 id="2-1-2-配置环境变量"><a href="#2-1-2-配置环境变量" class="headerlink" title="2.1.2 配置环境变量"></a>2.1.2 配置环境变量</h3><ul>
+<li><p>依次执行，右键【我的电脑】-【属性】-【高级系统设置】-【环境变量】</p>
+</li>
+<li><p>在【系统变量】中新建以下项目并设置对应的值</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">GOROOT：D:\Go</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">GOPATH：D:\mycoding\gocoding</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">GOPROXY：https:&#x2F;&#x2F;goproxy.cn,direct</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>GOROOT：设置Go的安装路径</p>
+</li>
+<li><p>GOPATH：设置Go的工作空间，里面需要包含bin、pkg、src三个文件夹</p>
+</li>
+<li><p>GOPROXY：设置Go的国内代理地址，用于拉取go的依赖包</p>
+</li>
+<li><p>最后再打开CMD命令行窗口执行 <code>SET GO111MODULE=on</code> ，确保GOPOOXY生效</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/02/24/GWiAqSxneXDlBF1.png" alt="image.png"></p>
+<p><img src="https://i.loli.net/2021/02/24/EsvxzSr7UahZwGg.png" alt="image.png"></p>
+<p><img src="https://i.loli.net/2021/02/24/MBb6y4xKpLFfCeW.png" alt="image.png"></p>
+<h3 id="2-2-3-验证"><a href="#2-2-3-验证" class="headerlink" title="2.2.3 验证"></a>2.2.3 验证</h3><ul>
+<li><p>打开CMD命令行，输入<code>go env</code>查看go环境变量，查看上面设置的项是否生效</p>
+</li>
+<li><p>输入<code>go version</code>，如能正常返回go的版本，说明Go环境搭建成功</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/02/24/4BsmD2CzGdFRKTJ.png" alt="image.png"></p>
+<p><img src="https://i.loli.net/2021/02/24/vgUxFpGdPwfZzQ4.png" alt="image.png"></p>
+<h2 id="2-2-Linux和mac"><a href="#2-2-Linux和mac" class="headerlink" title="2.2 Linux和mac"></a>2.2 Linux和mac</h2><h3 id="2-2-1-Linux下安装"><a href="#2-2-1-Linux下安装" class="headerlink" title="2.2.1 Linux下安装"></a>2.2.1 Linux下安装</h3><ul>
+<li>两个选择，可以下载.tar.gz压缩文件后上传到Linux服务器，也可以直接在Linux利用<code>wget</code>命令下载</li>
+</ul>
+<p><code>wget https://dl.google.com/go/go1.14.3.linux-amd64.tar.gz</code></p>
+<ul>
+<li>将下载好的压缩文件解压到<code>/usr/local</code>目录下</li>
+</ul>
+<p><code>tar -zxvf go1.14.3.linux-amd64.tar.gz -C /usr/local</code></p>
+<ul>
+<li>新建<code>/usr/local/goworkspace</code>作为go的开发工作区路径，包含bin、pkg、src三个文件夹</li>
+</ul>
+<h3 id="2-2-2-Mac下安装"><a href="#2-2-2-Mac下安装" class="headerlink" title="2.2.2 Mac下安装"></a>2.2.2 Mac下安装</h3><ul>
+<li>下载可执行文件版，直接点击下一步安装即可，默认会将go安装到<code>/usr/local/go</code>目录下。</li>
+</ul>
+<h3 id="2-2-2-配置环境变量"><a href="#2-2-2-配置环境变量" class="headerlink" title="2.2.2 配置环境变量"></a>2.2.2 配置环境变量</h3><ul>
+<li><p>Linux下有两个文件可以配置环境变量，其中<code>/etc/profile</code>中设备的环境变量是对所有用户生效的；</p>
+</li>
+<li><p>$HOME/.profile是对当前用户生效的，根据自己的情况自行选择一个文件打开，添加如下两行代码，保存退出。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">export GOROOT&#x3D;&#x2F;usr&#x2F;local&#x2F;go</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">export PATH&#x3D;$PATH:$GOROOT&#x2F;bin</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">export GOPATH&#x3D;&#x2F;usr&#x2F;local&#x2F;goworkspace</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>修改<code>/etc/profile</code>或者<code>$HOME/.profile</code>后使用source命令加载<code>$HOME/.profile</code>文件即可生效。</p>
+</li>
+<li><p>然后执行下面的命令追加环境变量，分别是开启GO111MODULE和GOPROXY</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">go env -w GO111MODULE&#x3D;on &#x2F;&#x2F;开启mod</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">go env -w GOPROXY&#x3D;https:&#x2F;&#x2F;goproxy.cn,direct &#x2F;&#x2F;设置七牛云goproxy代理</span></pre></td></tr></table></figure>
+
+<ul>
+<li>最后同样执行<code>go version</code>和<code>go env</code>进行检验</li>
+</ul>
+<p><img src="https://i.loli.net/2021/02/28/2urkchYLf6EI38q.png" alt="image.png"></p>
+<h1 id="3-go工作区文件解释"><a href="#3-go工作区文件解释" class="headerlink" title="3.go工作区文件解释"></a>3.go工作区文件解释</h1><ul>
+<li><p>bin：主要存放编译后的二进制文件，比如<code>go install</code>执行后生成的文件就会存放该文件之下</p>
+</li>
+<li><p>pkg：主要存放编译后的库文件，比如开启了<code>gomodule</code>机制后，<code>go get</code>拉取的项目代码在<code>/pkg/mod</code>路径下</p>
+</li>
+<li><p>src：主要存放我们自己编写程序的源代码</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/02/28/AUcFPeNzipwWVky.png" alt="image.png"></p>
+<h1 id="4-注意事项"><a href="#4-注意事项" class="headerlink" title="4.注意事项"></a>4.注意事项</h1><ul>
+<li><p>补充说明：Go1.11版本之后，开启go mod模式之后就不再强制需要配置GOPATH了。</p>
+</li>
+<li><p>GOPATH机制正慢慢被官方淡化，甚至后期会进行摒弃，因为涉及到版本切换的缺点，已被<code>gomodule</code>取代</p>
+</li>
+<li><p>目前建议大家使用最新的Go语言版本并且打开go mod模式，然后你可以将代码文件存放在任意位置。</p>
+</li>
+</ul>
+
+      </div>
+      
+        <br>
+        
+
+
+  <section class='meta' id="footer-meta">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-28T17:56:07+08:00">
+  <a class='notlink'>
+    <i class="fas fa-clock" aria-hidden="true"></i>
+    <p>更新于 2021年2月28日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Go/" rel="nofollow"><i class="fas fa-tag" aria-hidden="true"></i><p>Go</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="QQ好友" rel="external nofollow noopener noreferrer"
+          
+          href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/2021/02/24/go/go-install/&title=【Go语言】：搭建各系统的Go开发环境 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+记录Windows、Linux、Mac系统都如何搭建Go开发环境
+
+设置GOPROXY环境变量解决包拉取过慢和失败的问题
+
+解释go工作区各个文件路径代表的意义
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qq.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="QQ空间" rel="external nofollow noopener noreferrer"
+          
+          href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/2021/02/24/go/go-install/&title=【Go语言】：搭建各系统的Go开发环境 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+记录Windows、Linux、Mac系统都如何搭建Go开发环境
+
+设置GOPROXY环境变量解决包拉取过慢和失败的问题
+
+解释go工作区各个文件路径代表的意义
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/qzone.png">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="微博" rel="external nofollow noopener noreferrer"
+          
+          href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/2021/02/24/go/go-install/&title=【Go语言】：搭建各系统的Go开发环境 | JoyoHub&pics=https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg&summary=
+记录Windows、Linux、Mac系统都如何搭建Go开发环境
+
+设置GOPROXY环境变量解决包拉取过慢和失败的问题
+
+解释go工作区各个文件路径代表的意义
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/xaoxuu/assets@19.1.9/logo/128/weibo.png">
+          
+        </a>
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </section>
+
+
+      
+      
+          <div class="prev-next">
+              
+              
+                  <section class="next">
+                      <span class="art-item-right" aria-hidden="true">
+                          <h6>下一页&nbsp;<i class="fas fa-chevron-right" aria-hidden="true"></i></h6>
+                          <h4>
+                              <a href="/2020/08/09/go/go-dependency/" rel="prev" title="【Go语言】：依赖管理之vendor和Go Modules">
+                                  
+                                      【Go语言】：依赖管理之vendor和Go Modules
+                                  
+                              </a>
+                          </h4>
+                          
+                              
+                              <h6 class="tags">
+                                  <a class="tag" href="/tags/Go/"><i class="fas fa-tag fa-fw" aria-hidden="true"></i> Go</a>
+                              </h6>
+                          
+                      </span>
+                  </section>
+              
+          </div>
+      
+    </section>
+  </article>
+
+
+
+  <!-- 显示推荐文章和评论 -->
+
+
+
+  <article class="post white-box comments">
+    <section class="article typo">
+      <h4><i class="fas fa-comments fa-fw" aria-hidden="true"></i>&nbsp;评论</h4>
+      
+      
+      
+        <section id="comments">
+          <div id="gitalk-container"></div>
+        </section>
+      
+      
+    </section>
+  </article>
+
+
+
+
+
+
+<!-- 根据页面mathjax变量决定是否加载MathJax数学公式js -->
+
+
+
+  <script>
+    window.subData = {
+      title: '【Go语言】：搭建各系统的Go开发环境',
+      tools: true
+    }
+  </script>
+
+
+</div>
+<aside class='l_side'>
+  
+    
+    
+      
+      
+        
+          
+          
+        
+          
+          
+            
+              
+  <section class='widget toc-wrapper'>
+    
+<header class='pure'>
+  <div><i class="fas fa-list fa-fw" aria-hidden="true"></i>&nbsp;&nbsp;本文目录</div>
+  
+    <!-- <div class='wrapper'><a class="s-toc rightBtn" rel="external nofollow noopener noreferrer noopener" href="javascript:void(0)" target="_blank"><i class="fas fa-thumbtack fa-fw"></i></a></div> -->
+  
+</header>
+
+    <div class='content pure'>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-Go安装包的下载"><span class="toc-text">1.Go安装包的下载</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-安装和配置环境变量"><span class="toc-text">2.安装和配置环境变量</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-windows"><span class="toc-text">2.1 windows</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-1-安装"><span class="toc-text">2.1.1 安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-2-配置环境变量"><span class="toc-text">2.1.2 配置环境变量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-3-验证"><span class="toc-text">2.2.3 验证</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-Linux和mac"><span class="toc-text">2.2 Linux和mac</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-1-Linux下安装"><span class="toc-text">2.2.1 Linux下安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-Mac下安装"><span class="toc-text">2.2.2 Mac下安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-2-配置环境变量"><span class="toc-text">2.2.2 配置环境变量</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-go工作区文件解释"><span class="toc-text">3.go工作区文件解释</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-注意事项"><span class="toc-text">4.注意事项</span></a></li></ol>
+    </div>
+  </section>
+
+
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+    
+
+  
+</aside>
+
+<footer id="footer" class="clearfix">
+  
+  
+    <div class="social-wrapper">
+      
+        
+          <a href="mailto:554882285@qq.com"
+            class="social fas fa-envelope flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+        
+          <a href="https://github.com/littlejoyo"
+            class="social fab fa-github flat-btn"
+            target="_blank"
+            rel="external nofollow noopener noreferrer">
+          </a>
+        
+      
+    </div>
+  
+  <br>
+  <div><p>博客内容遵循 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank" rel="noopener">署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</a></p>
+</div>
+  <div>
+    本站使用
+    <a href="" target="_blank" class="codename">Material X</a>
+    作为主题
+    
+      ，
+      总访问量为
+      <span id="busuanzi_value_site_pv"><i class="fas fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span>
+      次
+    
+    。
+  </div>
+</footer>
+<script>setLoadingBarProgress(80);</script>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </div>
+    <a class="s-top fas fa-arrow-up fa-fw" href='javascript:void(0)' target="_blank" rel="noopener"></a>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+
+  <script>
+    var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+    var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+    var ALGOLIA_API_KEY = "";
+    var ALGOLIA_APP_ID = "";
+    var ALGOLIA_INDEX_NAME = "";
+    var AZURE_SERVICE_NAME = "";
+    var AZURE_INDEX_NAME = "";
+    var AZURE_QUERY_KEY = "";
+    var BAIDU_API_ID = "";
+    var SEARCH_SERVICE = "hexo" || "hexo";
+    var ROOT = "/"||"/";
+    if(!ROOT.endsWith('/'))ROOT += '/';
+  </script>
+
+<script src="//instant.page/1.2.2" type="module" integrity="sha384-2xV8M5griQmzyiY3CDqh1dn4z3llDVqZDqzjzcY+jCBCk/a5fXJmuZ/40JJAPeoU"></script>
+
+
+  <script async src="https://cdn.jsdelivr.net/npm/scrollreveal@4.0.5/dist/scrollreveal.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      const $reveal = $('.reveal');
+      if ($reveal.length === 0) return;
+      const sr = ScrollReveal({ distance: 0 });
+      sr.reveal('.reveal');
+    });
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/node-waves@0.7.6/dist/waves.min.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      Waves.attach('.flat-btn', ['waves-button']);
+      Waves.attach('.float-btn', ['waves-button', 'waves-float']);
+      Waves.attach('.float-btn-light', ['waves-button', 'waves-float', 'waves-light']);
+      Waves.attach('.flat-box', ['waves-block']);
+      Waves.attach('.float-box', ['waves-block', 'waves-float']);
+      Waves.attach('.waves-image');
+      Waves.init();
+    });
+  </script>
+
+
+  <script async src="https://cdn.jsdelivr.net/gh/xaoxuu/cdn-busuanzi@2.3/js/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+  
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        if ('.cover') {
+          $('.cover').backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        } else {
+          $.backstretch(
+          ["https://i.loli.net/2019/11/21/BpqoPigxED6C2XI.jpg"],
+          {
+            duration: "6000",
+            fade: "2500"
+          });
+        }
+      });
+    </script>
+  
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+  <script type="text/javascript">
+    var gitalk = new Gitalk({
+      clientID: "6428b70706cc5c089758",
+      clientSecret: "acb9d963f91bf7731c5ee1ebd80b7a172ba7f7de",
+      repo: "littlejoyo.github.io",
+      owner: "littlejoyo",
+      admin: "littlejoyo",
+      
+        id: location.pathname,      // Ensure uniqueness and length less than 50
+      
+      distractionFreeMode: false  // Facebook-like distraction free mode
+    });
+    gitalk.render('gitalk-container');
+  </script>
+
+
+
+
+
+  <script src="/js/app.js"></script>
+
+
+  <script src="/js/search.js"></script>
+
+
+
+
+<!-- 复制 -->
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  let COPY_SUCCESS = "复制成功";
+  let COPY_FAILURE = "复制失败";
+  /*页面载入完成后，创建复制按钮*/
+  !function (e, t, a) {
+    /* code */
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '  <i class="fa fa-copy"></i><span>复制</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+
+      clipboard.on('success', function(e) {
+        //您可以加入成功提示
+        console.info('Action:', e.action);
+        console.info('Text:', e.text);
+        console.info('Trigger:', e.trigger);
+        success_prompt(COPY_SUCCESS);
+        e.clearSelection();
+      });
+      clipboard.on('error', function(e) {
+        //您可以加入失败提示
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+        fail_prompt(COPY_FAILURE);
+      });
+    }
+    initCopyCode();
+
+  }(window, document);
+
+  /**
+   * 弹出式提示框，默认1.5秒自动消失
+   * @param message 提示信息
+   * @param style 提示样式，有alert-success、alert-danger、alert-warning、alert-info
+   * @param time 消失时间
+   */
+  var prompt = function (message, style, time)
+  {
+      style = (style === undefined) ? 'alert-success' : style;
+      time = (time === undefined) ? 1500 : time*1000;
+      $('<div>')
+          .appendTo('body')
+          .addClass('alert ' + style)
+          .html(message)
+          .show()
+          .delay(time)
+          .fadeOut();
+  };
+
+  // 成功提示
+  var success_prompt = function(message, time)
+  {
+      prompt(message, 'alert-success', time);
+  };
+
+  // 失败提示
+  var fail_prompt = function(message, time)
+  {
+      prompt(message, 'alert-danger', time);
+  };
+
+  // 提醒
+  var warning_prompt = function(message, time)
+  {
+      prompt(message, 'alert-warning', time);
+  };
+
+  // 信息提示
+  var info_prompt = function(message, time)
+  {
+      prompt(message, 'alert-info', time);
+  };
+
+</script>
+
+
+<!-- fancybox -->
+<script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+<script>
+  let LAZY_LOAD_IMAGE = "";
+  $(".article-entry").find("fancybox").find("img").each(function () {
+      var element = document.createElement("a");
+      $(element).attr("data-fancybox", "gallery");
+      $(element).attr("href", $(this).attr("src"));
+      /* 图片采用懒加载处理时,
+       * 一般图片标签内会有个属性名来存放图片的真实地址，比如 data-original,
+       * 那么此处将原本的属性名src替换为对应属性名data-original,
+       * 修改如下
+       */
+       if (LAZY_LOAD_IMAGE) {
+         $(element).attr("href", $(this).attr("data-original"));
+       }
+      $(this).wrap(element);
+  });
+</script>
+
+
+
+
+
+  <script>setLoadingBarProgress(100);</script>
+</body>
+</html>
