@@ -4,33 +4,6 @@
   
     
     <entry>
-      <title>【计算机网络】：一次性理清虚拟机网络模型</title>
-      <link href="/2021/03/13/network/virtoolbox-network/"/>
-      <url>/2021/03/13/network/virtoolbox-network/</url>
-      
-        <content type="html"><![CDATA[<ul><li><p>平时我们基于VirtoolBox或者VMware软件可以随意创建虚拟机</p></li><li><p>虚拟机的网络模型有多种，不理清它们之间的区别很容易出现网络不通的头痛问题</p></li><li><p>通过分析各种虚拟网络模型，解决虚拟机平台和物理机的网络连接问题</p></li></ul><a id="more"></a><blockquote><p>Github issues:<a href="https://github.com/littlejoyo/Blog/issues/" target="_blank" rel="noopener">https://github.com/littlejoyo/Blog/issues/</a></p></blockquote><h1 id="1-Virtool和VMware"><a href="#1-Virtool和VMware" class="headerlink" title="1.Virtool和VMware"></a>1.Virtool和VMware</h1><ul><li><p>两者都是优秀的虚拟机平台，我们可以通过它们创建虚拟机来安装不同环境的操作系统</p></li><li><p>主要区别对比：</p><ul><li><p>VirtualBox是开源免费软件，下载和安装比较方便，VMware功能更加强大，但是需要注册码</p></li><li><p>VirtualBox相对于VMware安装和配置更加简单，运行内存占用也比较小</p></li><li><p>VirtualBox由于是开源免费，社区相对更加活跃，但总体两者出现问题都能找到解决方案</p></li></ul></li><li><p>综上，本次主要采用VirtualBox来创建虚拟机进行演示，安装的操作系统镜像是Linux CentOS8.2版本</p></li></ul><h1 id="2-常见的网络模型"><a href="#2-常见的网络模型" class="headerlink" title="2.常见的网络模型"></a>2.常见的网络模型</h1><p>主要有下面四种网络模型</p><ul><li><p>桥接（Bridge Adapter）</p></li><li><p>NAT</p></li><li><p>主机网络（Host-only Adapter）</p></li><li><p>内部网络（Internal）</p></li></ul><blockquote><p>VirtualBox包含了以上的四种网络模型，VMware只有前三种</p></blockquote><h1 id="3-桥接网络"><a href="#3-桥接网络" class="headerlink" title="3.桥接网络"></a>3.桥接网络</h1><h2 id="3-1-主要原理"><a href="#3-1-主要原理" class="headerlink" title="3.1 主要原理"></a>3.1 主要原理</h2><ul><li><p>桥接网络模型依赖虚拟交换机（Linux bridge）将虚拟机和物理机连接起来，它们之间处在同一个二层网络</p></li><li><p>虚拟机和物理机的ip处在相同网段之下，举例，比如都处在192.168.100.x的网段之下，物理机ip为<strong>192.168.100.10</strong>，虚拟机ip为<strong>192.168.100.20</strong></p></li><li><p>网络连通情况表现为</p><ul><li><p>虚拟机之间彼此互通</p></li><li><p>虚拟机和物理机彼此互通</p></li><li><p>只要物理机能上外网，虚拟机也能上外网</p></li></ul></li></ul><h2 id="3-2-网络原理图"><a href="#3-2-网络原理图" class="headerlink" title="3.2 网络原理图"></a>3.2 网络原理图</h2><p><img src="https://i.loli.net/2021/03/13/enFEHXuoCqVtiLg.png" alt="image.png"></p><ul><li><p>如上图所示，物理主机内创建了三台虚拟机，然后通过<strong>bridge虚拟设备</strong>将物理网卡和虚拟网卡进行连接，虚拟机和物理机的ip都处在同一网段（192.168.100.x）之内</p></li><li><p>虚拟机借助物理机网卡实现外网的访问，物理机也可以并且虚拟机之间网络是连通的，彼此之间可以进行访问</p></li></ul><h2 id="3-3-配置方式"><a href="#3-3-配置方式" class="headerlink" title="3.3 配置方式"></a>3.3 配置方式</h2><p><img src="https://i.loli.net/2021/03/13/k6YSAvVEcCIrfQG.png" alt="image.png"></p><ul><li><p>找到创建好的虚拟机，【设置】-【网络】，连接方式选择“桥接网卡”，界面名称选择正确的外网网卡，然后勾选“启动网络连接”即可</p></li><li><p>外网网卡名称可以在网络适配器查看是否匹配对应，例如就需要选择这个无线网卡虚拟机才能上外网</p></li></ul><p><img src="https://i.loli.net/2021/03/13/qpkxshVfUSHdwE1.png" alt="image.png"></p><h2 id="3-4-验证网络连通"><a href="#3-4-验证网络连通" class="headerlink" title="3.4 验证网络连通"></a>3.4 验证网络连通</h2><ul><li>启动CentOS系统的虚拟机，输入<code>ip addr</code>查看网络设备地址,我这里虚拟网卡分配到的地址是<strong>192.168.123.21</strong></li></ul><p><img src="https://i.loli.net/2021/03/13/m1RFHyzesuwPGd9.png" alt="image.png"></p><ul><li>查看本地的网卡地址是否也是属于<strong>192.168.123.x</strong>的网段下，打开cmd输入<code>ipconfig</code>命令查看,物理网卡的地址为<strong>192.168.123.67</strong>,符合理论</li></ul><p><img src="https://i.loli.net/2021/03/13/btCkXow15dNKze2.png" alt="image.png"></p><ul><li>通过ping命令验证物理机和虚拟机的彼此之间互ping的情况，双方都可以ping通</li></ul><p><img src="https://i.loli.net/2021/03/13/3A9T6dZ2lLQfhnJ.png" alt="image.png"></p><blockquote><p>插入一个问题：可能会出现虚拟机ping主机不通的情况，一般是因为防火墙的问题，比如我物理机是win10的系统，就出现防火墙设置问题，问题主要是因为win10的防火墙没有打开ICMPv4-In这个规则，解决如下：</p></blockquote><ul><li><p>依次打开【控制面板】-【Windows Definder防火墙】-【高级设置】-【入站规则】-【按配置文件筛选】-【按公有配置文件筛选】</p></li><li><p>找到并启用文件类型为“公用”的“文件和打印共享（回显请求 – ICMPv4-In）”规则，此时就可以ping通了</p></li></ul><p><fancybox><img src="https://i.loli.net/2021/03/13/hoHsLpAQzgqYVbE.png" alt="image.png"></fancybox></p><ul><li>最后是验证虚拟机之间是否可以彼此互ping，另起一台虚拟机，同样的方式设置为桥接模式，我这里分配到为<strong>192.168.123.52</strong>,如下所示，彼此之间也能ping通</li></ul><p><fancybox><img src="https://i.loli.net/2021/03/13/zMThkCocxLGqjfW.png" alt="image.png"></fancybox></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 计算机网络 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 网络 </tag>
-            
-            <tag> 虚拟网络 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>【Go语言】：搭建各系统的Go开发环境</title>
       <link href="/2021/02/24/go/go-install/"/>
       <url>/2021/02/24/go/go-install/</url>
@@ -476,6 +449,33 @@
             <tag> Go </tag>
             
             <tag> 标准库 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>【计算机网络】：一次性理清虚拟机网络模型</title>
+      <link href="/2020/03/13/network/virtoolbox-network/"/>
+      <url>/2020/03/13/network/virtoolbox-network/</url>
+      
+        <content type="html"><![CDATA[<ul><li><p>平时我们基于VirtoolBox或者VMware软件可以随意创建虚拟机</p></li><li><p>虚拟机的网络模型有多种，不理清它们之间的区别很容易出现网络不通的头痛问题</p></li><li><p>通过分析各种虚拟网络模型，解决虚拟机平台和物理机的网络连接问题</p></li></ul><a id="more"></a><blockquote><p>Github issues:<a href="https://github.com/littlejoyo/Blog/issues/" target="_blank" rel="noopener">https://github.com/littlejoyo/Blog/issues/</a></p></blockquote><h1 id="1-Virtool和VMware"><a href="#1-Virtool和VMware" class="headerlink" title="1.Virtool和VMware"></a>1.Virtool和VMware</h1><ul><li><p>两者都是优秀的虚拟机平台，我们可以通过它们创建虚拟机来安装不同环境的操作系统</p></li><li><p>主要区别对比：</p><ul><li><p>VirtualBox是开源免费软件，下载和安装比较方便，VMware功能更加强大，但是需要注册码</p></li><li><p>VirtualBox相对于VMware安装和配置更加简单，运行内存占用也比较小</p></li><li><p>VirtualBox由于是开源免费，社区相对更加活跃，但总体两者出现问题都能找到解决方案</p></li></ul></li><li><p>综上，本次主要采用VirtualBox来创建虚拟机进行演示，安装的操作系统镜像是Linux CentOS8.2版本</p></li></ul><h1 id="2-常见的网络模型"><a href="#2-常见的网络模型" class="headerlink" title="2.常见的网络模型"></a>2.常见的网络模型</h1><p>主要有下面四种网络模型</p><ul><li><p>桥接（Bridge Adapter）</p></li><li><p>NAT</p></li><li><p>主机网络（Host-only Adapter）</p></li><li><p>内部网络（Internal）</p></li></ul><blockquote><p>VirtualBox包含了以上的四种网络模型，VMware只有前三种</p></blockquote><h1 id="3-桥接网络"><a href="#3-桥接网络" class="headerlink" title="3.桥接网络"></a>3.桥接网络</h1><h2 id="3-1-主要原理"><a href="#3-1-主要原理" class="headerlink" title="3.1 主要原理"></a>3.1 主要原理</h2><ul><li><p>桥接网络模型依赖虚拟交换机（Linux bridge）将虚拟机和物理机连接起来，它们之间处在同一个二层网络</p></li><li><p>虚拟机和物理机的ip处在相同网段之下，举例，比如都处在192.168.100.x的网段之下，物理机ip为<strong>192.168.100.10</strong>，虚拟机ip为<strong>192.168.100.20</strong></p></li><li><p>网络连通情况表现为</p><ul><li><p>虚拟机之间彼此互通</p></li><li><p>虚拟机和物理机彼此互通</p></li><li><p>只要物理机能上外网，虚拟机也能上外网</p></li></ul></li></ul><h2 id="3-2-网络原理图"><a href="#3-2-网络原理图" class="headerlink" title="3.2 网络原理图"></a>3.2 网络原理图</h2><p><img src="https://i.loli.net/2021/03/13/enFEHXuoCqVtiLg.png" alt="image.png"></p><ul><li><p>如上图所示，物理主机内创建了三台虚拟机，然后通过<strong>bridge虚拟设备</strong>将物理网卡和虚拟网卡进行连接，虚拟机和物理机的ip都处在同一网段（192.168.100.x）之内</p></li><li><p>虚拟机借助物理机网卡实现外网的访问，物理机也可以并且虚拟机之间网络是连通的，彼此之间可以进行访问</p></li></ul><h2 id="3-3-配置方式"><a href="#3-3-配置方式" class="headerlink" title="3.3 配置方式"></a>3.3 配置方式</h2><p><img src="https://i.loli.net/2021/03/13/k6YSAvVEcCIrfQG.png" alt="image.png"></p><ul><li><p>找到创建好的虚拟机，【设置】-【网络】，连接方式选择“桥接网卡”，界面名称选择正确的外网网卡，然后勾选“启动网络连接”即可</p></li><li><p>外网网卡名称可以在网络适配器查看是否匹配对应，例如就需要选择这个无线网卡虚拟机才能上外网</p></li></ul><p><img src="https://i.loli.net/2021/03/13/qpkxshVfUSHdwE1.png" alt="image.png"></p><h2 id="3-4-验证网络连通"><a href="#3-4-验证网络连通" class="headerlink" title="3.4 验证网络连通"></a>3.4 验证网络连通</h2><ul><li>启动CentOS系统的虚拟机，输入<code>ip addr</code>查看网络设备地址,我这里虚拟网卡分配到的地址是<strong>192.168.123.21</strong></li></ul><p><img src="https://i.loli.net/2021/03/13/m1RFHyzesuwPGd9.png" alt="image.png"></p><ul><li>查看本地的网卡地址是否也是属于<strong>192.168.123.x</strong>的网段下，打开cmd输入<code>ipconfig</code>命令查看,物理网卡的地址为<strong>192.168.123.67</strong>,符合理论</li></ul><p><img src="https://i.loli.net/2021/03/13/btCkXow15dNKze2.png" alt="image.png"></p><ul><li>通过ping命令验证物理机和虚拟机的彼此之间互ping的情况，双方都可以ping通</li></ul><p><img src="https://i.loli.net/2021/03/13/3A9T6dZ2lLQfhnJ.png" alt="image.png"></p><blockquote><p>插入一个问题：可能会出现虚拟机ping主机不通的情况，一般是因为防火墙的问题，比如我物理机是win10的系统，就出现防火墙设置问题，问题主要是因为win10的防火墙没有打开ICMPv4-In这个规则，解决如下：</p></blockquote><ul><li><p>依次打开【控制面板】-【Windows Definder防火墙】-【高级设置】-【入站规则】-【按配置文件筛选】-【按公有配置文件筛选】</p></li><li><p>找到并启用文件类型为“公用”的“文件和打印共享（回显请求 – ICMPv4-In）”规则，此时就可以ping通了</p></li></ul><p><fancybox><img src="https://i.loli.net/2021/03/13/hoHsLpAQzgqYVbE.png" alt="image.png"></fancybox></p><ul><li>最后是验证虚拟机之间是否可以彼此互ping，另起一台虚拟机，同样的方式设置为桥接模式，我这里分配到为<strong>192.168.123.52</strong>,如下所示，彼此之间也能ping通</li></ul><p><fancybox><img src="https://i.loli.net/2021/03/13/zMThkCocxLGqjfW.png" alt="image.png"></fancybox></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计算机网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 网络 </tag>
+            
+            <tag> 虚拟网络 </tag>
             
         </tags>
       
