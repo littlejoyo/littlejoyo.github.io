@@ -437,9 +437,12 @@
 </blockquote>
 <p>2.登录Linux主机并分配网卡ip如下，管理网卡在此就省略不写，只要保证能够在本地ssh连接即可</p>
 <p>主机A</p>
-<pre><code>`ifconfig enp0s8 1.1.1.10/24`</code></pre><p>主机C</p>
-<pre><code>`ifconfig enp0s8 1.1.1.20/24`</code></pre><p>主机B</p>
-<pre><code><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">ip link add dev br0 type bridge</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ip link set dev enp0s8 master br0</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">ip link set dev enp0s9 master br0</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">ifconfig br0 up</span></pre></td></tr></table></figure></code></pre><p>3.验证网络连通</p>
+<p><code>ifconfig enp0s8 1.1.1.10/24</code></p>
+<p>主机C</p>
+<p><code>ifconfig enp0s8 1.1.1.20/24</code></p>
+<p>主机B</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">ip link add dev br0 type bridge</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ip link set dev enp0s8 master br0</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">ip link set dev enp0s9 master br0</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">ifconfig br0 up</span></pre></td></tr></table></figure>
+<p>3.验证网络连通</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">主机A：ping 1.1.1.20  ==&gt; 不通</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">主机B：ping 1.1.1.10  ==&gt; 不通</span></pre></td></tr></table></figure>
 
 <p>此时在主机A和主机C分别进行互ping，发现并没有ping通，那这是什么问题呢？</p>
@@ -572,7 +575,7 @@
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-06T00:00:01+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-06T00:00:47+08:00">
   <a class='notlink'>
     <i class="fas fa-clock" aria-hidden="true"></i>
     <p>更新于 2021年6月6日</p>
