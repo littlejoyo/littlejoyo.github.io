@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.3.1'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <link rel="preload" href="/css/first.css" as="style">
+  
+
+  <!-- 页面元数据 -->
+  
+  <title>【Go语言】：由浅入深了解结构体Struct - JoyoHub</title>
+  
+    <meta name="keywords" content="Go">
+  
+
+  
+    <meta name="description" content="
+struct结构体可以说是Go语言中的最重要的组成部分之一
+
+Go不是传统的面向对象和面向过程的语言，如果确切地说可以说是面向结构的语言
+
+掌握好struct的知识点是非常有必要的，同时，利用好strcut也能写出面向对象思想的代码
+
+">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+  
+<script>
+if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMode))
+    document.write(
+	'<style>'+
+		'html{'+
+			'overflow-x: hidden !important;'+
+			'overflow-y: hidden !important;'+
+		'}'+
+		'.kill-ie{'+
+			'text-align:center;'+
+			'height: 100%;'+
+			'margin-top: 15%;'+
+			'margin-bottom: 5500%;'+
+		'}'+
+	'</style>'+
+    '<div class="kill-ie">'+
+        '<h1><b>抱歉，您的浏览器无法访问本站</b></h1>'+
+        '<h3>微软已经于2016年终止了对 Internet Explorer (IE) 10 及更早版本的支持，<br/>'+
+        '继续使用存在极大的安全隐患，请使用当代主流的浏览器进行访问。</h3><br/>'+
+        '<a target="_blank" rel="noopener" href="https://www.microsoft.com/zh-cn/WindowsForBusiness/End-of-IE-support"><strong>了解详情 ></strong></a>'+
+    '</div>');
+</script>
+
+
+<noscript>
+	<style>
+		html{
+			overflow-x: hidden !important;
+			overflow-y: hidden !important;
+		}
+		.kill-noscript{
+			text-align:center;
+			height: 100%;
+			margin-top: 15%;
+			margin-bottom: 5500%;
+		}
+	</style>
+    <div class="kill-noscript">
+        <h1><b>抱歉，您的浏览器无法访问本站</b></h1>
+        <h3>本页面需要浏览器支持（启用）JavaScript</h3><br/>
+        <a target="_blank" rel="noopener" href="https://www.baidu.com/s?wd=启用JavaScript"><strong>了解详情 ></strong></a>
+    </div>
+</noscript>
+
+</head>
+
+  <body>
+    
+
+<header id="l_header" class="l_header auto shadow floatable blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+          
+            <i class='https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png'></i>
+          
+          
+            JoyoHub
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fa fa-fan fa-spin fa-fw'></i>博文列表
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>博文分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>博文标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>时间线
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于Joyo
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box header toggle-mode-btn">
+                  <i class='fas fa-moon fa-fw'></i>暗黑模式
+                </a>
+              <li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="搜索博主的文章..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fa fa-fan fa-spin fa-fw'></i>博文列表
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>博文分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>博文标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>时间线
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于Joyo
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box header toggle-mode-btn">
+                  <i class='fas fa-moon fa-fw'></i>暗黑模式
+                </a>
+              <li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+    <div id="l_body">
+      <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210614224551.png"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">JoyoHub</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="搜索博主的历史文章..." />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <p>归档</p>
+            </a>
+          
+            <a href="/code/"
+              
+              
+              id="code">
+              <p>算法</p>
+            </a>
+          
+            <a target="_blank" rel="noopener" href="https://github.com/littlejoyo"
+              
+              
+              id="https:githubcomlittlejoyo">
+              <p>Github</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <p>留言板</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+      <div id="safearea">
+        <div class="body-wrapper" id="pjax-container">
+          
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        【Go语言】：由浅入深了解结构体Struct
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+    <p>Joyo</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/Go/">Go</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：2020年4月12日</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="【Go语言】：由浅入深了解结构体Struct" data-path="/go/go-struct/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：4.5k字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：19分钟</p>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  
+  <ul>
+<li><p><code>struct</code>结构体可以说是Go语言中的最重要的组成部分之一</p>
+</li>
+<li><p>Go不是传统的面向对象和面向过程的语言，如果确切地说可以说是面向结构的语言</p>
+</li>
+<li><p>掌握好struct的知识点是非常有必要的，同时，利用好strcut也能写出面向对象思想的代码</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<blockquote>
+<p>Github issues:<a target="_blank" rel="noopener" href="https://github.com/littlejoyo/Blog/issues/">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h1 id="1-什么是结构体？"><a href="#1-什么是结构体？" class="headerlink" title="1.什么是结构体？"></a>1.什么是结构体？</h1><ul>
+<li><p>Go语言提供了一种自定义数据类型，可以封装多个基本数据类型，这种数据类型叫结构体，对应的关键字叫<code>struct</code></p>
+</li>
+<li><p>当Go提供的基本类型满足不了我们想要表示的属性，就可以通过struct来定义自己的类型</p>
+</li>
+<li><p>Go通过定义数据结构的方式，实现了与类似Class（类）的功能，同样具备了自己定义和实例化的方式。</p>
+</li>
+</ul>
+<h1 id="2-结构体的定义和初始化"><a href="#2-结构体的定义和初始化" class="headerlink" title="2.结构体的定义和初始化"></a>2.结构体的定义和初始化</h1><h2 id="2-1-结构体的定义"><a href="#2-1-结构体的定义" class="headerlink" title="2.1 结构体的定义"></a>2.1 结构体的定义</h2><p>使用<strong>type</strong>和<strong>struct</strong>关键字来定义结构体，具体代码格式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> 类型名 <span class="keyword">struct</span> &#123;</span><br><span class="line">    字段名 字段类型</span><br><span class="line">    字段名 字段类型</span><br><span class="line">    …</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>对比Go语言内置的基础数据类型，基本数据类型是用来描述一个值的，而结构体是用来描述一组值的。比如一个人有名字、年龄和居住城市等，本质上是一种聚合型的数据类型，类比Java中关于类的定义。</li>
+</ul>
+<h2 id="2-2-结构体实例化"><a href="#2-2-结构体实例化" class="headerlink" title="2.2 结构体实例化"></a>2.2 结构体实例化</h2><ul>
+<li><p>只有当结构体实例化时，才会真正地分配内存。也就是必须实例化后才能使用结构体的字段。</p>
+</li>
+<li><p>结构体本身也是一种类型，我们可以像声明内置类型一样使用<code>var</code>关键字声明结构体类型。当然也可以直接使用<code>:=</code>符号进行结构体的创建</p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> 结构体实例 结构体类型</span><br></pre></td></tr></table></figure>
+
+<p><strong>一个实例化栗子：</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> person <span class="keyword">struct</span> &#123;</span><br><span class="line">	name  <span class="keyword">string</span></span><br><span class="line">	city  <span class="keyword">string</span></span><br><span class="line">	age   <span class="keyword">int8</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> p1 person</span><br><span class="line">	p1.name = <span class="string">&quot;Joyo&quot;</span></span><br><span class="line">	p1.city = <span class="string">&quot;Beijing&quot;</span></span><br><span class="line">	p1.age = <span class="number">18</span></span><br><span class="line">	fmt.Printf(<span class="string">&quot;p1=%v\n&quot;</span>, p1)  <span class="comment">//p1=&#123;Joyo Beijing 18&#125;</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;p1=%#v\n&quot;</span>, p1) <span class="comment">//p1=main.person&#123;name:&quot;Joyo&quot;, city:&quot;Beijing&quot;, age:18&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样我们就拥有了一个person的自定义类型，它有name、city、age三个字段，分别表示姓名、城市和年龄。然后通过使用这个person结构体就能够很方便的在程序中表示和存储有关于人的信息。</p>
+<p>续上，另一种实例化方式：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	p2 := person&#123;</span><br><span class="line">        name: <span class="string">&quot;joyo&quot;</span>,</span><br><span class="line">        city: <span class="string">&quot;Beijing&quot;</span>,</span><br><span class="line">        age: <span class="number">18</span>,</span><br><span class="line">    &#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;p1=%v\n&quot;</span>, p1)  <span class="comment">//p1=&#123;Joyo Beijing 18&#125;</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;p1=%#v\n&quot;</span>, p1) <span class="comment">//p1=main.person&#123;name:&quot;Joyo&quot;, city:&quot;Beijing&quot;, age:18&#125;</span></span><br><span class="line"></span><br><span class="line">    fmt.Printf(<span class="string">&quot;name=%s\n&quot;</span>, p.name) <span class="comment">// name=Joyo</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;name=%s\n&quot;</span>, p.city) <span class="comment">// city=Beijing</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;name=%d\n&quot;</span>, p.age) <span class="comment">//  age=18</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong></p>
+<ol>
+<li><p>上面最后一个逗号”,”不能省略，Go会报错，这个逗号有助于我们去扩展这个结构，所以习惯后，这是一个很好的特性。</p>
+</li>
+<li><p>结构体实例化后，就可以通过<code>.</code>来访问结构体的字段（成员变量）,例如上面的<code>p1.name</code>和<code>p1.age</code>等。</p>
+</li>
+<li><p>上面实例化结构体的时候，也可以不指定属性直接赋值，但是这样看起来不够直观，一般还是建议使用指定的方式。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p3 := person&#123;<span class="string">&quot;Joyo&quot;</span>,<span class="string">&quot;Beijing&quot;</span>,<span class="number">18</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>一次性无法将结构体的属性进行赋值的话，还可以通过先赋值部分，再通过<code>.</code>来追加赋值完整属性的对象</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    p4 := person&#123;</span><br><span class="line">    name: <span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">    city: <span class="string">&quot;Beijing&quot;</span>,</span><br><span class="line">    &#125;</span><br><span class="line">    p4.age = <span class="number">18</span></span><br><span class="line"></span><br><span class="line">    fmt.Printf(<span class="string">&quot;p1=%#v\n&quot;</span>, p1) <span class="comment">//p1=main.person&#123;name:&quot;Joyo&quot;, city:&quot;Beijing&quot;, age:18&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-3-匿名结构体"><a href="#2-3-匿名结构体" class="headerlink" title="2.3 匿名结构体"></a>2.3 匿名结构体</h1><p>在定义一些<strong>临时数据结构</strong>等场景下还可以使用匿名结构体。</p>
+<p>同样可以使用上面的两种方式进行实例化：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// 方式1：</span></span><br><span class="line">    <span class="keyword">var</span> p1 <span class="keyword">struct</span>&#123;Name <span class="keyword">string</span>; Age <span class="keyword">int</span>&#125;</span><br><span class="line">    p1.Name = <span class="string">&quot;Joyo&quot;</span></span><br><span class="line">    p1.Age = <span class="number">18</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;%#v\n&quot;</span>, user)<span class="comment">//struct &#123; Name string; Age int &#125;&#123;Name:&quot;Joyo&quot;, Age:18&#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 方式2：</span></span><br><span class="line">    p2 := <span class="keyword">struct</span> &#123;</span><br><span class="line">		Name <span class="keyword">string</span></span><br><span class="line">		Age  <span class="keyword">int</span></span><br><span class="line">	&#125;&#123;Name: <span class="string">&quot;Tom&quot;</span>, Age: <span class="number">18</span>&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Printf(<span class="string">&quot;%#v\n&quot;</span>, p2)<span class="comment">//struct &#123; Name string; Age int &#125;&#123;Name:&quot;Tom&quot;, Age:18&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-4-创建指针类型结构体"><a href="#2-4-创建指针类型结构体" class="headerlink" title="2.4 创建指针类型结构体"></a>2.4 创建指针类型结构体</h2><p>可以通过使用<code>new</code>关键字或者<code>&amp;</code>符号对结构体进行实例化，得到的是结构体的内存地址，即是指针地址。 </p>
+<p>事实上使用<code>&amp;</code>对结构体进行取地址操作相当于对该结构体类型进行了一次new实例化操作。</p>
+<p>格式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> p1 = <span class="built_in">new</span>(person)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%T\n&quot;</span>, p1)     <span class="comment">//*main.person(打印类型)</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;p1=%#v\n&quot;</span>, p1) <span class="comment">//p1=&amp;main.person&#123;name:&quot;&quot;, city:&quot;&quot;, age:0&#125;</span></span><br><span class="line"></span><br><span class="line">    p2 := &amp;person&#123;&#125;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%T\n&quot;</span>, p2)     <span class="comment">//*main.person(打印类型)</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;p2=%#v\n&quot;</span>, p2) <span class="comment">//p2=&amp;main.person&#123;name:&quot;&quot;, city:&quot;&quot;, age:0&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从打印的结果中我们可以看出<code>p1</code>和<code>p2</code>的类型都是一个结构体指针，需要注意的是在Go语言中支持对结构体指针直接使用<code>.</code>来访问结构体的成员。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> p = <span class="built_in">new</span>(person)</span><br><span class="line">p.name = <span class="string">&quot;Joyo&quot;</span></span><br><span class="line">p.age = <span class="number">18</span></span><br><span class="line">p.city = <span class="string">&quot;Beijing&quot;</span></span><br><span class="line">fmt.Printf(<span class="string">&quot;p=%#v\n&quot;</span>, p) <span class="comment">//p=&amp;main.person&#123;name:&quot;小王子&quot;, city:&quot;上海&quot;, age:28&#125;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>p.name = “Joyo”其实在底层是(*p).name = “Joyo”，这是Go语言帮我们实现的语法糖。</p>
+</blockquote>
+<h2 id="2-5-分析指针类型结构体"><a href="#2-5-分析指针类型结构体" class="headerlink" title="2.5 分析指针类型结构体"></a>2.5 分析指针类型结构体</h2><p>上面列出了两种实例化的方式分别是：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p1 := person&#123;name:<span class="string">&quot;Joyo&quot;</span>,city:<span class="string">&quot;Beijing&quot;</span>,age:<span class="number">18</span>&#125;</span><br><span class="line">p2 := &amp;person&#123;name:<span class="string">&quot;Joyo&quot;</span>,city:<span class="string">&quot;Beijing&quot;</span>,age:<span class="number">18</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>这两种赋值方式，有何不同？</strong></p>
+<ul>
+<li><p>第一种将整个数据结构赋值给变量p1，p1从此变成person的实例；</p>
+</li>
+<li><p>第二种使用了一个特殊符号<code>&amp;</code>在数据结构前面，它表示返回<strong>这个数据结构的引用</strong>，也就是这个数据结构的地址，所以p2也指向这个数据结构。</p>
+</li>
+</ul>
+<p><strong>那p1和p2都指向这个数据结构，有什么区别？</strong></p>
+<p>实际上，赋值给p1的是person实例的地址，赋值给p2是一个中间的指针，这个指针里保存了person实例的地址。它们的关系相当于：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p1 -&gt; person&#123;&#125;</span><br><span class="line">p1 -&gt; Pointer -&gt; person&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>其中Pointer在内存中占用一个长度为一个机器字长的单独数据块，64位机器上一个机器字长是8字节，所以赋值给p2的这个8字节长度的指针地址，这个指针地址再指向person{}，而p2则是直接指向person{}</p>
+</blockquote>
+<h2 id="2-6-结构体初始化"><a href="#2-6-结构体初始化" class="headerlink" title="2.6 结构体初始化"></a>2.6 结构体初始化</h2><p>没有初始化的结构体，其成员变量都是对应基本数据类型的零值。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> person <span class="keyword">struct</span> &#123;</span><br><span class="line">	name <span class="keyword">string</span></span><br><span class="line">	city <span class="keyword">string</span></span><br><span class="line">	age  <span class="keyword">int8</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> p person</span><br><span class="line">	fmt.Printf(<span class="string">&quot;p=%#v\n&quot;</span>, p) <span class="comment">//p=main.person&#123;name:&quot;&quot;, city:&quot;&quot;, age:0&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用键值初始化：</strong></p>
+<p>使用键值对对结构体进行初始化时，键对应结构体的字段，值对应该字段的初始值。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">p1 := person&#123;</span><br><span class="line">	name: <span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">	city: <span class="string">&quot;Beijing&quot;</span>,</span><br><span class="line">	age:  <span class="number">18</span>,</span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;p1=%#v\n&quot;</span>, p1) <span class="comment">//p1=main.person&#123;name:&quot;小王子&quot;, city:&quot;Beijing&quot;, age:18&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以对结构体指针进行键值对初始化，例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">p2 := &amp;person&#123;</span><br><span class="line">	name: <span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">	city: <span class="string">&quot;Beijing&quot;</span>,</span><br><span class="line">	age:  <span class="number">18</span>,</span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;p2=%#v\n&quot;</span>, p2) <span class="comment">//p2=main.person&#123;name:&quot;小王子&quot;, city:&quot;Beijing&quot;, age:18&#125;</span></span><br></pre></td></tr></table></figure>
+<p>当某些字段没有初始值的时候，该字段可以不写。此时，没有指定初始值的字段的值就是该字段类型的零值。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">p3 := &amp;person&#123;</span><br><span class="line">	name: <span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;p3=%#v\n&quot;</span>, p3) <span class="comment">//p3=&amp;main.person&#123;name:&quot;Joyo&quot;, city:&quot;&quot;, age:0&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>使用值的列表初始化：</strong></p>
+<p>初始化结构体的时候可以简写，也就是初始化的时候不写键，直接写值：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">p := &amp;person&#123;</span><br><span class="line">	<span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">	<span class="string">&quot;Beijing&quot;</span>,</span><br><span class="line">	<span class="number">18</span>,</span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;p=%#v\n&quot;</span>, p) <span class="comment">//p=&amp;main.person&#123;name:&quot;Joyo&quot;, city:&quot;Beijing&quot;, age:18&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>使用这种格式初始化时，需要注意：</p>
+<ol>
+<li>必须初始化结构体的所有字段。</li>
+<li>初始值的填充顺序必须与字段在结构体中的声明顺序一致。</li>
+<li>该方式不能和键值初始化方式混用。</li>
+</ol>
+<h2 id="2-7-空结构体"><a href="#2-7-空结构体" class="headerlink" title="2.7 空结构体"></a>2.7 空结构体</h2><ul>
+<li><code>struct&#123;&#125;</code>表示为空结构体，注意空结构体是不占用空间的。</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> v <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line">fmt.Println(unsafe.Sizeof(v))  <span class="comment">// 0</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="3-方法和接收者"><a href="#3-方法和接收者" class="headerlink" title="3.方法和接收者"></a>3.方法和接收者</h1><h2 id="3-1-认识方法和接受者"><a href="#3-1-认识方法和接受者" class="headerlink" title="3.1 认识方法和接受者"></a>3.1 认识方法和接受者</h2><p>Go语言中的方法（Method）是一种作用于特定类型变量的函数。这种特定类型变量叫做接收者（Receiver）。接收者的概念就类似于其他语言中的<code>this</code>或者 <code>self</code>。</p>
+<p>方法的定义格式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(接收者变量 接收者类型)</span> 方法名<span class="params">(参数列表)</span> <span class="params">(返回参数)</span></span> &#123;</span><br><span class="line">    函数体</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>接收者变量</strong>：接收者中的参数变量名在命名时，官方建议使用接收者类型名称首字母的小写，而不是<code>self</code>、<code>this</code>之类的命名。例如，Person类型的接收者变量应该命名为 p，Connector类型的接收者变量应该命名为c等。</p>
+</li>
+<li><p><strong>接收者类型</strong>：接收者类型和参数类似，可以是指针类型和非指针类型。</p>
+</li>
+<li><p><strong>方法名、参数列表、返回参数</strong>：具体格式与函数定义相同。</p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Person 结构体</span></span><br><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	name <span class="keyword">string</span></span><br><span class="line">	age  <span class="keyword">int8</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Sing Person唱歌的方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p Person)</span> <span class="title">Sing</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%s开始唱歌了！\n&quot;</span>, p.name)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	p1 := &amp;Person&#123;</span><br><span class="line">        name:<span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">        age:<span class="number">18</span>,</span><br><span class="line">    &#125;</span><br><span class="line">	p1.Sing()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>方法与函数的区别是，函数不属于任何类型，方法属于特定的类型。</p>
+</blockquote>
+<h2 id="3-2-指针类型-引用类型-接收者"><a href="#3-2-指针类型-引用类型-接收者" class="headerlink" title="3.2 指针类型(引用类型)接收者"></a>3.2 指针类型(引用类型)接收者</h2><p>指针类型的接收者由一个结构体的指针组成，由于指针的特性，调用方法时修改接收者指针的任意成员变量，在方法结束后，修改都是有效的,会将接收者的属性进行改变。</p>
+<p>这种方式就十分接近于其他语言中面向对象中的<code>this</code>或者<code>self</code>。 例如我们为Person添加一个SetAge方法，来修改实例变量的年龄。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SetAge 设置p的年龄</span></span><br><span class="line"><span class="comment">// 使用指针接收者</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *Person)</span> <span class="title">SetAge</span><span class="params">(newAge <span class="keyword">int8</span>)</span></span> &#123;</span><br><span class="line">	p.age = newAge</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用<code>SetAge</code>方法进行属性的修改</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	p1 := &amp;Person&#123;</span><br><span class="line">        name:<span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">        age:<span class="number">18</span>,</span><br><span class="line">    &#125;</span><br><span class="line">	fmt.Println(p1.age) <span class="comment">// 18</span></span><br><span class="line">	p1.SetAge(<span class="number">20</span>)</span><br><span class="line">	fmt.Println(p1.age) <span class="comment">// 20 （从18修改为20）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-3-值类型接收者"><a href="#3-3-值类型接收者" class="headerlink" title="3.3 值类型接收者"></a>3.3 值类型接收者</h2><p>当方法作用于值类型接收者时，Go语言会在代码运行时将接收者的值复制一份。</p>
+<p>在值类型接收者的方法中可以获取接收者的成员值，但修改操作只是针对副本，无法修改接收者变量本身。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// SetAge 设置p的年龄</span></span><br><span class="line"><span class="comment">// 使用值接收者</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p Person)</span> <span class="title">SetAge</span><span class="params">(newAge <span class="keyword">int8</span>)</span></span> &#123;</span><br><span class="line">	p.age = newAge</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	p1 := &amp;Person&#123;</span><br><span class="line">        name:<span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">        age:<span class="number">18</span>,</span><br><span class="line">    &#125;</span><br><span class="line">	fmt.Println(p1.age) <span class="comment">// 18</span></span><br><span class="line">	p1.SetAge(<span class="number">20</span>) <span class="comment">// (*p1).SetAge2(30)</span></span><br><span class="line">	fmt.Println(p1.age) <span class="comment">// 18</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-4-什么时候应该使用指针类型接收者"><a href="#3-4-什么时候应该使用指针类型接收者" class="headerlink" title="3.4 什么时候应该使用指针类型接收者"></a>3.4 什么时候应该使用指针类型接收者</h2><ol>
+<li>需要修改接收者中的值</li>
+<li>接收者是拷贝代价比较大的大对象</li>
+<li>保证一致性，如果有某个方法使用了指针接收者，那么其他的方法也应该使用指针接收者</li>
+</ol>
+<blockquote>
+<p>大多数时候，传递给函数使用指针类型，但极少数时候也有需求直接使用值类型。</p>
+</blockquote>
+<h2 id="3-5-任意类型添加方法"><a href="#3-5-任意类型添加方法" class="headerlink" title="3.5 任意类型添加方法"></a>3.5 任意类型添加方法</h2><p>在Go语言中，接收者的类型可以是任何类型，不仅仅是结构体，任何类型都可以拥有方法。 </p>
+<p>举个例子，我们基于内置的<code>int</code>类型使用<code>type</code>关键字可以定义新的自定义类型，然后为我们的自定义类型添加方法。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//MyInt 将int定义为自定义MyInt类型</span></span><br><span class="line"><span class="keyword">type</span> MyInt <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//SayHello 为MyInt添加一个SayHello的方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m MyInt)</span> <span class="title">SayHello</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;Hello, 我是int类型！&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> m1 MyInt</span><br><span class="line">	m1.SayHello() <span class="comment">//Hello, 我是int类型！</span></span><br><span class="line">	m1 = <span class="number">100</span></span><br><span class="line">	fmt.Printf(<span class="string">&quot;%#v  %T\n&quot;</span>, m1, m1) <span class="comment">//100  main.MyInt</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：非本地类型不能定义方法，也就是说我们不能给别的包的类型定义方法。</p>
+</blockquote>
+<h1 id="4-结构体的匿名字段"><a href="#4-结构体的匿名字段" class="headerlink" title="4.结构体的匿名字段"></a>4.结构体的匿名字段</h1><h2 id="4-1-什么是匿名字段？"><a href="#4-1-什么是匿名字段？" class="headerlink" title="4.1 什么是匿名字段？"></a>4.1 什么是匿名字段？</h2><p>结构体允许其成员字段在声明时<strong>没有字段名而只有类型</strong>，这种没有名字的字段就称为匿名字段。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Person 结构体Person类型</span></span><br><span class="line"><span class="keyword">type</span> Person <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="keyword">string</span></span><br><span class="line">	<span class="keyword">int</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	p1 := Person&#123;</span><br><span class="line">		<span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">		<span class="number">18</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%#v\n&quot;</span>, p1)        <span class="comment">//main.Person&#123;string:&quot;Joyo&quot;, int:18&#125;</span></span><br><span class="line">	fmt.Println(p1.<span class="keyword">string</span>, p1.<span class="keyword">int</span>) <span class="comment">//Joyo 18</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>匿名字段默认采用类型名作为字段名，结构体要求字段名称必须唯一，因此一个结构体中同种类型的匿名字段只能有一个,例如上面的string类型只能有一种，否则会出现同名错误。</p>
+</blockquote>
+<h2 id="4-2-嵌套结构体"><a href="#4-2-嵌套结构体" class="headerlink" title="4.2 嵌套结构体"></a>4.2 嵌套结构体</h2><p>一个结构体中可以嵌套包含另一个结构体或结构体指针,同样可以应用上面的匿名字段特性。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Address 地址结构体</span></span><br><span class="line"><span class="keyword">type</span> Address <span class="keyword">struct</span> &#123;</span><br><span class="line">	Province <span class="keyword">string</span></span><br><span class="line">	City     <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//User 用户结构体</span></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name    <span class="keyword">string</span></span><br><span class="line">	Gender  <span class="keyword">string</span></span><br><span class="line">	Address Address</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	u1 := User&#123;</span><br><span class="line">		Name:   <span class="string">&quot;Joyo&quot;</span>,</span><br><span class="line">		Gender: <span class="string">&quot;男&quot;</span>,</span><br><span class="line">		Address: Address&#123;</span><br><span class="line">			Province: <span class="string">&quot;广东&quot;</span>,</span><br><span class="line">			City:     <span class="string">&quot;深圳&quot;</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;u1=%#v\n&quot;</span>, u1)<span class="comment">//u1=main.User&#123;Name:&quot;Joyo&quot;, Gender:&quot;男&quot;, Address:main.Address&#123;Province:&quot;广东&quot;, City:&quot;深圳&quot;&#125;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>嵌套匿名结构体</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Address 地址结构体</span></span><br><span class="line"><span class="keyword">type</span> Address <span class="keyword">struct</span> &#123;</span><br><span class="line">	Province <span class="keyword">string</span></span><br><span class="line">	City     <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//User 用户结构体</span></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name    <span class="keyword">string</span></span><br><span class="line">	Gender  <span class="keyword">string</span></span><br><span class="line">	Address <span class="comment">//匿名结构体</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> u2 User</span><br><span class="line">	u2.Name = <span class="string">&quot;Joyo&quot;</span></span><br><span class="line">	u2.Gender = <span class="string">&quot;男&quot;</span></span><br><span class="line">	u2.Address.Province = <span class="string">&quot;广东&quot;</span>    <span class="comment">//通过匿名结构体.字段名访问</span></span><br><span class="line">	u2.City = <span class="string">&quot;深圳&quot;</span>                <span class="comment">//直接访问匿名结构体的字段名</span></span><br><span class="line">	fmt.Printf(<span class="string">&quot;u2=%#v\n&quot;</span>, u2) <span class="comment">//u2=main.User&#123;Name:&quot;Joyo&quot;, Gender:&quot;男&quot;, Address:main.Address&#123;Province:&quot;广东&quot;, City:&quot;深圳&quot;&#125;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当访问结构体成员时会先在结构体中查找该字段，找不到再去匿名结构体中查找。</p>
+</blockquote>
+<h2 id="4-3-嵌套结构体的字段名冲突"><a href="#4-3-嵌套结构体的字段名冲突" class="headerlink" title="4.3 嵌套结构体的字段名冲突"></a>4.3 嵌套结构体的字段名冲突</h2><p>嵌套结构体内部可能存在相同的字段名。这个时候为了避免歧义需要指定具体的内嵌结构体的字段。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Address 地址结构体</span></span><br><span class="line"><span class="keyword">type</span> Address <span class="keyword">struct</span> &#123;</span><br><span class="line">	Province   <span class="keyword">string</span></span><br><span class="line">	City       <span class="keyword">string</span></span><br><span class="line">	CreateTime <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Email 邮箱结构体</span></span><br><span class="line"><span class="keyword">type</span> Email <span class="keyword">struct</span> &#123;</span><br><span class="line">	Account    <span class="keyword">string</span></span><br><span class="line">	CreateTime <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//User 用户结构体</span></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name   <span class="keyword">string</span></span><br><span class="line">	Gender <span class="keyword">string</span></span><br><span class="line">	Address</span><br><span class="line">	Email</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> u1 User</span><br><span class="line">	u1.Name = <span class="string">&quot;Joyo&quot;</span></span><br><span class="line">	u1.Gender = <span class="string">&quot;男&quot;</span></span><br><span class="line">	<span class="comment">// u1.CreateTime = &quot;2019&quot; //ambiguous selector user3.CreateTime</span></span><br><span class="line">	u1.Address.CreateTime = <span class="string">&quot;2000&quot;</span> <span class="comment">//指定Address结构体中的CreateTime</span></span><br><span class="line">	u1.Email.CreateTime = <span class="string">&quot;2000&quot;</span>   <span class="comment">//指定Email结构体中的CreateTime</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-利用结构体实现面向对象特性"><a href="#5-利用结构体实现面向对象特性" class="headerlink" title="5.利用结构体实现面向对象特性"></a>5.利用结构体实现面向对象特性</h1><h2 id="5-1-构造函数"><a href="#5-1-构造函数" class="headerlink" title="5.1 构造函数"></a>5.1 构造函数</h2><p>面向对象中有构造器(也称为构造方法)，可以根据类构造出类的实例：对象。</p>
+<p>Go虽然不支持面向对象，没有构造函数的概念，但也具有构造函数的功能，毕竟构造函数只是一个方法而已。只要一个函数能够根据数据结构返回这个数据结构的一个实例对象，就可以称之为”构造函数”。</p>
+<p>举个栗子：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newPerson</span><span class="params">(name, city <span class="keyword">string</span>, age <span class="keyword">int8</span>)</span> *<span class="title">person</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;person&#123;</span><br><span class="line">		name: name,</span><br><span class="line">		city: city,</span><br><span class="line">		age:  age,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>因为struct是值类型，如果结构体比较复杂的话，值拷贝性能开销会比较大，所以该构造函数返回的是结构体指针类型,当然也可以直接返回非引用类型。</p>
+</blockquote>
+<p>调用构造函数生成实例对象：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p := newPerson(<span class="string">&quot;Joyo&quot;</span>, <span class="string">&quot;Beijing&quot;</span>, <span class="number">18</span>)</span><br><span class="line">fmt.Printf(<span class="string">&quot;%#v\n&quot;</span>, p) <span class="comment">//&amp;main.person&#123;name:&quot;张三&quot;, city:&quot;沙河&quot;, age:90&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果感觉上面的方式太过麻烦，其实可以直接使用Go内置的new()函数用于为一个数据结构分配内存。其中<code>new(x)</code>等价于<code>&amp;x&#123;&#125;</code>，以下两语句等价：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p1 := <span class="built_in">new</span>(person)</span><br><span class="line">p2 := &amp;person&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-2-扩展结构体属性实现继承特性"><a href="#5-2-扩展结构体属性实现继承特性" class="headerlink" title="5.2 扩展结构体属性实现继承特性"></a>5.2 扩展结构体属性实现继承特性</h2><p>Go可以通过组合的思想来实现面向对象的继承特性</p>
+<p>比如，在前面出现的结构体的数据结构中的字段数据类型都是简简单单的内置类型：<strong>string</strong>、<strong>int</strong>。但数据结构中的字段可以更复杂，例如可以是<strong>map</strong>、<strong>array</strong>等，还可以是<strong>自定义的数据类型</strong>。</p>
+<p>通过传入自定义的数据类型实现继承，使用动物的关系来举个栗子：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Animal 动物</span></span><br><span class="line"><span class="keyword">type</span> Animal <span class="keyword">struct</span> &#123;</span><br><span class="line">	name <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *Animal)</span> <span class="title">move</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%s会动！\n&quot;</span>, a.name)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Dog 狗</span></span><br><span class="line"><span class="keyword">type</span> Dog <span class="keyword">struct</span> &#123;</span><br><span class="line">	Feet    <span class="keyword">int8</span></span><br><span class="line">	*Animal <span class="comment">//通过嵌套匿名结构体实现继承</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d *Dog)</span> <span class="title">wang</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%s会汪汪汪~\n&quot;</span>, d.name)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	d1 := &amp;Dog&#123;</span><br><span class="line">		Feet: <span class="number">4</span>,</span><br><span class="line">		Animal: &amp;Animal&#123; <span class="comment">//注意嵌套的是结构体指针</span></span><br><span class="line">			name: <span class="string">&quot;Tom&quot;</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	d1.wang() <span class="comment">//Tom会汪汪汪~</span></span><br><span class="line">	d1.move() <span class="comment">//Tom会动！</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>通过组合的方式扩展了结构体的字段，同时也可以实现面向对象继承特性.</p>
+</blockquote>
+<h2 id="5-3-重写"><a href="#5-3-重写" class="headerlink" title="5.3 重写"></a>5.3 重写</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Animal 动物</span></span><br><span class="line"><span class="keyword">type</span> Animal <span class="keyword">struct</span> &#123;</span><br><span class="line">	name <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *Animal)</span> <span class="title">move</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%s会动！\n&quot;</span>, a.name)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Dog 狗</span></span><br><span class="line"><span class="keyword">type</span> Dog <span class="keyword">struct</span> &#123;</span><br><span class="line">	Feet    <span class="keyword">int8</span></span><br><span class="line">	*Animal <span class="comment">//通过嵌套匿名结构体实现继承</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(d *Dog)</span> <span class="title">move</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;%s用四条腿跑起来了！\n&quot;</span>, d.name)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    dog := &amp;Dog&#123;</span><br><span class="line">        Feet: <span class="number">4</span>,</span><br><span class="line">        Animal: &amp;Animal&#123;       <span class="comment">// 注意此行</span></span><br><span class="line">            name:   <span class="string">&quot;Tom&quot;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">    &#125;</span><br><span class="line">    dog.move() <span class="comment">// Tom用四条腿跑起来了！</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" class="lazyload" data-srcset="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="weixin-a"></p>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=https://littlejoyo.github.io/go/go-struct/>https://littlejoyo.github.io/go/go-struct/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T12:28:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Go/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Go</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/go/go-struct/&title=【Go语言】：由浅入深了解结构体Struct - JoyoHub&summary=
+struct结构体可以说是Go语言中的最重要的组成部分之一
+
+Go不是传统的面向对象和面向过程的语言，如果确切地说可以说是面向结构的语言
+
+掌握好struct的知识点是非常有必要的，同时，利用好strcut也能写出面向对象思想的代码
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/go/go-struct/&title=【Go语言】：由浅入深了解结构体Struct - JoyoHub&summary=
+struct结构体可以说是Go语言中的最重要的组成部分之一
+
+Go不是传统的面向对象和面向过程的语言，如果确切地说可以说是面向结构的语言
+
+掌握好struct的知识点是非常有必要的，同时，利用好strcut也能写出面向对象思想的代码
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/go/go-struct/&title=【Go语言】：由浅入深了解结构体Struct - JoyoHub&summary=
+struct结构体可以说是Go语言中的最重要的组成部分之一
+
+Go不是传统的面向对象和面向过程的语言，如果确切地说可以说是面向结构的语言
+
+掌握好struct的知识点是非常有必要的，同时，利用好strcut也能写出面向对象思想的代码
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/go/go-character/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>【Go语言】：区分字符和字节，掌握字符串遍历</p>
+          <p class='content'>
+在Go语言中没有字符类型，字符只是整数的特殊用例，使用了byte和rune作为别名
+
+Go的字符串使用了UTF-8的编码来表示，所以要明确好Unicode码和ASCII码的区别
+
+如何使用Go...</p>
+        </a>
+      
+      
+        <a class='next' href='/network/network-osi/'>
+          <p class='title'>【计算机网络】：OSI七层模型和各种协议介绍<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>
+了解OSI模型可以更清晰掌握数据在网络互联的各个层次的传输过程
+
+OSI七层模型也是面试热点问题，从中可以引申出大量的相关知识
+
+另外，各层次的代表协议和硬件、TCP四层模型你是否都掌握了解呢...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="gitalk-container"></div>
+
+  </article>
+
+
+
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AF%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%9F"><span class="toc-text">1.什么是结构体？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-text">2.结构体的定义和初始化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-text">2.1 结构体的定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E7%BB%93%E6%9E%84%E4%BD%93%E5%AE%9E%E4%BE%8B%E5%8C%96"><span class="toc-text">2.2 结构体实例化</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-3-%E5%8C%BF%E5%90%8D%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-text">2.3 匿名结构体</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-%E5%88%9B%E5%BB%BA%E6%8C%87%E9%92%88%E7%B1%BB%E5%9E%8B%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-text">2.4 创建指针类型结构体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-%E5%88%86%E6%9E%90%E6%8C%87%E9%92%88%E7%B1%BB%E5%9E%8B%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-text">2.5 分析指针类型结构体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-6-%E7%BB%93%E6%9E%84%E4%BD%93%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="toc-text">2.6 结构体初始化</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-7-%E7%A9%BA%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-text">2.7 空结构体</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%96%B9%E6%B3%95%E5%92%8C%E6%8E%A5%E6%94%B6%E8%80%85"><span class="toc-text">3.方法和接收者</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E8%AE%A4%E8%AF%86%E6%96%B9%E6%B3%95%E5%92%8C%E6%8E%A5%E5%8F%97%E8%80%85"><span class="toc-text">3.1 认识方法和接受者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E6%8C%87%E9%92%88%E7%B1%BB%E5%9E%8B-%E5%BC%95%E7%94%A8%E7%B1%BB%E5%9E%8B-%E6%8E%A5%E6%94%B6%E8%80%85"><span class="toc-text">3.2 指针类型(引用类型)接收者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E5%80%BC%E7%B1%BB%E5%9E%8B%E6%8E%A5%E6%94%B6%E8%80%85"><span class="toc-text">3.3 值类型接收者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E5%BA%94%E8%AF%A5%E4%BD%BF%E7%94%A8%E6%8C%87%E9%92%88%E7%B1%BB%E5%9E%8B%E6%8E%A5%E6%94%B6%E8%80%85"><span class="toc-text">3.4 什么时候应该使用指针类型接收者</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-%E4%BB%BB%E6%84%8F%E7%B1%BB%E5%9E%8B%E6%B7%BB%E5%8A%A0%E6%96%B9%E6%B3%95"><span class="toc-text">3.5 任意类型添加方法</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%8C%BF%E5%90%8D%E5%AD%97%E6%AE%B5"><span class="toc-text">4.结构体的匿名字段</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E4%BB%80%E4%B9%88%E6%98%AF%E5%8C%BF%E5%90%8D%E5%AD%97%E6%AE%B5%EF%BC%9F"><span class="toc-text">4.1 什么是匿名字段？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-%E5%B5%8C%E5%A5%97%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-text">4.2 嵌套结构体</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-%E5%B5%8C%E5%A5%97%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%AD%97%E6%AE%B5%E5%90%8D%E5%86%B2%E7%AA%81"><span class="toc-text">4.3 嵌套结构体的字段名冲突</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E5%88%A9%E7%94%A8%E7%BB%93%E6%9E%84%E4%BD%93%E5%AE%9E%E7%8E%B0%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%89%B9%E6%80%A7"><span class="toc-text">5.利用结构体实现面向对象特性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1-%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="toc-text">5.1 构造函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-2-%E6%89%A9%E5%B1%95%E7%BB%93%E6%9E%84%E4%BD%93%E5%B1%9E%E6%80%A7%E5%AE%9E%E7%8E%B0%E7%BB%A7%E6%89%BF%E7%89%B9%E6%80%A7"><span class="toc-text">5.2 扩展结构体属性实现继承特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-3-%E9%87%8D%E5%86%99"><span class="toc-text">5.3 重写</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7"><span class="toc-text">微信公众号</span></a></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+		  
+		  <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="【Go语言】：由浅入深了解结构体Struct";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+  // header 这里无论是否开启pjax都需要
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+  
+    // cover
+    var cover_wrapper=document.querySelector('.cover-wrapper');
+    
+    cover_wrapper.id="none";
+    cover_wrapper.style.display="none";
+    
+  
+</script>
+
+        </div>
+        
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+  </footer>
+
+
+        <a id="s-top" class="fas fa-arrow-up fa-fw" href="javascript:void(0)"></a>
+      </div>
+    </div>
+    <div>
+      <script>
+/************这个文件存放不需要重载的全局变量和全局函数*********/
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/******************** Pjax ********************************/
+function VPjax(){
+	this.list=[] // 存放回调函数
+	this.start=()=>{
+	  for(var i=0;i<this.list.length;i++){
+		this.list[i].run();
+	  }
+	}
+	this.push=(fn,name)=>{
+		var f=new PjaxItem(fn,name);
+		this.list.push(f);
+	}
+	// 构造一个可以run的对象
+	function PjaxItem(fn,name){
+		// 函数名称
+		this.name = name || fn.name
+		// run方法
+		this.run=()=>{
+			fn()
+		}
+	}
+}
+volantis.pjax={}
+volantis.pjax.method={
+	complete: new VPjax(),
+	error: new VPjax(),
+	send: new VPjax()
+}
+volantis.pjax={
+	...volantis.pjax,
+	push: volantis.pjax.method.complete.push,
+	error: volantis.pjax.method.error.push,
+	send: volantis.pjax.method.send.push
+}
+/********************脚本懒加载函数********************************/
+// 已经加入了setTimeout
+function loadScript(src, cb) {
+	setTimeout(function() {
+		var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+		var script = document.createElement('script');
+		script.setAttribute('type','text/javascript');
+		if (cb) script.onload = cb;
+		script.setAttribute('src', src);
+		HEAD.appendChild(script);
+	});
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+  function Pjax_SCload_fancybox(){
+	if (typeof $.fancybox == "undefined") {
+	 SCload_fancybox();
+    } else {
+	 pjax_fancybox();
+    }
+  }
+  volantis.pjax.push(Pjax_SCload_fancybox)
+  volantis.pjax.send(()=>{
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+  },'fancybox')
+</script>
+
+
+<!-- internal -->
+
+
+
+
+<script>
+  function loadIssuesJS() {
+    if ($(".md").find(".issues-api").length == 0) return;
+	
+	  loadScript('/js/issues.js');
+	
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  volantis.pjax.push(()=>{
+	if (typeof IssuesAPI == "undefined") {
+	  loadIssuesJS();
+	}
+  },"IssuesJS")
+</script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+
+<script>
+  window.FPConfig = {
+	delay: 0,
+	ignoreKeywords: [],
+	maxRPS: 5,
+	hoverDelay: 25
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+
+
+
+
+
+
+
+   <script type="text/javascript">
+  loadScript("https://cdn.jsdelivr.net/npm/scrollreveal@4.0.6/dist/scrollreveal.min.js")
+  function pjax_scrollrebeal() {
+    ScrollReveal().reveal('.l_main .reveal', {
+      distance: '32px',
+      duration: '800',
+      interval: '20',
+      scale: '1',
+      easing: 'ease-out'
+    });
+  }
+  $(function () {
+  var checkScrollReveal = setInterval(function () {
+    if ($("#safearea").css("display")!="block") return
+    if (typeof ScrollReveal=="undefined") return
+    clearInterval(checkScrollReveal)
+	pjax_scrollrebeal();
+  }, 100)
+  });
+  volantis.pjax.push(pjax_scrollrebeal)
+</script>
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+  function pjax_gitalk() {
+    if(!document.querySelectorAll("#gitalk-container")[0])return;
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+    if (document.getElementById('gitalk-container') != null) {
+      var gitalk = new Gitalk(Object.assign({"clientID":"6428b70706cc5c089758","clientSecret":"acb9d963f91bf7731c5ee1ebd80b7a172ba7f7de","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"path":null}, {
+	  id: path,
+	  distractionFreeMode: false  // Facebook-like distraction free mode
+    }));
+      gitalk.render('gitalk-container');
+    }
+  }
+  $(function () {
+    pjax_gitalk();
+  });
+  volantis.pjax.push(pjax_gitalk);
+</script>
+
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'u9j57bwJod4EDmXWdxrwuqQT-MdYXbMMI',
+    app_key: 'jfHtEKVE24j0IVCGHbvuFClp',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'https://littlejoyo.github.io' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'https://littlejoyo.github.io' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'https://littlejoyo.github.io' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+  <script>
+const rootElement = document.documentElement;
+const darkModeStorageKey = "user-color-scheme";
+const rootElementDarkModeAttributeName = "data-user-color-scheme";
+
+const setLS = (k, v) => {
+    localStorage.setItem(k, v);
+};
+
+const removeLS = (k) => {
+    localStorage.removeItem(k);
+};
+
+const getLS = (k) => {
+    return localStorage.getItem(k);
+};
+
+const getModeFromCSSMediaQuery = () => {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+};
+
+const resetRootDarkModeAttributeAndLS = () => {
+  rootElement.removeAttribute(rootElementDarkModeAttributeName);
+  removeLS(darkModeStorageKey);
+};
+
+const validColorModeKeys = {
+  dark: true,
+  light: true,
+};
+
+const applyCustomDarkModeSettings = (mode) => {
+  const currentSetting = mode || getLS(darkModeStorageKey);
+
+  if (currentSetting === getModeFromCSSMediaQuery()) {
+    resetRootDarkModeAttributeAndLS();
+  } else if (validColorModeKeys[currentSetting]) {
+    rootElement.setAttribute(rootElementDarkModeAttributeName, currentSetting);
+  } else {
+    resetRootDarkModeAttributeAndLS();
+  }
+};
+
+const invertDarkModeObj = {
+  dark: "light",
+  light: "dark",
+};
+
+/**
+ * get target mode
+ */
+const toggleCustomDarkMode = () => {
+  let currentSetting = getLS(darkModeStorageKey);
+
+  if (validColorModeKeys[currentSetting]) {
+    currentSetting = invertDarkModeObj[currentSetting];
+  } else if (currentSetting === null) {
+    currentSetting = invertDarkModeObj[getModeFromCSSMediaQuery()];
+  } else {
+    return;
+  }
+  setLS(darkModeStorageKey, currentSetting);
+  return currentSetting;
+};
+
+/**
+ * bind click event for toggle button
+ */
+var btn=$("#wrapper .toggle-mode-btn,#rightmenu-wrapper .toggle-mode-btn");
+function bindToggleButton() {
+    btn.on('click',(e) => {
+      const mode = toggleCustomDarkMode();
+      applyCustomDarkModeSettings(mode);
+    });
+}
+
+applyCustomDarkModeSettings();
+document.addEventListener("DOMContentLoaded", bindToggleButton);
+volantis.pjax.push(bindToggleButton);
+volantis.pjax.send(()=>{
+	btn.unbind('click');
+},'toggle-mode-btn-unbind');
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+		behavior: "smooth"
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+ 
+	   
+	    
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  // 使用 volantis.pjax.send 方法传入pjax:send回调函数 参见layout/_partial/scripts/global.ejs
+	  volantis.pjax.method.send.start();
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+		// 使用 volantis.pjax.push 方法传入重载函数 参见layout/_partial/scripts/global.ejs
+		volantis.pjax.method.complete.start();
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  // 使用 volantis.pjax.error 方法传入pjax:error回调函数 参见layout/_partial/scripts/global.ejs
+	  volantis.pjax.method.error.start();
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+ 
+	  
+    </div>
+  </body>
+</html>

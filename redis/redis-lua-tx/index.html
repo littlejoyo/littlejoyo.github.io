@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.3.1'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <link rel="preload" href="/css/first.css" as="style">
+  
+
+  <!-- 页面元数据 -->
+  
+  <title>【Redis】：Redis事务、Lua事务和管道的实践探究 - JoyoHub</title>
+  
+    <meta name="keywords" content="数据库,Redis">
+  
+
+  
+    <meta name="description" content="
+虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？
+
+Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？
+
+本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景
+
+">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+  
+<script>
+if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMode))
+    document.write(
+	'<style>'+
+		'html{'+
+			'overflow-x: hidden !important;'+
+			'overflow-y: hidden !important;'+
+		'}'+
+		'.kill-ie{'+
+			'text-align:center;'+
+			'height: 100%;'+
+			'margin-top: 15%;'+
+			'margin-bottom: 5500%;'+
+		'}'+
+	'</style>'+
+    '<div class="kill-ie">'+
+        '<h1><b>抱歉，您的浏览器无法访问本站</b></h1>'+
+        '<h3>微软已经于2016年终止了对 Internet Explorer (IE) 10 及更早版本的支持，<br/>'+
+        '继续使用存在极大的安全隐患，请使用当代主流的浏览器进行访问。</h3><br/>'+
+        '<a target="_blank" rel="noopener" href="https://www.microsoft.com/zh-cn/WindowsForBusiness/End-of-IE-support"><strong>了解详情 ></strong></a>'+
+    '</div>');
+</script>
+
+
+<noscript>
+	<style>
+		html{
+			overflow-x: hidden !important;
+			overflow-y: hidden !important;
+		}
+		.kill-noscript{
+			text-align:center;
+			height: 100%;
+			margin-top: 15%;
+			margin-bottom: 5500%;
+		}
+	</style>
+    <div class="kill-noscript">
+        <h1><b>抱歉，您的浏览器无法访问本站</b></h1>
+        <h3>本页面需要浏览器支持（启用）JavaScript</h3><br/>
+        <a target="_blank" rel="noopener" href="https://www.baidu.com/s?wd=启用JavaScript"><strong>了解详情 ></strong></a>
+    </div>
+</noscript>
+
+</head>
+
+  <body>
+    
+
+<header id="l_header" class="l_header auto shadow floatable blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+          
+            <i class='https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png'></i>
+          
+          
+            JoyoHub
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fa fa-fan fa-spin fa-fw'></i>博文列表
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>博文分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>博文标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>时间线
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于Joyo
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box header toggle-mode-btn">
+                  <i class='fas fa-moon fa-fw'></i>暗黑模式
+                </a>
+              <li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="搜索博主的文章..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fa fa-fan fa-spin fa-fw'></i>博文列表
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>博文分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>博文标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>时间线
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于Joyo
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box header toggle-mode-btn">
+                  <i class='fas fa-moon fa-fw'></i>暗黑模式
+                </a>
+              <li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+    <div id="l_body">
+      <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210614224551.png"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">JoyoHub</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="搜索博主的历史文章..." />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <p>归档</p>
+            </a>
+          
+            <a href="/code/"
+              
+              
+              id="code">
+              <p>算法</p>
+            </a>
+          
+            <a target="_blank" rel="noopener" href="https://github.com/littlejoyo"
+              
+              
+              id="https:githubcomlittlejoyo">
+              <p>Github</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <p>留言板</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+      <div id="safearea">
+        <div class="body-wrapper" id="pjax-container">
+          
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        【Redis】：Redis事务、Lua事务和管道的实践探究
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+    <p>Joyo</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/Redis/">Redis</a><span class="sep"></span><a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：2020年7月26日</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="【Redis】：Redis事务、Lua事务和管道的实践探究" data-path="/redis/redis-lua-tx/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：3.9k字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：15分钟</p>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  
+  <ul>
+<li><p>虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？</p>
+</li>
+<li><p>Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？</p>
+</li>
+<li><p>本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<blockquote>
+<p>Github issues:<a target="_blank" rel="noopener" href="https://github.com/littlejoyo/Blog/issues/">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h2 id="1-Redis什么场景下会出现并发问题？"><a href="#1-Redis什么场景下会出现并发问题？" class="headerlink" title="1.Redis什么场景下会出现并发问题？"></a>1.Redis什么场景下会出现并发问题？</h2><ul>
+<li><p>Redis是基于C/S架构，支持多个客户端请求，然后Redis服务并没有对每个请求进行同步处理，也就是不保证命令执行的有序性</p>
+</li>
+<li><p>当一个客户端存在<strong>先读后写</strong>的多个执行指令时，不能保证其顺序就可能出现并发问题</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>举个例子：</strong></p>
+</blockquote>
+<p>1.有一个共同访问的<code>key=&quot;joyo&quot;</code>,当前<code>value=1</code>，然后客户端有下面操作，如果value&gt;0,就执行递减操作<code>decr joyo</code>（减1操作）,否则直接返回</p>
+<p>2.现有A和B两个客户端发送请求到服务端，每个客户端都有<strong>1</strong>和<strong>2</strong>两个指令，分别对应读和写</p>
+<p>3.理想情况的顺序是<strong>A1-&gt;A2-&gt;B1-&gt;B2</strong>或者<strong>B1-&gt;B2-&gt;A1-&gt;A2</strong>,这样就能保证key的最终value是0，但是多客户端下，各个执行的顺序是不能保证的</p>
+<p>4.但是实际上，很可能会出现<strong>A1-&gt;B1-&gt;A2-&gt;B2</strong>或者<strong>B1-&gt;A1-&gt;B2-&gt;B1</strong>，这样A和B都能执行减1的操作，因为都会读取到<code>value=1</code>，最终的结果就会是-1，这个时候就是因为并发问题导致业务bug的发生了</p>
+<h2 id="2-如何解决并发问题？"><a href="#2-如何解决并发问题？" class="headerlink" title="2.如何解决并发问题？"></a>2.如何解决并发问题？</h2><h2 id="2-1-redis事务-watch"><a href="#2-1-redis事务-watch" class="headerlink" title="2.1 redis事务+watch"></a>2.1 redis事务+watch</h2><ul>
+<li><p>使用redis事务可以保证当前客户端的指令执行不会被其他客户端打断的，也就是满足事务的隔离性</p>
+</li>
+<li><p>但是，在一个事务中，只有当所有命令都依次执行完后才能得到每个结果的返回值，可是有些情况下需要先获得一条命令的返回值，然后再根据这个返回值进行业务判断后，才去执行下一条命令，比如我们这里就需要先去读取到<code>key=&quot;joyo&quot;</code>的值，如果<code>value&gt;0</code>，再去执行下一条命令</p>
+</li>
+<li><p>此时，对于<code>get</code>命令，这个时候我们是放在事务之外的，也就是当前事务体中只有一条递减的指令<code>decr</code>,是否能执行取决于读指令<code>get</code>取到的value</p>
+</li>
+<li><p>最终还是可能出现客户端A和B读取到value都是1,如，<strong>A1-&gt;B1-&gt;A2-&gt;B2</strong>或者<strong>B1-&gt;A1-&gt;B2-&gt;B1</strong>,此时<code>watch</code>命令就派上用场了</p>
+</li>
+<li><p><code>watch</code>命令能够监控key是否被修改过，如果发现被修改了就不执行事务的操作，直接返回</p>
+</li>
+<li><p>如果此时的命令执行顺序为<strong>A1-&gt;B1-&gt;A2-&gt;B2</strong>，表示此刻客户端A先执行了事务，读取到<code>value=1</code>,对key进行了减1的操作，<strong>value变为0</strong>，然后轮到客户端B执行的时候就会发现key已经被修改了，所以不执行事务然后直接返回，所以最终结果会是<code>value=0</code></p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 读取</span></span><br><span class="line">redis＞ get joyo <span class="comment">// A1=1 B1=1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 监控key （如果发现已经被修改就不执行下面的事务）</span></span><br><span class="line">redis＞ watch joyo</span><br><span class="line"><span class="comment">// 事务操作</span></span><br><span class="line">redis＞MULTI</span><br><span class="line">OK</span><br><span class="line">redis＞DECR joyo </span><br><span class="line">QUEUED</span><br><span class="line">redis＞EXEC</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>redis事务参考另一篇文章：<a target="_blank" rel="noopener" href="https://joyohub.com/2020/03/01/redis/redis-transaction/">【Redis】：正确认识Redis的事务机制</a></p>
+</blockquote>
+<h2 id="2-2-使用lua脚本"><a href="#2-2-使用lua脚本" class="headerlink" title="2.2 使用lua脚本"></a>2.2 使用lua脚本</h2><ul>
+<li><p>Redis 从 2.6 版本开始在服务器内部嵌入了一个 Lua 解释器，使得用户可以在服务器端执行 Lua 脚本</p>
+</li>
+<li><p>Redis提供了<code>eval</code>指令，只需要传入<code>lua脚本</code>和<code>对应参数</code>就能执行具备原子性操作的指令集合</p>
+</li>
+<li><p>还有一点就是，所有脚本都是以事务的形式来执行的，脚本在执行过程中不会被其他工作打断，也不会引起任何竞争条件，完全可以使用 Lua 脚本来代替事务和乐观锁</p>
+</li>
+<li><p>如果当前Redis服务端正在执行lua执行脚本，不会再接受其他指令，知道lua脚本执行完成后再去执行别的指令，因此，写lua脚本的时候切记不要写耗时过长的操作，避免出现死循环语句</p>
+</li>
+</ul>
+<p><strong>如何解决上面的问题呢？</strong></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 写一段lua脚本</span></span><br><span class="line"><span class="string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) &gt; 0 then return redis.call(&#x27;decr&#x27;, KEYS[1]) else return 0 end&quot;</span></span><br><span class="line"><span class="comment">// 假设当前key=joyo的值为1</span></span><br><span class="line">redis＞ get joyo</span><br><span class="line">redis＞ <span class="number">1</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// redis客户端执行</span></span><br><span class="line"><span class="comment">// 第一次执行</span></span><br><span class="line">redis＞ eval <span class="string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) &gt; 0 then return redis.call(&#x27;decr&#x27;, KEYS[1]) else return 0 end&quot;</span> <span class="number">1</span> joyo </span><br><span class="line">redis＞ <span class="number">1</span> </span><br><span class="line"><span class="comment">// 再次执行</span></span><br><span class="line">redis＞ eval <span class="string">&quot;if redis.call(&#x27;get&#x27;, KEYS[1]) &gt; 0 then return redis.call(&#x27;decr&#x27;, KEYS[1]) else return 0 end&quot;</span> <span class="number">1</span> joyo </span><br><span class="line">redis＞ <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>第一次执行的时候，读取到value=1，所以执行了递减操作</p>
+</li>
+<li><p>第二次以及后面都读取到的value=0，直接返回0</p>
+</li>
+<li><p>通过lua语句保证了指令执行的原子性还有有序性，因为是一次性执行的</p>
+</li>
+</ul>
+<h2 id="3-Lua脚本的好处"><a href="#3-Lua脚本的好处" class="headerlink" title="3.Lua脚本的好处"></a>3.Lua脚本的好处</h2><ol>
+<li><p>使用脚本可以直接在服务器端执行 Redis 命令，一般的数据处理操作可以直接使用 Lua 语言或者Lua 解释器提供的函数库来完成，不必再返回给客户端进行处理。</p>
+</li>
+<li><p>所有脚本都是以事务的形式来执行的，脚本在执行过程中不会被其他工作打断，也不会引起任何竞争条件，完全可以使用 Lua 脚本来代替事务和乐观锁。</p>
+</li>
+<li><p>所有脚本都是可重用的，重复执行相同的操作时，只要调用储存在服务器内部的脚本缓存就可以了，不用重新发送整个脚本，从而尽可能地节约网络资源，(redis提供了<code>evalsha</code>的指令)</p>
+</li>
+</ol>
+<h2 id="4-如何在Redis中使用Lua？"><a href="#4-如何在Redis中使用Lua？" class="headerlink" title="4.如何在Redis中使用Lua？"></a>4.如何在Redis中使用Lua？</h2><h2 id="4-1-基本语法"><a href="#4-1-基本语法" class="headerlink" title="4.1 基本语法"></a>4.1 基本语法</h2><ul>
+<li>基本语法如下：</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; EVAL script numkeys key [key ...] arg [arg ...]</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>EVAL: Redis执行Lua脚本的指令</p>
+</li>
+<li><p>script: Lua脚本（字符串格式）</p>
+</li>
+<li><p>numkeys: 脚本要处理的数据库键的数量，指明后面key数组的长度</p>
+</li>
+<li><p>key [key …]: 指定了脚本要处理的数据库键，被传入的键可以在脚本里面通过访问 KEYS 数组来取得，比如 KEYS[1] 就取出第一个输入的键，KEYS[2] 取出第二个输入的键，诸如此类。</p>
+</li>
+<li><p>arg [arg …]: 指定了脚本要用到的参数，在脚本里面可以通过访问 ARGV 数组来获取这些参数。显式地指定脚本里面用到的键是为了配合 Redis 集群对键的检查，如果不这样做的话，在集群里面使用脚本可能会出错。</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">&quot;return &#x27;hello joyo&#x27;&quot;</span> 0</span></span><br><span class="line">&quot;hello joyo&quot;</span><br><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">&quot;return 1+2&quot;</span> 0</span></span><br><span class="line">(integer) 3</span><br><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">&quot;return &#123;KEYS[1], KEYS[2], ARGV[1], ARGV[2]&#125;&quot;</span> 2 <span class="string">&quot;name&quot;</span> <span class="string">&quot;age&quot;</span> <span class="string">&quot;joyo&quot;</span> 18</span></span><br><span class="line">1) &quot;name&quot; # KEYS[1]</span><br><span class="line">2) &quot;age&quot; # KEYS[2]</span><br><span class="line">3) &quot;joyo&quot; # ARGV[1]</span><br><span class="line">4) 18 # ARGV[2]</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-2-如果调用Redis命令？"><a href="#4-2-如果调用Redis命令？" class="headerlink" title="4.2 如果调用Redis命令？"></a>4.2 如果调用Redis命令？</h2><ul>
+<li>通过调用 <code>redis.call()</code> 函数或者 <code>redis.pcall()</code> 函数，就可以直接在 Lua 脚本里面执行 Redis 命令。</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 Lua 脚本里面执行 PING 命令</span></span><br><span class="line">redis&gt; EVAL <span class="string">&quot;return redis.call(&#x27;PING&#x27;)&quot;</span> <span class="number">0</span></span><br><span class="line">PONG</span><br><span class="line"><span class="comment">// 在 Lua 脚本里面执行 DBSIZE 命令</span></span><br><span class="line">redis&gt; EVAL <span class="string">&quot;return redis.call(&#x27;DBSIZE&#x27;)&quot;</span> <span class="number">0</span> </span><br><span class="line">(integer) <span class="number">16</span></span><br><span class="line"><span class="comment">// 在 Lua 脚本里面执行 GET 命令，取出键 msg 的值，并对值进行字符串拼接操作</span></span><br><span class="line">redis&gt; SET msg <span class="string">&quot;hello joyo&quot;</span></span><br><span class="line">OK</span><br><span class="line">redis&gt; EVAL <span class="string">&quot;return &#x27;The message is: &#x27; .. redis.call(&#x27;GET&#x27;, KEYS[1]) &#x27;&quot;</span> <span class="number">1</span> msg</span><br><span class="line"><span class="string">&quot;The message is: hello joyo&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-3-redis-call和redis-pcall的区别"><a href="#4-3-redis-call和redis-pcall的区别" class="headerlink" title="4.3 redis.call和redis.pcall的区别"></a>4.3 redis.call和redis.pcall的区别</h2><ul>
+<li><p><code>redis.call()</code> 和 <code>redis.pcall()</code> 都可以用来执行 Redis 命令</p>
+</li>
+<li><p>不同的地方表现为，当被执行的脚本出错时，<code>redis.call()</code> 会返回出错脚本的名字以及 EVAL 命令的错误信息，而 <code>redis.pcall()</code> 只返回 EVAL 命令的错误信息。</p>
+</li>
+<li><p>在被执行的脚本出错时， redis.call() 可以提供更详细的错误信息，方便进行查错</p>
+</li>
+<li><p>使用时一定要注意 call 函数出错时会中断脚本的执行，而 pcall 会继续执行后面的内容</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 执行call</span></span></span><br><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">&quot;return redis.call(&#x27;NotExistsCommand&#x27;)&quot;</span> 0</span></span><br><span class="line">(error) ERR Error running script (call to f_ddabd662fa0a8e105765181ee7606562c1e6f1ce):</span><br><span class="line">@user_script:1: @user_script: 1: Unknown Redis command called from Lua script</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 执行pcall</span></span></span><br><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">&quot;return redis.pcall(&#x27;NotExistsCommand&#x27;)&quot;</span> 0</span></span><br><span class="line">(error) @user_script: 1: Unknown Redis command called from Lua script</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-4-EVALSHA命令减少网络资源损耗"><a href="#4-4-EVALSHA命令减少网络资源损耗" class="headerlink" title="4.4 EVALSHA命令减少网络资源损耗"></a>4.4 EVALSHA命令减少网络资源损耗</h2><ul>
+<li><p>任何 Lua 脚本，只要被 EVAL 命令执行过一次，就会被储存到服务器的脚本缓存里面</p>
+</li>
+<li><p>然后其实用户只要通过EVALSHA 命令，指定被缓存脚本的 SHA1 值，就可以在不发送脚本的情况下，再次执行脚本：<br><code>EVALSHA sha1 numkeys key [key ...] arg [arg ...]</code></p>
+</li>
+<li><p>如若每次执行EVAL都需要读取一大段Lua脚本会造成不必要的网络加载开销，通过SHA1值可以进行脚本的重用,那么如何生成这个SHA1值呢？</p>
+</li>
+<li><p>Redis提供了<code>SCRIPTLOAD</code>命令可以生成Lua脚本的SHA1值</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVAL <span class="string">&quot;return &#x27;hello world&#x27;&quot;</span> 0</span></span><br><span class="line">&quot;hello world&quot;</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 生成SHA1值</span></span></span><br><span class="line"><span class="meta">redis&gt;</span><span class="bash"> SCRIPTLOAD <span class="string">&quot;return &#x27;hello world&#x27;&quot;</span> 0</span></span><br><span class="line">&quot;5332031c6b470dc5a0dd9b4bf2030dea6d65de91&quot;</span><br><span class="line"><span class="meta">redis&gt;</span><span class="bash"> EVALSHA 5332031c6b470dc5a0dd9b4bf2030dea6d65de91 0</span></span><br><span class="line">&quot;hello world&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-5-Lua脚本管理命令"><a href="#4-5-Lua脚本管理命令" class="headerlink" title="4.5 Lua脚本管理命令"></a>4.5 Lua脚本管理命令</h2><style>
+table th:first-of-type {  
+    width: 25%; 
+}
+</style>
+
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SCRIPT EXISTS</td>
+<td>检查 sha1 值所代表的脚本是否已经被加入到脚本缓存里面，是的话返回 1 ，不是的话返回 0</td>
+</tr>
+<tr>
+<td>SCRIPT LOAD script</td>
+<td>将脚本储存到脚本缓存里面，等待将来 EVALSHA 使用</td>
+</tr>
+<tr>
+<td>SCRIPT FLUSH</td>
+<td>清除脚本缓存储存的所有脚本</td>
+</tr>
+<tr>
+<td>SCRIPT KILL</td>
+<td>杀死运行超时的脚本。如果脚本已经执行过写入操作，那么还需要使用 SHUTDOWN NOSAVE 命令来强制服务器不保存数据，以免错误的数据被保存到数据库里面。</td>
+</tr>
+</tbody></table>
+<h2 id="4-6-Lua函数库"><a href="#4-6-Lua函数库" class="headerlink" title="4.6 Lua函数库"></a>4.6 Lua函数库</h2><ul>
+<li><p>Lua语言提供了各种函数库可以供程序员使用，直接写在脚本中即可有调用</p>
+</li>
+<li><p>具体的使用参考Lua的语法：<a target="_blank" rel="noopener" href="https://www.runoob.com/lua/lua-basic-syntax.html">Lua语法入门</a></p>
+</li>
+</ul>
+<style>
+table th:first-of-type {  
+    width: 25%; 
+}
+</style>
+
+<table>
+<thead>
+<tr>
+<th>函数库</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>base 库</td>
+<td>包含 Lua 的核心（core）函数，比如 assert、tostring、error、type 等</td>
+</tr>
+<tr>
+<td>string 库</td>
+<td>包含用于处理字符串的函数，比如 find、format、len、reverse 等</td>
+</tr>
+<tr>
+<td>table 库</td>
+<td>包含用于处理表格的函数，比如 concat、insert、remove、sort 等</td>
+</tr>
+<tr>
+<td>math 库</td>
+<td>包含常用的数学计算函数，比如 abs、sqrt、log 等</td>
+</tr>
+<tr>
+<td>debug 库</td>
+<td>包含调试程序所需的函数，比如 sethook、gethook 等,以及外部库</td>
+</tr>
+<tr>
+<td>struct 库</td>
+<td>在 C 语言的结构和 Lua 语言的值之间进行转换</td>
+</tr>
+<tr>
+<td>cjson 库</td>
+<td>将 Lua 值转换为 JSON 对象，或者将 JSON 对象转换为 Lua 值</td>
+</tr>
+<tr>
+<td>cmsgpack 库</td>
+<td>将 Lua 值编码为 MessagePack 格式，或者从 MessagePack 格式里面解码出 Lua值</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>另外还有一个用于计算 sha1 值的外部函数 redis.sha1hex。</p>
+</blockquote>
+<h2 id="5-Lua脚本出现死循环怎办？"><a href="#5-Lua脚本出现死循环怎办？" class="headerlink" title="5.Lua脚本出现死循环怎办？"></a>5.Lua脚本出现死循环怎办？</h2><ul>
+<li><p>此时有一个问题要思考，Redis的指令执行是个单线程，如果当前执行的的lua 脚本中出现了死循环，是不是 Redis 服务也就完全卡死没用了？</p>
+</li>
+<li><p>此时的确会导致Redis无法提供服务，但是Redis提供了终止脚本死循环的命令：<code>SCRIPT KILL</code></p>
+</li>
+<li><p>如果当前出现了死循环的话，解决方案就是另起一个Redis客户端执行：<code>SCRIPT KILL</code>命令来终止脚本的执行</p>
+</li>
+</ul>
+<blockquote>
+<p>不过 SCRIPT KILL 的执行有一个重要的前提，那就是当前正在执行的脚本没有对 Redis 的内部数据状态进行修改，因为 Redis 不允许 SCRIPT KILL 破坏脚本执行的原子性。</p>
+</blockquote>
+<p><strong>思考：此时Redis都卡死了，为什么还可以执行SCRIPT KILL指令?</strong></p>
+<ul>
+<li><p>Lua脚本引擎功能提供了各式各样的钩子函数，它允许在内部虚拟机执行指令时运行钩子代码。</p>
+</li>
+<li><p>比如每执行 N 条指令执行一次某个钩子函数，Redis 正是使用了这个钩子函数。</p>
+</li>
+<li><p>Redis 在钩子函数里会忙里偷闲去处理客户端的请求，并且只有在发现 Lua 脚本执行超时之后才会去处理请求，这个超时时间默认是 5 秒，因此执行<code>SCRIPT KILL</code>指令可能需要等待几秒后才返回执行成功</p>
+</li>
+</ul>
+<h2 id="6-Redis事务和Lua脚本的对比"><a href="#6-Redis事务和Lua脚本的对比" class="headerlink" title="6.Redis事务和Lua脚本的对比"></a>6.Redis事务和Lua脚本的对比</h2><ul>
+<li><p>虽然使用事务可以一次执行多个命令，并且通过乐观锁可以防止事务产生竞争条件，但是在实际中，要正确地使用事务和乐观锁并不是一件容易的事情。</p>
+</li>
+<li><p>对于一个业务场景需要考虑需要对哪些键加锁，给不相关的key加锁或者相关的key却不加锁，都会出现意外的错误，因此需要仔细结合业务场景进行全面的综合考虑，需要有一个思考的过程</p>
+</li>
+<li><p>另外一个就是引入事务和乐观锁会让代码显得更加复杂，还有带来额外的损耗</p>
+</li>
+<li><p>相比较之下，Lua脚本可能更加容易接受，上面已经总结了使用Lua脚本的有点，缺点就是需要保证好Lua脚本的准确性，相比较增加了新一门语言语法的掌握，值得庆幸的是Lua基本语法还算简单易懂。</p>
+</li>
+<li><p>Lua保证了脚本执行的原子性，在当前脚本没执行完之前，别的命令和脚本都是等待状态，所以一定要控制好脚本中的内容，防止出现需要消耗大量时间的内容(逻辑相对简单)</p>
+</li>
+</ul>
+<h2 id="7-管道"><a href="#7-管道" class="headerlink" title="7.管道"></a>7.管道</h2><blockquote>
+<p>最后简单讲一下关于管道和事务、Lua脚本的区别</p>
+</blockquote>
+<ul>
+<li><p>Redis是基于TCP连接进行通信的，每一个请求/响应过程都需要经历一个RTT往返时间，如果需要执行很多短小的命令，这些往返时间的开销是很大的，在此情形下，redis提出了管道来提高执行效率。</p>
+</li>
+<li><p>管道的思想是：如果client执行一些<strong>相互之间无关的命令</strong>或者<strong>不需要获取命令的返回值</strong>，那么redis允许你连续发送多条命令，而不需要等待前面命令执行完毕。</p>
+</li>
+<li><p>比如我们执行3条INCR命令，如果使用管道，理论上只需要一个RTT+3条命令的执行时间即可，如果不适用管道，那么可能需要额外的两个RTT时间。因此，管道相当于批处理脚本，相当于是命令集，可以理解为复用了当前的TCP连接完成所有命令的执行。</p>
+</li>
+</ul>
+<blockquote>
+<p>注意：管道中的多个命令，如果其中一个出现执行错误，仍然会去执行下一个命令，不会停止。</p>
+</blockquote>
+<ul>
+<li>使用管道可能在效率上比使用Lua脚本要好，但是有的情况下只能使用script。<strong>因为管道在执行后面的命令时，无法得到前面命令的结果</strong>，就像事务一样，所以如果需要在后面命令中使用前面命令的value等结果，则只能使用script或者事务+watch。</li>
+</ul>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" class="lazyload" data-srcset="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="weixin-a"></p>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=https://littlejoyo.github.io/redis/redis-lua-tx/>https://littlejoyo.github.io/redis/redis-lua-tx/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-02-21T12:28:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：2021年2月21日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>数据库</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Redis/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Redis</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/redis/redis-lua-tx/&title=【Redis】：Redis事务、Lua事务和管道的实践探究 - JoyoHub&summary=
+虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？
+
+Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？
+
+本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/redis/redis-lua-tx/&title=【Redis】：Redis事务、Lua事务和管道的实践探究 - JoyoHub&summary=
+虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？
+
+Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？
+
+本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/redis/redis-lua-tx/&title=【Redis】：Redis事务、Lua事务和管道的实践探究 - JoyoHub&summary=
+虽然Redis是单线程的工作模式，但是你是否考虑过是否还会出现并发问题吗？
+
+Redis是基于C/S架构，支持多个客户端请求，多个客户端的访问顺序能保证吗？
+
+本篇主要从多客户端执行多个命令入手，介绍事务、Lua脚本和管道的应用场景
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+        <a class='prev' href='/go/go-dependency/'>
+          <p class='title'><i class="fas fa-chevron-left" aria-hidden="true"></i>【Go语言】：依赖管理之vendor和Go Modules</p>
+          <p class='content'>
+Go的依赖管理曾经是饱受诟病的大问题，随着版本的更迭正逐渐完善起来
+
+现在主要的解决方案有vendor模式和Go Modules 两种管理方式
+
+如果不引入依赖管理单靠GOPATH的话，那么就...</p>
+        </a>
+      
+      
+        <a class='next' href='/mysql/mysql-string/'>
+          <p class='title'>【Mysql】：搞清楚字符串类型char、varchar、text<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>
+在Mysql中表示字符串类型的有char、varchar、text
+
+它们之间有什么区别呢？用到什么场景才更加合适呢？相信很多人搞不清
+
+本文主要从字符串的存储、查询效率、字符串表示范围进行讨...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="gitalk-container"></div>
+
+  </article>
+
+
+
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Redis%E4%BB%80%E4%B9%88%E5%9C%BA%E6%99%AF%E4%B8%8B%E4%BC%9A%E5%87%BA%E7%8E%B0%E5%B9%B6%E5%8F%91%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="toc-text">1.Redis什么场景下会出现并发问题？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E5%B9%B6%E5%8F%91%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="toc-text">2.如何解决并发问题？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-redis%E4%BA%8B%E5%8A%A1-watch"><span class="toc-text">2.1 redis事务+watch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-%E4%BD%BF%E7%94%A8lua%E8%84%9A%E6%9C%AC"><span class="toc-text">2.2 使用lua脚本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Lua%E8%84%9A%E6%9C%AC%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="toc-text">3.Lua脚本的好处</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E5%A6%82%E4%BD%95%E5%9C%A8Redis%E4%B8%AD%E4%BD%BF%E7%94%A8Lua%EF%BC%9F"><span class="toc-text">4.如何在Redis中使用Lua？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95"><span class="toc-text">4.1 基本语法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-%E5%A6%82%E6%9E%9C%E8%B0%83%E7%94%A8Redis%E5%91%BD%E4%BB%A4%EF%BC%9F"><span class="toc-text">4.2 如果调用Redis命令？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-redis-call%E5%92%8Credis-pcall%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="toc-text">4.3 redis.call和redis.pcall的区别</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-EVALSHA%E5%91%BD%E4%BB%A4%E5%87%8F%E5%B0%91%E7%BD%91%E7%BB%9C%E8%B5%84%E6%BA%90%E6%8D%9F%E8%80%97"><span class="toc-text">4.4 EVALSHA命令减少网络资源损耗</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-5-Lua%E8%84%9A%E6%9C%AC%E7%AE%A1%E7%90%86%E5%91%BD%E4%BB%A4"><span class="toc-text">4.5 Lua脚本管理命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-6-Lua%E5%87%BD%E6%95%B0%E5%BA%93"><span class="toc-text">4.6 Lua函数库</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Lua%E8%84%9A%E6%9C%AC%E5%87%BA%E7%8E%B0%E6%AD%BB%E5%BE%AA%E7%8E%AF%E6%80%8E%E5%8A%9E%EF%BC%9F"><span class="toc-text">5.Lua脚本出现死循环怎办？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-Redis%E4%BA%8B%E5%8A%A1%E5%92%8CLua%E8%84%9A%E6%9C%AC%E7%9A%84%E5%AF%B9%E6%AF%94"><span class="toc-text">6.Redis事务和Lua脚本的对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-%E7%AE%A1%E9%81%93"><span class="toc-text">7.管道</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7"><span class="toc-text">微信公众号</span></a>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+		  
+		  <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="【Redis】：Redis事务、Lua事务和管道的实践探究";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+  // header 这里无论是否开启pjax都需要
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+  
+    // cover
+    var cover_wrapper=document.querySelector('.cover-wrapper');
+    
+    cover_wrapper.id="none";
+    cover_wrapper.style.display="none";
+    
+  
+</script>
+
+        </div>
+        
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+  </footer>
+
+
+        <a id="s-top" class="fas fa-arrow-up fa-fw" href="javascript:void(0)"></a>
+      </div>
+    </div>
+    <div>
+      <script>
+/************这个文件存放不需要重载的全局变量和全局函数*********/
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/******************** Pjax ********************************/
+function VPjax(){
+	this.list=[] // 存放回调函数
+	this.start=()=>{
+	  for(var i=0;i<this.list.length;i++){
+		this.list[i].run();
+	  }
+	}
+	this.push=(fn,name)=>{
+		var f=new PjaxItem(fn,name);
+		this.list.push(f);
+	}
+	// 构造一个可以run的对象
+	function PjaxItem(fn,name){
+		// 函数名称
+		this.name = name || fn.name
+		// run方法
+		this.run=()=>{
+			fn()
+		}
+	}
+}
+volantis.pjax={}
+volantis.pjax.method={
+	complete: new VPjax(),
+	error: new VPjax(),
+	send: new VPjax()
+}
+volantis.pjax={
+	...volantis.pjax,
+	push: volantis.pjax.method.complete.push,
+	error: volantis.pjax.method.error.push,
+	send: volantis.pjax.method.send.push
+}
+/********************脚本懒加载函数********************************/
+// 已经加入了setTimeout
+function loadScript(src, cb) {
+	setTimeout(function() {
+		var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+		var script = document.createElement('script');
+		script.setAttribute('type','text/javascript');
+		if (cb) script.onload = cb;
+		script.setAttribute('src', src);
+		HEAD.appendChild(script);
+	});
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+  function Pjax_SCload_fancybox(){
+	if (typeof $.fancybox == "undefined") {
+	 SCload_fancybox();
+    } else {
+	 pjax_fancybox();
+    }
+  }
+  volantis.pjax.push(Pjax_SCload_fancybox)
+  volantis.pjax.send(()=>{
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+  },'fancybox')
+</script>
+
+
+<!-- internal -->
+
+
+
+
+<script>
+  function loadIssuesJS() {
+    if ($(".md").find(".issues-api").length == 0) return;
+	
+	  loadScript('/js/issues.js');
+	
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  volantis.pjax.push(()=>{
+	if (typeof IssuesAPI == "undefined") {
+	  loadIssuesJS();
+	}
+  },"IssuesJS")
+</script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+
+<script>
+  window.FPConfig = {
+	delay: 0,
+	ignoreKeywords: [],
+	maxRPS: 5,
+	hoverDelay: 25
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+
+
+
+
+
+
+
+   <script type="text/javascript">
+  loadScript("https://cdn.jsdelivr.net/npm/scrollreveal@4.0.6/dist/scrollreveal.min.js")
+  function pjax_scrollrebeal() {
+    ScrollReveal().reveal('.l_main .reveal', {
+      distance: '32px',
+      duration: '800',
+      interval: '20',
+      scale: '1',
+      easing: 'ease-out'
+    });
+  }
+  $(function () {
+  var checkScrollReveal = setInterval(function () {
+    if ($("#safearea").css("display")!="block") return
+    if (typeof ScrollReveal=="undefined") return
+    clearInterval(checkScrollReveal)
+	pjax_scrollrebeal();
+  }, 100)
+  });
+  volantis.pjax.push(pjax_scrollrebeal)
+</script>
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+  function pjax_gitalk() {
+    if(!document.querySelectorAll("#gitalk-container")[0])return;
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+    if (document.getElementById('gitalk-container') != null) {
+      var gitalk = new Gitalk(Object.assign({"clientID":"6428b70706cc5c089758","clientSecret":"acb9d963f91bf7731c5ee1ebd80b7a172ba7f7de","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"path":null}, {
+	  id: path,
+	  distractionFreeMode: false  // Facebook-like distraction free mode
+    }));
+      gitalk.render('gitalk-container');
+    }
+  }
+  $(function () {
+    pjax_gitalk();
+  });
+  volantis.pjax.push(pjax_gitalk);
+</script>
+
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'u9j57bwJod4EDmXWdxrwuqQT-MdYXbMMI',
+    app_key: 'jfHtEKVE24j0IVCGHbvuFClp',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'https://littlejoyo.github.io' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'https://littlejoyo.github.io' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'https://littlejoyo.github.io' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+  <script>
+const rootElement = document.documentElement;
+const darkModeStorageKey = "user-color-scheme";
+const rootElementDarkModeAttributeName = "data-user-color-scheme";
+
+const setLS = (k, v) => {
+    localStorage.setItem(k, v);
+};
+
+const removeLS = (k) => {
+    localStorage.removeItem(k);
+};
+
+const getLS = (k) => {
+    return localStorage.getItem(k);
+};
+
+const getModeFromCSSMediaQuery = () => {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+};
+
+const resetRootDarkModeAttributeAndLS = () => {
+  rootElement.removeAttribute(rootElementDarkModeAttributeName);
+  removeLS(darkModeStorageKey);
+};
+
+const validColorModeKeys = {
+  dark: true,
+  light: true,
+};
+
+const applyCustomDarkModeSettings = (mode) => {
+  const currentSetting = mode || getLS(darkModeStorageKey);
+
+  if (currentSetting === getModeFromCSSMediaQuery()) {
+    resetRootDarkModeAttributeAndLS();
+  } else if (validColorModeKeys[currentSetting]) {
+    rootElement.setAttribute(rootElementDarkModeAttributeName, currentSetting);
+  } else {
+    resetRootDarkModeAttributeAndLS();
+  }
+};
+
+const invertDarkModeObj = {
+  dark: "light",
+  light: "dark",
+};
+
+/**
+ * get target mode
+ */
+const toggleCustomDarkMode = () => {
+  let currentSetting = getLS(darkModeStorageKey);
+
+  if (validColorModeKeys[currentSetting]) {
+    currentSetting = invertDarkModeObj[currentSetting];
+  } else if (currentSetting === null) {
+    currentSetting = invertDarkModeObj[getModeFromCSSMediaQuery()];
+  } else {
+    return;
+  }
+  setLS(darkModeStorageKey, currentSetting);
+  return currentSetting;
+};
+
+/**
+ * bind click event for toggle button
+ */
+var btn=$("#wrapper .toggle-mode-btn,#rightmenu-wrapper .toggle-mode-btn");
+function bindToggleButton() {
+    btn.on('click',(e) => {
+      const mode = toggleCustomDarkMode();
+      applyCustomDarkModeSettings(mode);
+    });
+}
+
+applyCustomDarkModeSettings();
+document.addEventListener("DOMContentLoaded", bindToggleButton);
+volantis.pjax.push(bindToggleButton);
+volantis.pjax.send(()=>{
+	btn.unbind('click');
+},'toggle-mode-btn-unbind');
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+		behavior: "smooth"
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+ 
+	   
+	    
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  // 使用 volantis.pjax.send 方法传入pjax:send回调函数 参见layout/_partial/scripts/global.ejs
+	  volantis.pjax.method.send.start();
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+		// 使用 volantis.pjax.push 方法传入重载函数 参见layout/_partial/scripts/global.ejs
+		volantis.pjax.method.complete.start();
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  // 使用 volantis.pjax.error 方法传入pjax:error回调函数 参见layout/_partial/scripts/global.ejs
+	  volantis.pjax.method.error.start();
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+ 
+	  
+    </div>
+  </body>
+</html>
