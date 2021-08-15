@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head hexo-theme='https://github.com/volantis-x/hexo-theme-volantis/tree/4.3.1'>
+  <meta charset="utf-8">
+  <!-- SEO相关 -->
+  
+    
+  
+  <!-- 渲染优化 -->
+  <meta http-equiv='x-dns-prefetch-control' content='on' />
+  <link rel='dns-prefetch' href='https://cdn.jsdelivr.net'>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="renderer" content="webkit">
+  <meta name="force-rendering" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="HandheldFriendly" content="True" >
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <link rel="preload" href="/css/first.css" as="style">
+  
+
+  <!-- 页面元数据 -->
+  
+  <title>【Go】利用go test编写单元测试 - JoyoHub</title>
+  
+    <meta name="keywords" content="Go,测试">
+  
+
+  
+    <meta name="description" content="
+单元测试能够最小范围测试程序代码，从而保证程序的正确性和健壮性
+
+平时我们可以编写单元测试代码快速了解当前的程序模块的情况，作出问题快速定位
+
+那么，在Go该如何编写单元测试呢？那必须是go test工具
+
+">
+  
+
+  <!-- feed -->
+  
+
+  <!-- import meta -->
+  
+
+  <!-- link -->
+  
+    <link rel="shortcut icon" type='image/x-icon' href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <!-- import link -->
+  
+
+  
+    
+<link rel="stylesheet" href="/css/first.css">
+
+  
+
+  
+  <link rel="stylesheet" href="/css/style.css" media="print" onload="this.media='all';this.onload=null">
+  <noscript><link rel="stylesheet" href="/css/style.css"></noscript>
+  
+
+  <script id="loadcss"></script>
+
+  
+<script>
+if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMode))
+    document.write(
+	'<style>'+
+		'html{'+
+			'overflow-x: hidden !important;'+
+			'overflow-y: hidden !important;'+
+		'}'+
+		'.kill-ie{'+
+			'text-align:center;'+
+			'height: 100%;'+
+			'margin-top: 15%;'+
+			'margin-bottom: 5500%;'+
+		'}'+
+	'</style>'+
+    '<div class="kill-ie">'+
+        '<h1><b>抱歉，您的浏览器无法访问本站</b></h1>'+
+        '<h3>微软已经于2016年终止了对 Internet Explorer (IE) 10 及更早版本的支持，<br/>'+
+        '继续使用存在极大的安全隐患，请使用当代主流的浏览器进行访问。</h3><br/>'+
+        '<a target="_blank" rel="noopener" href="https://www.microsoft.com/zh-cn/WindowsForBusiness/End-of-IE-support"><strong>了解详情 ></strong></a>'+
+    '</div>');
+</script>
+
+
+<noscript>
+	<style>
+		html{
+			overflow-x: hidden !important;
+			overflow-y: hidden !important;
+		}
+		.kill-noscript{
+			text-align:center;
+			height: 100%;
+			margin-top: 15%;
+			margin-bottom: 5500%;
+		}
+	</style>
+    <div class="kill-noscript">
+        <h1><b>抱歉，您的浏览器无法访问本站</b></h1>
+        <h3>本页面需要浏览器支持（启用）JavaScript</h3><br/>
+        <a target="_blank" rel="noopener" href="https://www.baidu.com/s?wd=启用JavaScript"><strong>了解详情 ></strong></a>
+    </div>
+</noscript>
+
+</head>
+
+  <body>
+    
+
+<header id="l_header" class="l_header auto shadow floatable blur show" style='opacity: 0' >
+  <div class='container'>
+  <div id='wrapper'>
+    <div class='nav-sub'>
+      <p class="title"></p>
+      <ul class='switcher nav-list-h m-phone' id="pjax-header-nav-list">
+        <li><a id="s-comment" class="fas fa-comments fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+          <li><a id="s-toc" class="s-toc fas fa-list fa-fw" target="_self" href='javascript:void(0)'></a></li>
+        
+      </ul>
+    </div>
+		<div class="nav-main">
+      
+        
+        <a class="title flat-box" target="_self" href='/'>
+          
+          
+            <i class='https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png'></i>
+          
+          
+            JoyoHub
+          
+        </a>
+      
+
+			<div class='menu navigation'>
+				<ul class='nav-list-h m-pc'>
+          
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fa fa-fan fa-spin fa-fw'></i>博文列表
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>博文分类
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>博文标签
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>时间线
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于Joyo
+                </a>
+                
+              </li>
+            
+          
+          
+            
+            
+              <li>
+                <a class="menuitem flat-box header toggle-mode-btn">
+                  <i class='fas fa-moon fa-fw'></i>暗黑模式
+                </a>
+              <li>
+            
+          
+          
+				</ul>
+			</div>
+
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <i class="icon fas fa-search fa-fw"></i>
+          <input type="text" class="input u-search-input" placeholder="搜索博主的文章..." />
+        </form>
+      </div>
+
+			<ul class='switcher nav-list-h m-phone'>
+				
+					<li><a class="s-search fas fa-search fa-fw" target="_self" href='javascript:void(0)'></a></li>
+				
+				<li>
+          <a class="s-menu fas fa-bars fa-fw" target="_self" href='javascript:void(0)'></a>
+          <ul class="menu-phone list-v navigation white-box">
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/
+                  
+                  
+                  
+                    id="home"
+                  >
+                  <i class='fa fa-fan fa-spin fa-fw'></i>博文列表
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/categories/
+                  
+                  
+                  
+                    id="categories"
+                  >
+                  <i class='fas fa-folder-open fa-fw'></i>博文分类
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/tags/
+                  
+                  
+                  
+                    id="tags"
+                  >
+                  <i class='fas fa-tags fa-fw'></i>博文标签
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/archives/
+                  
+                  
+                  
+                    id="archives"
+                  >
+                  <i class='fas fa-archive fa-fw'></i>时间线
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box faa-parent animated-hover" href=/about/
+                  
+                  
+                  
+                    id="about"
+                  >
+                  <i class='fas fa-info-circle fa-fw'></i>关于Joyo
+                </a>
+                
+              </li>
+            
+          
+            
+              
+            
+              <li>
+                <a class="menuitem flat-box header toggle-mode-btn">
+                  <i class='fas fa-moon fa-fw'></i>暗黑模式
+                </a>
+              <li>
+            
+          
+            
+          </ul>
+        </li>
+			</ul>
+		</div>
+	</div>
+  </div>
+</header>
+
+    <div id="l_body">
+      <div id="l_cover">
+  
+    
+        <div id="full" class='cover-wrapper post search' style="display: none;">
+          
+            <div class='cover-bg lazyload placeholder' data-bg="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210614224551.png"></div>
+          
+          <div class='cover-body'>
+  <div class='top'>
+    
+    
+      <p class="title">JoyoHub</p>
+    
+    
+  </div>
+  <div class='bottom'>
+    
+      <div class="m_search">
+        <form name="searchform" class="form u-search-form">
+          <input type="text" class="input u-search-input" placeholder="搜索博主的历史文章..." />
+          <i class="icon fas fa-search fa-fw"></i>
+        </form>
+      </div>
+    
+    <div class='menu navigation'>
+      <div class='list-h'>
+        
+          
+            <a href="/archives/"
+              
+              
+              id="archives">
+              <p>归档</p>
+            </a>
+          
+            <a href="/code/"
+              
+              
+              id="code">
+              <p>算法</p>
+            </a>
+          
+            <a target="_blank" rel="noopener" href="https://github.com/littlejoyo"
+              
+              
+              id="https:githubcomlittlejoyo">
+              <p>Github</p>
+            </a>
+          
+            <a href="/about/"
+              
+              
+              id="about">
+              <p>留言板</p>
+            </a>
+          
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+          <div id="scroll-down" style="display: none;"><i class="fa fa-chevron-down scroll-down-effects"></i></div>
+        </div>
+    
+  
+  </div>
+
+      <div id="safearea">
+        <div class="body-wrapper" id="pjax-container">
+          
+
+<div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+    <div class='headimg-div'>
+      <a class='headimg-a'>
+        <img class='headimg' src='https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210815223447.png'/>
+      </a>
+    </div>
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        【Go】利用go test编写单元测试
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+    <p>Joyo</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：2021年7月7日</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="【Go】利用go test编写单元测试" data-path="/go/go-test/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：5.7k字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：25分钟</p>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  
+  <ul>
+<li><p>单元测试能够最小范围测试程序代码，从而保证程序的正确性和健壮性</p>
+</li>
+<li><p>平时我们可以编写单元测试代码快速了解当前的程序模块的情况，作出问题快速定位</p>
+</li>
+<li><p>那么，在Go该如何编写单元测试呢？那必须是go test工具</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="1-什么是go-test？"><a href="#1-什么是go-test？" class="headerlink" title="1.什么是go test？"></a>1.什么是go test？</h1><p>Go语言中自带有一个轻量级的测试框架testing，可以使用<code>go test</code>命令来实现单元测试和性能基准测试！</p>
+<p>利用<code>go test</code>无须进行任何其它安装或配置，就可以编写GO程序的单元测试，编写测试代码和编写普通的Go代码过程是类似的，并不需要学习新的语法、规则或工具。</p>
+<p>在包目录内，当我们想要新建单元测试文件的时候，命名都需遵循”*_test.go”的格式，因为<code>go test</code>命令会遍历测试所有<code>_test.go</code>为后缀名的源代码文件，而且不会被<code>go build</code>命令编译到最终的可执行文件中。</p>
+<blockquote>
+<p>例如下面的的目录，calc.go为源程序，calc_test.go是对应的单元测试程序，这样的文件命名一目了然</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">example/</span><br><span class="line">   |--calc.<span class="keyword">go</span></span><br><span class="line">   |--calc_test.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="2-go-test函数种类"><a href="#2-go-test函数种类" class="headerlink" title="2.go test函数种类"></a>2.go test函数种类</h1><p>上面说到<code>*_test.go</code>文件是单元测试程序，程序里面当然就包含每一个单元测试函数，主要分为三类函数：</p>
+<table>
+<thead>
+<tr>
+<th align="left">函数种类</th>
+<th align="center">格式</th>
+<th align="center">作用描述</th>
+<th align="center">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>测试函数</strong></td>
+<td align="center">函数名前缀为Test</td>
+<td align="center">测试程序的一些逻辑行为是否正确</td>
+<td align="center"><code>func TestAdd(t *testing.T) &#123;...&#125;</code></td>
+</tr>
+<tr>
+<td align="left"><strong>基准函数</strong></td>
+<td align="center">函数名前缀为Benchmark</td>
+<td align="center">测试函数的性能</td>
+<td align="center"><code>func BenchmarkAdd(b *testing.B) &#123;...&#125;</code></td>
+</tr>
+<tr>
+<td align="left"><strong>示例函数</strong></td>
+<td align="center">函数名前缀为Example</td>
+<td align="center">为文档提供示例文档</td>
+<td align="center"><code>func ExampleAdd(t *testing.T) &#123;...&#125;</code></td>
+</tr>
+</tbody></table>
+<p>编写好上面的函数，然后执行<code>go test</code>命令会遍历所有的<code>*_test.go</code>文件中符合上述命名规则的函数，会在本地生成一个临时的main包用于调用相应的测试函数，然后构建并运行、报告测试结果，最后清理测试中生成的临时文件。</p>
+<blockquote>
+<p>分享一个小技巧:当本地程序没有写测试程序的时候也可以直接执行<code>go test</code>命令，通过这个命令的输出内容可以快速定位当前的程序是否存在编译错误。</p>
+</blockquote>
+<h1 id="3-测试函数"><a href="#3-测试函数" class="headerlink" title="3. 测试函数"></a>3. 测试函数</h1><h2 id="3-1-测试函数的格式"><a href="#3-1-测试函数的格式" class="headerlink" title="3.1 测试函数的格式"></a>3.1 测试函数的格式</h2><p>编写测试函数的时候必须导入<code>testing</code>包，测试函数的名字必须以<code>Test</code>开头，可选的后缀名必须以大写字母开头，举几个例子：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestAdd</span><span class="params">(t *testing.T)</span></span>&#123; ... &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSum</span><span class="params">(t *testing.T)</span></span>&#123; ... &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestLog</span><span class="params">(t *testing.T)</span></span>&#123; ... &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>其中参数t用于报告测试失败和附加的日志信息。 testing.T的拥有的方法如下：</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Error</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Errorf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Fail</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">FailNow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Failed</span><span class="params">()</span> <span class="title">bool</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Fatal</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Fatalf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Log</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Logf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Name</span><span class="params">()</span> <span class="title">string</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *T)</span> <span class="title">Parallel</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *T)</span> <span class="title">Run</span><span class="params">(name <span class="keyword">string</span>, f <span class="keyword">func</span>(t *T)</span>) <span class="title">bool</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Skip</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">SkipNow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Skipf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *T)</span> <span class="title">Skipped</span><span class="params">()</span> <span class="title">bool</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-2-测试函数编写规则"><a href="#3-2-测试函数编写规则" class="headerlink" title="3.2 测试函数编写规则"></a>3.2 测试函数编写规则</h2><ul>
+<li><p>测试程序文件名必须是<code>_test.go</code>结尾的，执行<code>go test</code>的时候才会执行到相应的单元测试代码</p>
+</li>
+<li><p>必须<code>import testing</code></p>
+</li>
+<li><p>所有的测试用例函数必须是<code>Test</code>开头</p>
+</li>
+<li><p>测试用例会按照源代码中写的顺序依次执行</p>
+</li>
+<li><p>测试函数TestXxx()的参数是testing.T，我们可以使用该类型提供的方法来记录错误或者测试状态</p>
+</li>
+<li><p>测试格式：<code>func TestXxx (t *testing.T)</code>,Xxx部分可以为任意的字母数字的组合，但是首字母不能是小写字母[a-z]，例如:<strong>Testadd</strong>是错误的函数名。</p>
+</li>
+<li><p>函数中通过调用testing.T的<code>Error</code>, <code>Errorf</code>, <code>Fail</code>,<code>FailNow</code>, <code>Fatal</code>, <code>FatalIf</code>方法，说明测试不通过，调用<code>Log</code>或者<code>Logf</code>方法用来记录测试的信息。</p>
+</li>
+</ul>
+<h2 id="3-3-测试案例编写"><a href="#3-3-测试案例编写" class="headerlink" title="3.3 测试案例编写"></a>3.3 测试案例编写</h2><p>通过一个小案例展示如何编写单元测试和查看运行结果，程序目录结果如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">example/</span><br><span class="line">   |--intutils.<span class="keyword">go</span></span><br><span class="line">   |--intutils_test.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>intutils.go</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> example</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">IntMin</span><span class="params">(a, b <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> a &lt; b &#123;</span><br><span class="line">        <span class="keyword">return</span> a</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> b</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>intutils_test.go 内含两个测试函数分别是TestIntMinBasic和TestIntMinTableDriven，</p>
+</blockquote>
+<p>后者是通过构建一个匿名结构体切片来模拟多种测试用例的情况，切片元素前两个值为需要传递的参数，最后的值为期望值，当函数返回的结果和期望值不一致，说明被测试的函数中的逻辑是有问题的，这种方式在go的单元测试编写非常常用。</p>
+<p>除了模拟多种测试用例情况外，还用到了<code>t.run()</code>的方法实现<strong>子测试</strong>的运行，这样写的效果是可以清晰地看到每一个用例的执行情况，多个用例当其中出现错误的时候，通过输出的详细信息，我们就可以明确是哪一个子测试出现问题，也是一个推荐使用的小技巧</p>
+<p>好处：</p>
+<ol>
+<li><p>新增用例非常简单，只需给结构体切片中新增一条测试数据即可。</p>
+</li>
+<li><p>测试代码可读性好，直观地能够看到每个子测试的参数和期待的返回值。</p>
+</li>
+<li><p>用例失败时，报错信息的格式比较统一，测试报告易于阅读。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> example</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">&quot;fmt&quot;</span></span><br><span class="line">    <span class="string">&quot;testing&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestIntMinBasic</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">    ans := IntMin(<span class="number">2</span>, <span class="number">-2</span>)</span><br><span class="line">    <span class="keyword">if</span> ans != <span class="number">-2</span> &#123;</span><br><span class="line">        t.Errorf(<span class="string">&quot;IntMin(2, -2) = %d; want -2&quot;</span>, ans)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestIntMinTableDriven</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> tests = []<span class="keyword">struct</span> &#123;</span><br><span class="line">        a, b <span class="keyword">int</span></span><br><span class="line">        want <span class="keyword">int</span></span><br><span class="line">    &#125;&#123;</span><br><span class="line">        &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">        &#123;<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>&#125;,</span><br><span class="line">        &#123;<span class="number">2</span>, <span class="number">-2</span>, <span class="number">-2</span>&#125;,</span><br><span class="line">        &#123;<span class="number">0</span>, <span class="number">-1</span>, <span class="number">-1</span>&#125;,</span><br><span class="line">        &#123;<span class="number">-1</span>, <span class="number">0</span>, <span class="number">-1</span>&#125;,</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _, tt := <span class="keyword">range</span> tests &#123;</span><br><span class="line">        testname := fmt.Sprintf(<span class="string">&quot;%d,%d&quot;</span>, tt.a, tt.b)</span><br><span class="line">        t.Run(testname, <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">            ans := IntMin(tt.a, tt.b)</span><br><span class="line">            <span class="keyword">if</span> ans != tt.want &#123;</span><br><span class="line">                t.Errorf(<span class="string">&quot;got %d, want %d&quot;</span>, ans, tt.want)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行<code>go test</code>返回结果如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">0.686</span>s</span><br></pre></td></tr></table></figure>
+
+<p>如果想要查看详细的输出内容，执行<code>go test -v</code>,输出下面的结果，注意下子测试的写法，清晰地输出了每一个用例的执行情况：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v</span><br><span class="line">=== RUN   TestIntMinBasic</span><br><span class="line">--- PASS: TestIntMinBasic (<span class="number">0.00</span>s)</span><br><span class="line">=== RUN   TestIntMinTableDriven</span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">0</span>,<span class="number">1</span></span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">1</span>,<span class="number">0</span></span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">2</span>,<span class="number">-2</span></span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">0</span>,<span class="number">-1</span></span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">-1</span>,<span class="number">0</span></span><br><span class="line">--- PASS: TestIntMinTableDriven (<span class="number">0.01</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">0</span>,<span class="number">1</span> (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">1</span>,<span class="number">0</span> (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">2</span>,<span class="number">-2</span> (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">0</span>,<span class="number">-1</span> (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">-1</span>,<span class="number">0</span> (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">0.843</span>s</span><br></pre></td></tr></table></figure>
+
+<p>上面的程序包含了两个测试函数，有时我们只想执行其中的一个函数，可以通过<code>go test -v -run=&quot;指定函数名称或者名称子串&quot;</code></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v -run=<span class="string">&quot;TestIntMinBasic&quot;</span></span><br><span class="line">=== RUN   TestIntMinBasic</span><br><span class="line">--- PASS: TestIntMinBasic (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">0.803</span>s</span><br><span class="line"></span><br><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v -run=<span class="string">&quot;Basic&quot;</span></span><br><span class="line">=== RUN   TestIntMinBasic</span><br><span class="line">--- PASS: TestIntMinBasic (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">0.805</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>尝试修改一下测试函数的期望值，比如将<code>TestIntMinTableDriven()</code>中最后的用例期望值修改为错误值，输出结果如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestIntMinTableDriven</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> tests = []<span class="keyword">struct</span> &#123;</span><br><span class="line">		a, b <span class="keyword">int</span></span><br><span class="line">		want <span class="keyword">int</span></span><br><span class="line">	&#125;&#123;</span><br><span class="line">		&#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>&#125;,</span><br><span class="line">		&#123;<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>&#125;,</span><br><span class="line">		&#123;<span class="number">2</span>, <span class="number">-2</span>, <span class="number">-2</span>&#125;,</span><br><span class="line">		&#123;<span class="number">0</span>, <span class="number">-1</span>, <span class="number">-1</span>&#125;,</span><br><span class="line">		&#123;<span class="number">-1</span>, <span class="number">0</span>, <span class="number">0</span>&#125;, <span class="comment">// 修改为错误的期望值，故意错误</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, tt := <span class="keyword">range</span> tests &#123;</span><br><span class="line">		testname := fmt.Sprintf(<span class="string">&quot;%d,%d&quot;</span>, tt.a, tt.b)</span><br><span class="line">		t.Run(testname, <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">			ans := IntMin(tt.a, tt.b)</span><br><span class="line">			<span class="keyword">if</span> ans != tt.want &#123;</span><br><span class="line">				t.Errorf(<span class="string">&quot;got %d, want %d&quot;</span>, ans, tt.want)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果,单元测试不通过：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v -run=<span class="string">&quot;TestIntMinTableDriven&quot;</span></span><br><span class="line">=== RUN   TestIntMinTableDriven</span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">0</span>,<span class="number">1</span></span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">1</span>,<span class="number">0</span></span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">2</span>,<span class="number">-2</span></span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">0</span>,<span class="number">-1</span></span><br><span class="line">=== RUN   TestIntMinTableDriven/<span class="number">-1</span>,<span class="number">0</span></span><br><span class="line">    TestIntMinTableDriven/<span class="number">-1</span>,<span class="number">0</span>: intutils_test.<span class="keyword">go</span>:<span class="number">32</span>: got <span class="number">-1</span>, want <span class="number">0</span></span><br><span class="line">--- FAIL: TestIntMinTableDriven (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">0</span>,<span class="number">1</span> (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">1</span>,<span class="number">0</span> (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">2</span>,<span class="number">-2</span> (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMinTableDriven/<span class="number">0</span>,<span class="number">-1</span> (<span class="number">0.00</span>s)</span><br><span class="line">    --- FAIL: TestIntMinTableDriven/<span class="number">-1</span>,<span class="number">0</span> (<span class="number">0.00</span>s)</span><br><span class="line">FAIL</span><br><span class="line">exit status <span class="number">1</span></span><br><span class="line">FAIL    example <span class="number">0.851</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-4-子测试和表格测试的总结"><a href="#3-4-子测试和表格测试的总结" class="headerlink" title="3.4 子测试和表格测试的总结"></a>3.4 子测试和表格测试的总结</h2><p>根据上面的案例我们知道使用<code>t.Run</code>创建不同的子测试用例，主要使用方法就是传入【具体的子测试用例名称】和【对应的匿名测试函数】，然后其返回类型是布尔值，代表测试用例是否运行成功，一般情况不需要用到。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// calc_test.go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestIntMin</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	t.Run(<span class="string">&quot;pos&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">		<span class="keyword">if</span> IntMin(<span class="number">2</span>, <span class="number">3</span>) != <span class="number">2</span> &#123;</span><br><span class="line">			t.Fatal(<span class="string">&quot;fail&quot;</span>)</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;)</span><br><span class="line">	t.Run(<span class="string">&quot;neg&quot;</span>, <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">		<span class="keyword">if</span> IntMin(<span class="number">2</span>, <span class="number">-3</span>) != <span class="number">-3</span> &#123;</span><br><span class="line">			t.Fatal(<span class="string">&quot;fail&quot;</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果想要运行指定的子测试，可以通过下面的方式运行：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">go</span> test -run TestIntMin/pos -v</span><br><span class="line">=== RUN   TestIntMin</span><br><span class="line">=== RUN   TestIntMin/pos</span><br><span class="line">--- PASS: TestIntMin (<span class="number">0.00</span>s)</span><br><span class="line">    --- PASS: TestIntMin/pos (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">0.008</span>s</span><br></pre></td></tr></table></figure>
+
+<p>但是，对于多个子测试的场景，更推荐上面用到的表格写法(table-driven tests)，可以让我们集中进行用例的管理，参见上面的案例，配合for循环和<code>t.run</code>,当用例出现问题的时候，也能快速定位到具体的用例。</p>
+<h2 id="3-5-帮助函数的应用"><a href="#3-5-帮助函数的应用" class="headerlink" title="3.5 帮助函数的应用"></a>3.5 帮助函数的应用</h2><p>对一些重复的逻辑，我们常常会抽取出来作为公共的帮助函数(helpers)，可以增加测试代码的可读性和可维护性。 借助帮助函数，可以让测试用例的主逻辑看起来更清晰，减少代码的重复性，但是如果像下面的案例，故意让最后的case出现错误，那么<code>go test</code>运行后的输出结果只能告诉我们是<code>createIntMinCase</code>函数里面的第2行代码的if判断出现了错误，这样我们就无法直接知道下面三个case中哪一个出现错误了。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> intMinCase <span class="keyword">struct</span>&#123; A, B, Expected <span class="keyword">int</span> &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">createIntMinCase</span><span class="params">(t *testing.T, c *intMinCase)</span></span> &#123;</span><br><span class="line">	<span class="comment">//t.Helper()</span></span><br><span class="line">	<span class="keyword">if</span> ans :=IntMin (c.A, c.B); ans != c.Expected &#123;</span><br><span class="line">		t.Fatalf(<span class="string">&quot;%d * %d expected %d, but %d got&quot;</span>,</span><br><span class="line">			c.A, c.B, c.Expected, ans)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestIntMinHelper</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	createIntMinCase(t, &amp;intMinCase&#123;<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>&#125;)</span><br><span class="line">	createIntMinCase(t, &amp;intMinCase&#123;<span class="number">2</span>, <span class="number">-3</span>, <span class="number">-3</span>&#125;)</span><br><span class="line">	createIntMinCase(t, &amp;intMinCase&#123;<span class="number">2</span>, <span class="number">0</span>, <span class="number">-1</span>&#125;) <span class="comment">// wrong case</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果如下，只知道是公共函数里面报错了：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v -run=<span class="string">&quot;TestIntMinHelper&quot;</span></span><br><span class="line">=== RUN   TestIntMinHelper</span><br><span class="line">    TestIntMinHelper: intutils_test.<span class="keyword">go</span>:<span class="number">43</span>: <span class="number">2</span> * <span class="number">0</span> expected <span class="number">1</span>, but <span class="number">0</span> got</span><br><span class="line">--- FAIL: TestIntMinHelper (<span class="number">0.00</span>s)</span><br><span class="line">FAIL</span><br><span class="line">exit status <span class="number">1</span></span><br><span class="line">FAIL    example <span class="number">0.540</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>那么，如果知道是哪一个case出现了错误的判断呢？</p>
+</blockquote>
+<p>Go 语言在 1.9 版本中引入了 <code>t.Helper()</code>，用于标注该函数是帮助函数，报错时将输出帮助函数调用者的信息，而不是帮助函数的内部信息。</p>
+<p>所以上面的案例，我们只需要在<code>createIntMinCase</code>函数里面写上<code>t.Helper()</code>再执行<code>go test</code>只能知道是一个case出错，如下输出的结果：<br>上面没加<code>t.Helper()</code>报错的43行，加后输出的结果是51行，根据代码的行号明确了是第三个case出现了错误</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v -run=<span class="string">&quot;TestIntMinHelper&quot;</span></span><br><span class="line">=== RUN   TestIntMinHelper</span><br><span class="line">    TestIntMinHelper: intutils_test.<span class="keyword">go</span>:<span class="number">51</span>: <span class="number">2</span> * <span class="number">0</span> expected <span class="number">1</span>, but <span class="number">0</span> got</span><br><span class="line">--- FAIL: TestIntMinHelper (<span class="number">0.00</span>s)</span><br><span class="line">FAIL</span><br><span class="line">exit status <span class="number">1</span></span><br><span class="line">FAIL    example <span class="number">0.521</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-6-setup-和-teardown"><a href="#3-6-setup-和-teardown" class="headerlink" title="3.6 setup 和 teardown"></a>3.6 setup 和 teardown</h2><p>如果在同一个测试文件中，每一个测试用例运行前后的逻辑是相同的，也就是存在公共的调用函数，一般会写在<code>setup</code>和<code>teardown</code>函数中。例如执行前需要实例化或者初始化待测试的对象，并且如果这个对象比较复杂，很适合将这一部分逻辑提取出来；<br>执行测试逻辑后，甚至我们可能会做一些资源回收类的工作，例如关闭网络连接，释放文件等操作。标准库<code>testing</code>提供了这样的机制：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> example</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;os&quot;</span></span><br><span class="line">	<span class="string">&quot;testing&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setup</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;Before all tests&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">teardown</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;After all tests&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Test1</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;I&#x27;m test1&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Test2</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">&quot;I&#x27;m test2&quot;</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestMain</span><span class="params">(m *testing.M)</span></span> &#123;</span><br><span class="line">	setup()</span><br><span class="line">	code := m.Run()</span><br><span class="line">	teardown()</span><br><span class="line">	os.Exit(code)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>该测试文件中，包含有2个测试用例<code>Test1</code>和<code>Test2</code></p>
+</li>
+<li><p>如果测试文件中包含函数 TestMain，那么生成的测试将先调用<code>TestMain(m)</code>，而不是直接运行测试</p>
+</li>
+<li><p>然后在其中调用<code>m.Run()</code>触发所有测试用例的执行，并使用<code>os.Exit()</code>处理返回的状态码，如果不为0，说明有用例失败s</p>
+</li>
+<li><p>因此可以在调用<code>m.Run()</code>前后做一些额外的准备(<code>setup</code>)和回收(<code>teardown</code>)工作</p>
+</li>
+</ul>
+<p>输出的运行结果：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v demo_test.<span class="keyword">go</span></span><br><span class="line">Before all tests</span><br><span class="line">=== RUN   Test1</span><br><span class="line">I<span class="string">&#x27;m test1</span></span><br><span class="line"><span class="string">--- PASS: Test1 (0.00s)</span></span><br><span class="line"><span class="string">=== RUN   Test2</span></span><br><span class="line"><span class="string">I&#x27;</span>m test2</span><br><span class="line">--- PASS: Test2 (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line">After all tests</span><br><span class="line">ok      command-line-arguments  <span class="number">0.561</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-7-http单元测试"><a href="#3-7-http单元测试" class="headerlink" title="3.7 http单元测试"></a>3.7 http单元测试</h2><p>有些时候我们需要验证某个API接口的handler是否能正常工作，除了直接mock数据去调用handler内部的业务函数外，还可以自己编写htpp请求一次性构造测试测试，达到更直接的测试作用</p>
+<p>例如下面一个简单的handler函数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">helloHandler</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	 w.Write([]<span class="keyword">byte</span>(<span class="string">&quot;hello golang&quot;</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-7-1-简约版"><a href="#3-7-1-简约版" class="headerlink" title="3.7.1 简约版"></a>3.7.1 简约版</h3><p>我们可以直接使用<code>htpp</code>和<code>net</code>库在测试函数中构造http服务和请求来进行handler的功能验证</p>
+<ol>
+<li><p>利用<code>net.Listen(&quot;tcp&quot;, &quot;127.0.0.1:0&quot;)</code>监听一个未被占用的端口，并返回<code>Listener</code></p>
+</li>
+<li><p>另起携程调用<code>http.Serve(ln, nil)</code>启动http监听服务</p>
+</li>
+<li><p>使用<code>http.Get</code>发起一个<code>Get</code>请求，检查返回值是否正确</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handleError</span><span class="params">(t *testing.T, err error)</span></span> &#123;</span><br><span class="line">	t.Helper()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Fatal(<span class="string">&quot;failed&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestConn</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	ln, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;127.0.0.1:0&quot;</span>)</span><br><span class="line">	handleError(t, err)</span><br><span class="line">	<span class="keyword">defer</span> ln.Close()</span><br><span class="line"></span><br><span class="line">	http.HandleFunc(<span class="string">&quot;/hello&quot;</span>, helloHandler)</span><br><span class="line">	<span class="keyword">go</span> http.Serve(ln, <span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line">	resp, err := http.Get(<span class="string">&quot;http://&quot;</span> + ln.Addr().String() + <span class="string">&quot;/hello&quot;</span>)</span><br><span class="line">	handleError(t, err)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">defer</span> resp.Body.Close()</span><br><span class="line">	body, err := ioutil.ReadAll(resp.Body)</span><br><span class="line">	handleError(t, err)</span><br><span class="line">	log.Printf(<span class="string">&quot;resp:%s&quot;</span>,<span class="keyword">string</span>(body))</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">string</span>(body) != <span class="string">&quot;hello golang&quot;</span> &#123;</span><br><span class="line">		t.Fatal(<span class="string">&quot;expected hello world, but got&quot;</span>, <span class="keyword">string</span>(body))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行后的结果如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v -test.run=TestConn</span><br><span class="line">Before all tests</span><br><span class="line">=== RUN   TestConn</span><br><span class="line"><span class="number">2021</span>/<span class="number">07</span>/<span class="number">28</span> <span class="number">23</span>:<span class="number">35</span>:<span class="number">22</span> resp:hello golang</span><br><span class="line">--- PASS: TestConn (<span class="number">0.02</span>s)</span><br><span class="line">PASS</span><br><span class="line">After all tests</span><br><span class="line">ok      example <span class="number">0.805</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-7-2-高效版"><a href="#3-7-2-高效版" class="headerlink" title="3.7.2 高效版"></a>3.7.2 高效版</h3><p>针对http开发的场景，使用标准库<code>net/http/httptest</code>可以进行更为高效的测试，使用<code>httptest</code>模拟请求对象(<code>req</code>)和响应对象(<code>w</code>)，达到了相同的目的</p>
+<p>使用httptest改写上面的案例：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestConnByHttpTest</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	req := httptest.NewRequest(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;http://example.com/foo&quot;</span>, <span class="literal">nil</span>)</span><br><span class="line">	w := httptest.NewRecorder()</span><br><span class="line">	helloHandler(w, req)</span><br><span class="line">	body, _ := ioutil.ReadAll(w.Result().Body)</span><br><span class="line">	log.Printf(<span class="string">&quot;resp:%s&quot;</span>,<span class="keyword">string</span>(body))</span><br><span class="line">	<span class="keyword">if</span> <span class="keyword">string</span>(body) != <span class="string">&quot;hello golang&quot;</span> &#123;</span><br><span class="line">		t.Fatal(<span class="string">&quot;expected hello world, but got&quot;</span>, <span class="keyword">string</span>(body))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -v -test.run=TestConnByHttpTest</span><br><span class="line">Before all tests</span><br><span class="line">=== RUN   TestConnByHttpTest</span><br><span class="line"><span class="number">2021</span>/<span class="number">07</span>/<span class="number">28</span> <span class="number">23</span>:<span class="number">55</span>:<span class="number">42</span> resp:hello golang</span><br><span class="line">--- PASS: TestConnByHttpTest (<span class="number">0.03</span>s)</span><br><span class="line">PASS</span><br><span class="line">After all tests</span><br><span class="line">ok      example <span class="number">0.779</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-测试覆盖率"><a href="#4-测试覆盖率" class="headerlink" title="4.测试覆盖率"></a>4.测试覆盖率</h2><p>当我们写完单元测试的时候，为了查看是否测试覆盖是否足够完整，都会查看一下测试覆盖率，其中go test同样提供了便捷的工具供我们使用</p>
+<p>Go提供内置功能来检查你的代码覆盖率。我们可以使用go test -cover来查看测试覆盖率。例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -cover</span><br><span class="line">--- FAIL: TestIntMinBasic (<span class="number">0.00</span>s)</span><br><span class="line">    intutils_test.<span class="keyword">go</span>:<span class="number">11</span>: IntMin(<span class="number">2</span>, <span class="number">-2</span>) = <span class="number">-2</span>; want <span class="number">-2</span></span><br><span class="line">--- FAIL: TestIntMinTableDriven (<span class="number">0.00</span>s)</span><br><span class="line">    --- FAIL: TestIntMinTableDriven/<span class="number">-1</span>,<span class="number">0</span> (<span class="number">0.00</span>s)</span><br><span class="line">        intutils_test.<span class="keyword">go</span>:<span class="number">32</span>: got <span class="number">-1</span>, want <span class="number">0</span></span><br><span class="line">--- FAIL: TestIntMinHelper (<span class="number">0.00</span>s)</span><br><span class="line">    intutils_test.<span class="keyword">go</span>:<span class="number">51</span>: <span class="number">2</span> * <span class="number">0</span> expected <span class="number">1</span>, but <span class="number">0</span> got</span><br><span class="line">FAIL</span><br><span class="line">coverage: <span class="number">100.0</span>% of statements</span><br><span class="line">exit status <span class="number">1</span></span><br><span class="line">FAIL    example <span class="number">0.672</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>根据上面的输出结果可以看出我们的测试覆盖率是达到了100%，当然真实的开发情况不可能这么简单，通过查出的覆盖率，可以让我们查缺补漏补充对应的单例，提高覆盖率。</p>
+<p>另外，除了上面的查看方式，go test还提供了快捷生成HTML报告的命令，具体的做法是：</p>
+<ol>
+<li><p>提供了一个额外的<code>-coverprofile</code>参数，用来将覆盖率相关的记录信息输出到一个文件,比如<code>c.out</code></p>
+</li>
+<li><p>执行<code>go tool cover -html=c.out</code>，使用cover工具来处理生成的记录信息，该命令会打开本地的浏览器窗口生成一个HTML报告</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -cover -coverprofile=c.out</span><br><span class="line">--- FAIL: TestIntMinBasic (<span class="number">0.00</span>s)</span><br><span class="line">    intutils_test.<span class="keyword">go</span>:<span class="number">11</span>: IntMin(<span class="number">2</span>, <span class="number">-2</span>) = <span class="number">-2</span>; want <span class="number">-2</span></span><br><span class="line">--- FAIL: TestIntMinTableDriven (<span class="number">0.00</span>s)</span><br><span class="line">    --- FAIL: TestIntMinTableDriven/<span class="number">-1</span>,<span class="number">0</span> (<span class="number">0.00</span>s)</span><br><span class="line">        intutils_test.<span class="keyword">go</span>:<span class="number">32</span>: got <span class="number">-1</span>, want <span class="number">0</span></span><br><span class="line">--- FAIL: TestIntMinHelper (<span class="number">0.00</span>s)</span><br><span class="line">    intutils_test.<span class="keyword">go</span>:<span class="number">51</span>: <span class="number">2</span> * <span class="number">0</span> expected <span class="number">1</span>, but <span class="number">0</span> got</span><br><span class="line">FAIL</span><br><span class="line">coverage: <span class="number">100.0</span>% of statements</span><br><span class="line">exit status <span class="number">1</span></span><br><span class="line">FAIL    example <span class="number">0.649</span>s</span><br><span class="line"></span><br><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> tool cover -html=c.out</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>浏览器输出测试覆盖情况，绿色代表覆盖，红色代表未覆盖，灰色代表不需要跟踪代码。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210815214033.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210815214033.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="测试覆盖率"></p>
+<h2 id="5-基准测试"><a href="#5-基准测试" class="headerlink" title="5.基准测试"></a>5.基准测试</h2><h3 id="5-1-基准测试格式"><a href="#5-1-基准测试格式" class="headerlink" title="5.1 基准测试格式"></a>5.1 基准测试格式</h3><p>基准测试的基本格式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkName</span><span class="params">(b *testing.B)</span></span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>函数名必须以<code>Benchmark</code>开头，后面一般跟待测试的函数名</li>
+<li>参数为<code>b *testing.B</code></li>
+<li>执行基准测试时，需要添加<code>-bench</code>参数</li>
+<li>基准测试必须要执行<code>b.N</code>次，<code>b.N</code>的值是系统根据实际情况去调整的，从而保证测试的稳定性。</li>
+</ul>
+<p><code>testing.B</code>拥有的方法如下:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Error</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Errorf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Fail</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">FailNow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Failed</span><span class="params">()</span> <span class="title">bool</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Fatal</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Fatalf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Log</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Logf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Name</span><span class="params">()</span> <span class="title">string</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">ReportAllocs</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">ResetTimer</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">Run</span><span class="params">(name <span class="keyword">string</span>, f <span class="keyword">func</span>(b *B)</span>) <span class="title">bool</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">RunParallel</span><span class="params">(body <span class="keyword">func</span>(*PB)</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">SetBytes</span><span class="params">(n <span class="keyword">int64</span>)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">SetParallelism</span><span class="params">(p <span class="keyword">int</span>)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Skip</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">SkipNow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Skipf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Skipped</span><span class="params">()</span> <span class="title">bool</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">StartTimer</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">StopTimer</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-基准测试案例"><a href="#5-2-基准测试案例" class="headerlink" title="5.2 基准测试案例"></a>5.2 基准测试案例</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkHello</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ &#123;</span><br><span class="line">        fmt.Sprintf(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行基准测试可以通过<code>go test -benchmem -bench .</code>运行所有的基准测试案例，也可以指定运行某个案例函数名称，<code>go test -benchmem -bench=Hello</code>，其中<code>-benchmem</code>指定获取内存分配的统计数据。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -benchmem -bench .</span><br><span class="line">goos: windows</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: example</span><br><span class="line">BenchmarkHello<span class="number">-8</span>         <span class="number">6628830</span>               <span class="number">170</span> ns/op               <span class="number">5</span> B/op          <span class="number">1</span> allocs/op</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">2.060</span>s</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>BenchmarkSplit-8</code>表示对<code>Hello</code>函数进行基准测试，数字8表示<code>GOMAXPROCS</code>的值，这个对于并发基准测试很重要。<code>6628830</code>和<code>170ns/op</code>表示每次调用<code>Hello</code>函数耗时<code>203ns</code>，这个结果是<code>6628830</code>次调用的平均值,<code>5 B/op</code>表示每次操作内存分配了<code>112字节</code>，<code>1 allocs/op</code>则表示每次操作进行了1次内存分配。 </p>
+<p>基准测试报告每一列值对应的含义如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> BenchmarkResult <span class="keyword">struct</span> &#123;</span><br><span class="line">    N         <span class="keyword">int</span>           <span class="comment">// 迭代次数</span></span><br><span class="line">    T         time.Duration <span class="comment">// 基准测试花费的时间</span></span><br><span class="line">    Bytes     <span class="keyword">int64</span>         <span class="comment">// 一次迭代处理的字节数</span></span><br><span class="line">    MemAllocs <span class="keyword">uint64</span>        <span class="comment">// 总的分配内存的次数</span></span><br><span class="line">    MemBytes  <span class="keyword">uint64</span>        <span class="comment">// 总的分配内存的字节数</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-性能比较函数"><a href="#5-3-性能比较函数" class="headerlink" title="5.3 性能比较函数"></a>5.3 性能比较函数</h3><p>上面的基准测试只能得到给定操作的绝对耗时，但是在很多性能问题是发生在两个不同操作之间的相对耗时，比如同一个函数处理1000个元素的耗时与处理1万甚至100万个元素的耗时的差别是多少？再或者对于同一个任务究竟使用哪种算法性能最佳？我们通常需要对两个不同算法的实现使用相同的输入来进行基准比较测试。</p>
+<p>性能比较函数通常是一个带有参数的函数，被多个不同的Benchmark函数传入不同的值来调用。举个例子如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">benchmark</span><span class="params">(b *testing.B, size <span class="keyword">int</span>)</span></span>&#123;<span class="comment">/* ... */</span>&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Benchmark10</span><span class="params">(b *testing.B)</span></span>&#123; benchmark(b, <span class="number">10</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Benchmark100</span><span class="params">(b *testing.B)</span></span>&#123; benchmark(b, <span class="number">100</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Benchmark1000</span><span class="params">(b *testing.B)</span></span>&#123; benchmark(b, <span class="number">1000</span>) &#125;</span><br></pre></td></tr></table></figure>
+
+<p>例如我们编写了一个计算斐波那契数列的函数如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// fib.go</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Fib 是一个计算第n个斐波那契数的函数</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fib</span><span class="params">(n <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> n &lt; <span class="number">2</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> n</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> Fib(n<span class="number">-1</span>) + Fib(n<span class="number">-2</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们编写的性能比较函数如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// fib_test.go</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">benchmarkFib</span><span class="params">(b *testing.B, n <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ &#123;</span><br><span class="line">		Fib(n)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib1</span><span class="params">(b *testing.B)</span></span>  &#123; benchmarkFib(b, <span class="number">1</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib2</span><span class="params">(b *testing.B)</span></span>  &#123; benchmarkFib(b, <span class="number">2</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib3</span><span class="params">(b *testing.B)</span></span>  &#123; benchmarkFib(b, <span class="number">3</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib10</span><span class="params">(b *testing.B)</span></span> &#123; benchmarkFib(b, <span class="number">10</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib20</span><span class="params">(b *testing.B)</span></span> &#123; benchmarkFib(b, <span class="number">20</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib40</span><span class="params">(b *testing.B)</span></span> &#123; benchmarkFib(b, <span class="number">40</span>) &#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -benchmem -bench .</span><br><span class="line">goos: windows</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: example</span><br><span class="line">BenchmarkFib1<span class="number">-8</span>         <span class="number">339907020</span>                <span class="number">4.30</span> ns/op            <span class="number">0</span> B/op          <span class="number">0</span> allocs/op</span><br><span class="line">BenchmarkFib2<span class="number">-8</span>         <span class="number">150234828</span>               <span class="number">12.1</span> ns/op             <span class="number">0</span> B/op          <span class="number">0</span> allocs/op</span><br><span class="line">BenchmarkFib3<span class="number">-8</span>         <span class="number">47958372</span>                <span class="number">23.4</span> ns/op             <span class="number">0</span> B/op          <span class="number">0</span> allocs/op</span><br><span class="line">BenchmarkFib10<span class="number">-8</span>         <span class="number">1880780</span>               <span class="number">616</span> ns/op               <span class="number">0</span> B/op          <span class="number">0</span> allocs/op</span><br><span class="line">BenchmarkFib20<span class="number">-8</span>            <span class="number">9999</span>            <span class="number">110119</span> ns/op               <span class="number">0</span> B/op          <span class="number">0</span> allocs/op</span><br><span class="line">BenchmarkFib40<span class="number">-8</span>               <span class="number">1</span>        <span class="number">1598119000</span> ns/op               <span class="number">0</span> B/op          <span class="number">0</span> allocs/op</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">11.504</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里需要注意的是，默认情况下，每个基准测试至少运行1秒。如果在<code>Benchmark函数</code>返回时没有到1秒，则b.N的值会按<code>1,2,5,10,20,50，…</code>增加，并且函数再次运行。</p>
+<p>最终的<code>BenchmarkFib40</code>只运行了一次，像这种情况下我们应该可以使用-benchtime标志增加最小基准时间，以产生更准确的结果。例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -benchmem -bench=Fib40 -benchtime=<span class="number">20</span>s</span><br><span class="line">goos: windows</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: example</span><br><span class="line">BenchmarkFib40<span class="number">-8</span>              <span class="number">22</span>        <span class="number">1513385245</span> ns/op               <span class="number">0</span> B/op          <span class="number">0</span> allocs/op</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">35.124</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这一次<code>BenchmarkFib40</code>函数运行了22次，结果性对会更准确一些了。</p>
+<h3 id="5-4-重置定时器"><a href="#5-4-重置定时器" class="headerlink" title="5.4 重置定时器"></a>5.4 重置定时器</h3><p>如果在运行前基准测试需要一些耗时的配置，则可以使用<code>b.ResetTimer()</code>先重置定时器，例如:</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkHello</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">    ... <span class="comment">// 耗时操作</span></span><br><span class="line">    b.ResetTimer()</span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ &#123;</span><br><span class="line">        fmt.Sprintf(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-5-并行测试"><a href="#5-5-并行测试" class="headerlink" title="5.5 并行测试"></a>5.5 并行测试</h3><p><code>func (b *B) RunParallel(body func(*PB))</code>会以并行的方式执行给定的基准测试。</p>
+<p><code>RunParallel</code>会创建出多个<code>goroutine</code>，并将<code>b.N</code>分配给这些<code>goroutine</code>执行， 其中<code>goroutine</code>数量的默认值为<code>GOMAXPROCS</code>。<br>用户如果想要增加非CPU受限（non-CPU-bound）基准测试的并行性， 那么可以在<code>RunParallel</code>之前调用<code>SetParallelism</code>。<code>RunParallel</code>通常会与<code>-cpu</code>标志一同使用。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkParallel</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">	templ := template.Must(template.New(<span class="string">&quot;test&quot;</span>).Parse(<span class="string">&quot;Hello, &#123;&#123;.&#125;&#125;!&quot;</span>))</span><br><span class="line">    <span class="comment">// b.SetParallelism(4) // 设置使用的CPU数</span></span><br><span class="line">	b.RunParallel(<span class="function"><span class="keyword">func</span><span class="params">(pb *testing.PB)</span></span> &#123;</span><br><span class="line">		<span class="keyword">var</span> buf bytes.Buffer</span><br><span class="line">		<span class="keyword">for</span> pb.Next() &#123;</span><br><span class="line">			<span class="comment">// 所有 goroutine 一起，循环一共执行 b.N 次</span></span><br><span class="line">			buf.Reset()</span><br><span class="line">			templ.Execute(&amp;buf, <span class="string">&quot;World&quot;</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">D:\mycoding\gocoding\example&gt;<span class="keyword">go</span> test -benchmem -bench=BenchmarkParallel</span><br><span class="line">goos: windows</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: example</span><br><span class="line">BenchmarkParallel<span class="number">-8</span>     <span class="number">12807045</span>                <span class="number">82.9</span> ns/op            <span class="number">48</span> B/op          <span class="number">1</span> allocs/op</span><br><span class="line">PASS</span><br><span class="line">ok      example <span class="number">2.883</span>s</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" class="lazyload" data-srcset="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="weixin-a"></p>
+
+  
+  
+    
+    <div class='footer'>
+      
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=https://littlejoyo.github.io/go/go-test/>https://littlejoyo.github.io/go/go-test/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
+    
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-08-15T22:35:18+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：2021年8月15日</p>
+  </a>
+</div>
+
+        
+      
+        
+          
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/Go/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>Go</p></a></div> <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E6%B5%8B%E8%AF%95/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>测试</p></a></div>
+
+
+        
+      
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
+    
+      
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/go/go-test/&title=【Go】利用go test编写单元测试 - JoyoHub&summary=
+单元测试能够最小范围测试程序代码，从而保证程序的正确性和健壮性
+
+平时我们可以编写单元测试代码快速了解当前的程序模块的情况，作出问题快速定位
+
+那么，在Go该如何编写单元测试呢？那必须是go test工具
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/go/go-test/&title=【Go】利用go test编写单元测试 - JoyoHub&summary=
+单元测试能够最小范围测试程序代码，从而保证程序的正确性和健壮性
+
+平时我们可以编写单元测试代码快速了解当前的程序模块的情况，作出问题快速定位
+
+那么，在Go该如何编写单元测试呢？那必须是go test工具
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/go/go-test/&title=【Go】利用go test编写单元测试 - JoyoHub&summary=
+单元测试能够最小范围测试程序代码，从而保证程序的正确性和健壮性
+
+平时我们可以编写单元测试代码快速了解当前的程序模块的情况，作出问题快速定位
+
+那么，在Go该如何编写单元测试呢？那必须是go test工具
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+
+
+        
+      
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+      
+        <a class='next' href='/network/virtualbox-bridge/'>
+          <p class='title'>【计算机网络】使用VirtualBox和namespace搭建桥接环境<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>
+在工作中遇到需要使用Virtualbox基于Bridge搭建桥接环境，由此做个记录
+
+主要是Virtualbox实现bridge桥接还需要一些黑手段，跟Vmware的LAN Segment还有...</p>
+        </a>
+      
+    </div>
+  
+</article>
+
+
+  
+
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
+    
+    <div id="gitalk-container"></div>
+
+  </article>
+
+
+
+
+
+
+</div>
+<aside class='l_side'>
+  
+  
+    
+    
+
+
+
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
+    
+  <header>
+    
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
+    
+  </header>
+
+
+    <div class='content'>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFgo-test%EF%BC%9F"><span class="toc-text">1.什么是go test？</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-go-test%E5%87%BD%E6%95%B0%E7%A7%8D%E7%B1%BB"><span class="toc-text">2.go test函数种类</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E6%B5%8B%E8%AF%95%E5%87%BD%E6%95%B0"><span class="toc-text">3. 测试函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-%E6%B5%8B%E8%AF%95%E5%87%BD%E6%95%B0%E7%9A%84%E6%A0%BC%E5%BC%8F"><span class="toc-text">3.1 测试函数的格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-%E6%B5%8B%E8%AF%95%E5%87%BD%E6%95%B0%E7%BC%96%E5%86%99%E8%A7%84%E5%88%99"><span class="toc-text">3.2 测试函数编写规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-%E6%B5%8B%E8%AF%95%E6%A1%88%E4%BE%8B%E7%BC%96%E5%86%99"><span class="toc-text">3.3 测试案例编写</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-%E5%AD%90%E6%B5%8B%E8%AF%95%E5%92%8C%E8%A1%A8%E6%A0%BC%E6%B5%8B%E8%AF%95%E7%9A%84%E6%80%BB%E7%BB%93"><span class="toc-text">3.4 子测试和表格测试的总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-%E5%B8%AE%E5%8A%A9%E5%87%BD%E6%95%B0%E7%9A%84%E5%BA%94%E7%94%A8"><span class="toc-text">3.5 帮助函数的应用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-6-setup-%E5%92%8C-teardown"><span class="toc-text">3.6 setup 和 teardown</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-7-http%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="toc-text">3.7 http单元测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-1-%E7%AE%80%E7%BA%A6%E7%89%88"><span class="toc-text">3.7.1 简约版</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-7-2-%E9%AB%98%E6%95%88%E7%89%88"><span class="toc-text">3.7.2 高效版</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E6%B5%8B%E8%AF%95%E8%A6%86%E7%9B%96%E7%8E%87"><span class="toc-text">4.测试覆盖率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95"><span class="toc-text">5.基准测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E6%A0%BC%E5%BC%8F"><span class="toc-text">5.1 基准测试格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E6%A1%88%E4%BE%8B"><span class="toc-text">5.2 基准测试案例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E6%80%A7%E8%83%BD%E6%AF%94%E8%BE%83%E5%87%BD%E6%95%B0"><span class="toc-text">5.3 性能比较函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E9%87%8D%E7%BD%AE%E5%AE%9A%E6%97%B6%E5%99%A8"><span class="toc-text">5.4 重置定时器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-%E5%B9%B6%E8%A1%8C%E6%B5%8B%E8%AF%95"><span class="toc-text">5.5 并行测试</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7"><span class="toc-text">微信公众号</span></a></li></ol>
+    </div>
+  </section>
+
+
+  
+
+
+</aside>
+
+
+
+		  
+		  <!--此文件用来存放一些不方便取值的变量-->
+<!--思路大概是将值藏到重加载的区域内-->
+
+<script>
+  window.pdata={}
+  pdata.ispage=true;
+  pdata.postTitle="【Go】利用go test编写单元测试";
+  pdata.commentPath="";
+  pdata.commentPlaceholder="";
+  // header 这里无论是否开启pjax都需要
+  var l_header=document.getElementById("l_header");
+  
+  l_header.classList.add("show");
+  
+  
+    // cover
+    var cover_wrapper=document.querySelector('.cover-wrapper');
+    
+    cover_wrapper.id="none";
+    cover_wrapper.style.display="none";
+    
+  
+</script>
+
+        </div>
+        
+  
+  <footer class="footer clearfix">
+    <br><br>
+    
+      
+        <div class="aplayer-container">
+          
+
+
+        </div>
+      
+    
+      
+        <br>
+        <div class="social-wrapper">
+          
+            
+          
+            
+          
+            
+          
+        </div>
+      
+    
+  </footer>
+
+
+        <a id="s-top" class="fas fa-arrow-up fa-fw" href="javascript:void(0)"></a>
+      </div>
+    </div>
+    <div>
+      <script>
+/************这个文件存放不需要重载的全局变量和全局函数*********/
+window.volantis={};
+window.volantis.loadcss=document.getElementById("loadcss");
+/******************** Pjax ********************************/
+function VPjax(){
+	this.list=[] // 存放回调函数
+	this.start=()=>{
+	  for(var i=0;i<this.list.length;i++){
+		this.list[i].run();
+	  }
+	}
+	this.push=(fn,name)=>{
+		var f=new PjaxItem(fn,name);
+		this.list.push(f);
+	}
+	// 构造一个可以run的对象
+	function PjaxItem(fn,name){
+		// 函数名称
+		this.name = name || fn.name
+		// run方法
+		this.run=()=>{
+			fn()
+		}
+	}
+}
+volantis.pjax={}
+volantis.pjax.method={
+	complete: new VPjax(),
+	error: new VPjax(),
+	send: new VPjax()
+}
+volantis.pjax={
+	...volantis.pjax,
+	push: volantis.pjax.method.complete.push,
+	error: volantis.pjax.method.error.push,
+	send: volantis.pjax.method.send.push
+}
+/********************脚本懒加载函数********************************/
+// 已经加入了setTimeout
+function loadScript(src, cb) {
+	setTimeout(function() {
+		var HEAD = document.getElementsByTagName('head')[0] || document.documentElement;
+		var script = document.createElement('script');
+		script.setAttribute('type','text/javascript');
+		if (cb) script.onload = cb;
+		script.setAttribute('src', src);
+		HEAD.appendChild(script);
+	});
+}
+//https://github.com/filamentgroup/loadCSS
+var loadCSS = function( href, before, media, attributes ){
+	var doc = window.document;
+	var ss = doc.createElement( "link" );
+	var ref;
+	if( before ){
+		ref = before;
+	}
+	else {
+		var refs = ( doc.body || doc.getElementsByTagName( "head" )[ 0 ] ).childNodes;
+		ref = refs[ refs.length - 1];
+	}
+	var sheets = doc.styleSheets;
+	if( attributes ){
+		for( var attributeName in attributes ){
+			if( attributes.hasOwnProperty( attributeName ) ){
+				ss.setAttribute( attributeName, attributes[attributeName] );
+			}
+		}
+	}
+	ss.rel = "stylesheet";
+	ss.href = href;
+	ss.media = "only x";
+	function ready( cb ){
+		if( doc.body ){
+			return cb();
+		}
+		setTimeout(function(){
+			ready( cb );
+		});
+	}
+	ready( function(){
+		ref.parentNode.insertBefore( ss, ( before ? ref : ref.nextSibling ) );
+	});
+	var onloadcssdefined = function( cb ){
+		var resolvedHref = ss.href;
+		var i = sheets.length;
+		while( i-- ){
+			if( sheets[ i ].href === resolvedHref ){
+				return cb();
+			}
+		}
+		setTimeout(function() {
+			onloadcssdefined( cb );
+		});
+	};
+	function loadCB(){
+		if( ss.addEventListener ){
+			ss.removeEventListener( "load", loadCB );
+		}
+		ss.media = media || "all";
+	}
+	if( ss.addEventListener ){
+		ss.addEventListener( "load", loadCB);
+	}
+	ss.onloadcssdefined = onloadcssdefined;
+	onloadcssdefined( loadCB );
+	return ss;
+};
+</script>
+<script>
+  
+  loadCSS("https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.14/css/all.min.css", window.volantis.loadcss);
+  
+  
+  
+  
+</script>
+<!-- required -->
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5/dist/jquery.min.js"></script>
+
+<script>
+  function pjax_fancybox() {
+    $(".md .gallery").find("img").each(function () { //渲染 fancybox
+      var element = document.createElement("a"); // a 标签
+      $(element).attr("class", "fancybox");
+      $(element).attr("pjax-fancybox", "");  // 过滤 pjax
+      $(element).attr("href", $(this).attr("src"));
+      if ($(this).attr("data-original")) {
+        $(element).attr("href", $(this).attr("data-original"));
+      }
+      $(element).attr("data-fancybox", "images");
+      var caption = "";   // 描述信息
+      if ($(this).attr('alt')) {  // 判断当前页面是否存在描述信息
+        $(element).attr('data-caption', $(this).attr('alt'));
+        caption = $(this).attr('alt');
+      }
+      var div = document.createElement("div");
+      $(div).addClass("fancybox");
+      $(this).wrap(div); // 最外层套 div ，其实主要作用还是 class 样式
+      var span = document.createElement("span");
+      $(span).addClass("image-caption");
+      $(span).text(caption); // 加描述
+      $(this).after(span);  // 再套一层描述
+      $(this).wrap(element);  // 最后套 a 标签
+    })
+    $(".md .gallery").find("img").fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+      closeClick: true,
+      helpers: {
+        overlay: {closeClick: true}
+      },
+      buttons: [
+        "zoom",
+        "close"
+      ]
+    });
+  };
+  function SCload_fancybox() {
+    if ($(".md .gallery").find("img").length == 0) return;
+    loadCSS("https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css", document.getElementById("loadcss"));
+    loadScript('https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js', pjax_fancybox)
+  };
+  $(function () {
+    SCload_fancybox();
+  });
+  function Pjax_SCload_fancybox(){
+	if (typeof $.fancybox == "undefined") {
+	 SCload_fancybox();
+    } else {
+	 pjax_fancybox();
+    }
+  }
+  volantis.pjax.push(Pjax_SCload_fancybox)
+  volantis.pjax.send(()=>{
+      if (typeof $.fancybox != "undefined") {
+        $.fancybox.close();    // 关闭弹窗
+      }
+  },'fancybox')
+</script>
+
+
+<!-- internal -->
+
+
+
+
+<script>
+  function loadIssuesJS() {
+    if ($(".md").find(".issues-api").length == 0) return;
+	
+	  loadScript('/js/issues.js');
+	
+  };
+  $(function () {
+    loadIssuesJS();
+  });
+  volantis.pjax.push(()=>{
+	if (typeof IssuesAPI == "undefined") {
+	  loadIssuesJS();
+	}
+  },"IssuesJS")
+</script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.1.0/dist/lazyload.min.js"></script>
+<script>
+  // https://www.npmjs.com/package/vanilla-lazyload
+  // Set the options globally
+  // to make LazyLoad self-initialize
+  window.lazyLoadOptions = {
+    elements_selector: ".lazyload",
+    threshold: 0
+  };
+  // Listen to the initialization event
+  // and get the instance of LazyLoad
+  window.addEventListener(
+    "LazyLoad::Initialized",
+    function (event) {
+      window.lazyLoadInstance = event.detail.instance;
+    },
+    false
+  );
+  document.addEventListener('DOMContentLoaded', function () {
+    lazyLoadInstance.update();
+  });
+  document.addEventListener('pjax:complete', function () {
+    lazyLoadInstance.update();
+  });
+</script>
+
+
+
+
+  
+
+<script>
+  window.FPConfig = {
+	delay: 0,
+	ignoreKeywords: [],
+	maxRPS: 5,
+	hoverDelay: 25
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/gh/gijo-varghese/flying-pages@2.1.2/flying-pages.min.js"></script>
+
+
+
+
+
+
+
+   <script type="text/javascript">
+  loadScript("https://cdn.jsdelivr.net/npm/scrollreveal@4.0.6/dist/scrollreveal.min.js")
+  function pjax_scrollrebeal() {
+    ScrollReveal().reveal('.l_main .reveal', {
+      distance: '32px',
+      duration: '800',
+      interval: '20',
+      scale: '1',
+      easing: 'ease-out'
+    });
+  }
+  $(function () {
+  var checkScrollReveal = setInterval(function () {
+    if ($("#safearea").css("display")!="block") return
+    if (typeof ScrollReveal=="undefined") return
+    clearInterval(checkScrollReveal)
+	pjax_scrollrebeal();
+  }, 100)
+  });
+  volantis.pjax.push(pjax_scrollrebeal)
+</script>
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script type="text/javascript">
+  function pjax_gitalk() {
+    if(!document.querySelectorAll("#gitalk-container")[0])return;
+    let path = pdata.commentPath;
+    if (path.length == 0) {
+      let defaultPath = '';
+      path = defaultPath || decodeURI(window.location.pathname);
+    }
+    if (document.getElementById('gitalk-container') != null) {
+      var gitalk = new Gitalk(Object.assign({"clientID":"6428b70706cc5c089758","clientSecret":"acb9d963f91bf7731c5ee1ebd80b7a172ba7f7de","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"path":null}, {
+	  id: path,
+	  distractionFreeMode: false  // Facebook-like distraction free mode
+    }));
+      gitalk.render('gitalk-container');
+    }
+  }
+  $(function () {
+    pjax_gitalk();
+  });
+  volantis.pjax.push(pjax_gitalk);
+</script>
+
+
+
+
+
+
+  
+<script src="/js/app.js"></script>
+
+
+
+<!-- optional -->
+
+  <script>
+const SearchServiceimagePath="https://cdn.jsdelivr.net/gh/volantis-x/cdn-volantis@master/img/";
+const ROOT =  ("/" || "/").endsWith('/') ? ("/" || "/") : ("//" || "/" );
+
+$('.input.u-search-input').one('focus',function(){
+	
+		loadScript('/js/search/hexo.js',setSearchService);
+	
+})
+
+function listenSearch(){
+  
+    customSearch = new HexoSearch({
+      imagePath: SearchServiceimagePath
+    });
+  
+}
+function setSearchService() {
+	listenSearch();
+	
+		document.addEventListener("pjax:success", listenSearch);
+	
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+  <script defer>
+
+  const LCCounter = {
+    app_id: 'u9j57bwJod4EDmXWdxrwuqQT-MdYXbMMI',
+    app_key: 'jfHtEKVE24j0IVCGHbvuFClp',
+    custom_api_server: '',
+
+    // 查询存储的记录
+    getRecord(Counter, url, title) {
+      return new Promise(function (resolve, reject) {
+        Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({url})))
+          .then(resp => resp.json())
+          .then(({results, code, error}) => {
+            if (code === 401) {
+              throw error;
+            }
+            if (results && results.length > 0) {
+              var record = results[0];
+              resolve(record);
+            } else {
+              Counter('post', '/classes/Counter', {url, title: title, times: 0})
+                .then(resp => resp.json())
+                .then((record, error) => {
+                  if (error) {
+                    throw error;
+                  }
+                  resolve(record);
+                }).catch(error => {
+                console.error('Failed to create', error);
+                reject(error);
+              });
+            }
+          }).catch((error) => {
+          console.error('LeanCloud Counter Error:', error);
+          reject(error);
+        });
+      })
+    },
+
+    // 发起自增请求
+    increment(Counter, incrArr) {
+      return new Promise(function (resolve, reject) {
+        Counter('post', '/batch', {
+          "requests": incrArr
+        }).then((res) => {
+          res = res.json();
+          if (res.error) {
+            throw res.error;
+          }
+          resolve(res);
+        }).catch((error) => {
+          console.error('Failed to save visitor count', error);
+          reject(error);
+        });
+      });
+    },
+
+    // 构建自增请求体
+    buildIncrement(objectId) {
+      return {
+        "method": "PUT",
+        "path": `/1.1/classes/Counter/${ objectId }`,
+        "body": {
+          "times": {
+            '__op': 'Increment',
+            'amount': 1
+          }
+        }
+      }
+    },
+
+    // 校验是否为有效的 UV
+    validUV() {
+      var key = 'LeanCloudUVTimestamp';
+      var flag = localStorage.getItem(key);
+      if (flag) {
+        // 距离标记小于 24 小时则不计为 UV
+        if (new Date().getTime() - parseInt(flag) <= 86400000) {
+          return false;
+        }
+      }
+      localStorage.setItem(key, new Date().getTime().toString());
+      return true;
+    },
+
+    addCount(Counter) {
+      var enableIncr = '' === 'true' && window.location.hostname !== 'localhost';
+      enableIncr = true;
+      var getterArr = [];
+      var incrArr = [];
+      // 请求 PV 并自增
+      var pvCtn = document.querySelector('#lc-sv');
+      if (pvCtn || enableIncr) {
+        var pvGetter = this.getRecord(Counter, 'https://littlejoyo.github.io' + '/#lc-sv', 'Visits').then((record) => {
+          incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-sv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + 1;
+              if (pvCtn) {
+                pvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(pvGetter);
+      }
+
+      // 请求 UV 并自增
+      var uvCtn = document.querySelector('#lc-uv');
+      if (uvCtn || enableIncr) {
+        var uvGetter = this.getRecord(Counter, 'https://littlejoyo.github.io' + '/#lc-uv', 'Visitors').then((record) => {
+          var vuv = this.validUV();
+          vuv && incrArr.push(this.buildIncrement(record.objectId))
+          var eles = document.querySelectorAll('#lc-uv #number');
+          if (eles.length > 0) {
+            eles.forEach((el,index,array)=>{
+              el.innerText = record.times + (vuv ? 1 : 0);
+              if (uvCtn) {
+                uvCtn.style.display = 'inline';
+              }
+            })
+          }
+        });
+        getterArr.push(uvGetter);
+      }
+
+      // 请求文章的浏览数，如果是当前页面就自增
+      var allPV = document.querySelectorAll('#lc-pv');
+      if (allPV.length > 0 || enableIncr) {
+        for (i = 0; i < allPV.length; i++) {
+          let pv = allPV[i];
+          let title = pv.getAttribute('data-title');
+          var url = 'https://littlejoyo.github.io' + pv.getAttribute('data-path');
+          if (url) {
+            var viewGetter = this.getRecord(Counter, url, title).then((record) => {
+              // 是当前页面就自增
+              let curPath = window.location.pathname;
+              if (curPath.includes('index.html')) {
+                curPath = curPath.substring(0, curPath.lastIndexOf('index.html'));
+              }
+              if (pv.getAttribute('data-path') == curPath) {
+                incrArr.push(this.buildIncrement(record.objectId));
+              }
+              if (pv) {
+                var ele = pv.querySelector('#lc-pv #number');
+                if (ele) {
+                  if (pv.getAttribute('data-path') == curPath) {
+                    ele.innerText = (record.times || 0) + 1;
+                  } else {
+                    ele.innerText = record.times || 0;
+                  }
+                  pv.style.display = 'inline';
+                }
+              }
+            });
+            getterArr.push(viewGetter);
+          }
+        }
+      }
+
+      // 如果启动计数自增，批量发起自增请求
+      if (enableIncr) {
+        Promise.all(getterArr).then(() => {
+          incrArr.length > 0 && this.increment(Counter, incrArr);
+        })
+      }
+
+    },
+
+
+    fetchData(api_server) {
+      var Counter = (method, url, data) => {
+        return fetch(`${ api_server }/1.1${ url }`, {
+          method,
+          headers: {
+            'X-LC-Id': this.app_id,
+            'X-LC-Key': this.app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      this.addCount(Counter);
+    },
+
+    refreshCounter() {
+      var api_server = this.app_id.slice(-9) !== '-MdYXbMMI' ? this.custom_api_server : `https://${ this.app_id.slice(0, 8).toLowerCase() }.api.lncldglobal.com`;
+      if (api_server) {
+        this.fetchData(api_server);
+      } else {
+        fetch('https://app-router.leancloud.cn/2/route?appId=' + this.app_id)
+          .then(resp => resp.json())
+          .then(({api_server}) => {
+            this.fetchData('https://' + api_server);
+          });
+      }
+    }
+
+  };
+
+  LCCounter.refreshCounter();
+
+  document.addEventListener('pjax:complete', function () {
+    LCCounter.refreshCounter();
+  });
+</script>
+
+
+
+
+  <script>
+const rootElement = document.documentElement;
+const darkModeStorageKey = "user-color-scheme";
+const rootElementDarkModeAttributeName = "data-user-color-scheme";
+
+const setLS = (k, v) => {
+    localStorage.setItem(k, v);
+};
+
+const removeLS = (k) => {
+    localStorage.removeItem(k);
+};
+
+const getLS = (k) => {
+    return localStorage.getItem(k);
+};
+
+const getModeFromCSSMediaQuery = () => {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+};
+
+const resetRootDarkModeAttributeAndLS = () => {
+  rootElement.removeAttribute(rootElementDarkModeAttributeName);
+  removeLS(darkModeStorageKey);
+};
+
+const validColorModeKeys = {
+  dark: true,
+  light: true,
+};
+
+const applyCustomDarkModeSettings = (mode) => {
+  const currentSetting = mode || getLS(darkModeStorageKey);
+
+  if (currentSetting === getModeFromCSSMediaQuery()) {
+    resetRootDarkModeAttributeAndLS();
+  } else if (validColorModeKeys[currentSetting]) {
+    rootElement.setAttribute(rootElementDarkModeAttributeName, currentSetting);
+  } else {
+    resetRootDarkModeAttributeAndLS();
+  }
+};
+
+const invertDarkModeObj = {
+  dark: "light",
+  light: "dark",
+};
+
+/**
+ * get target mode
+ */
+const toggleCustomDarkMode = () => {
+  let currentSetting = getLS(darkModeStorageKey);
+
+  if (validColorModeKeys[currentSetting]) {
+    currentSetting = invertDarkModeObj[currentSetting];
+  } else if (currentSetting === null) {
+    currentSetting = invertDarkModeObj[getModeFromCSSMediaQuery()];
+  } else {
+    return;
+  }
+  setLS(darkModeStorageKey, currentSetting);
+  return currentSetting;
+};
+
+/**
+ * bind click event for toggle button
+ */
+var btn=$("#wrapper .toggle-mode-btn,#rightmenu-wrapper .toggle-mode-btn");
+function bindToggleButton() {
+    btn.on('click',(e) => {
+      const mode = toggleCustomDarkMode();
+      applyCustomDarkModeSettings(mode);
+    });
+}
+
+applyCustomDarkModeSettings();
+document.addEventListener("DOMContentLoaded", bindToggleButton);
+volantis.pjax.push(bindToggleButton);
+volantis.pjax.send(()=>{
+	btn.unbind('click');
+},'toggle-mode-btn-unbind');
+</script>
+
+
+
+
+
+
+
+
+<script>
+function listennSidebarTOC() {
+  const navItems = document.querySelectorAll(".toc li");
+  if (!navItems.length) return;
+  const sections = [...navItems].map((element) => {
+    const link = element.querySelector(".toc-link");
+    const target = document.getElementById(
+      decodeURI(link.getAttribute("href")).replace("#", "")
+    );
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.scrollTo({
+		top: target.offsetTop + 100,
+		
+		behavior: "smooth"
+		
+	  });
+    });
+    return target;
+  });
+
+  function activateNavByIndex(target) {
+    if (target.classList.contains("active-current")) return;
+
+    document.querySelectorAll(".toc .active").forEach((element) => {
+      element.classList.remove("active", "active-current");
+    });
+    target.classList.add("active", "active-current");
+    let parent = target.parentNode;
+    while (!parent.matches(".toc")) {
+      if (parent.matches("li")) parent.classList.add("active");
+      parent = parent.parentNode;
+    }
+  }
+
+  function findIndex(entries) {
+    let index = 0;
+    let entry = entries[index];
+    if (entry.boundingClientRect.top > 0) {
+      index = sections.indexOf(entry.target);
+      return index === 0 ? 0 : index - 1;
+    }
+    for (; index < entries.length; index++) {
+      if (entries[index].boundingClientRect.top <= 0) {
+        entry = entries[index];
+      } else {
+        return sections.indexOf(entry.target);
+      }
+    }
+    return sections.indexOf(entry.target);
+  }
+
+  function createIntersectionObserver(marginTop) {
+    marginTop = Math.floor(marginTop + 10000);
+    let intersectionObserver = new IntersectionObserver(
+      (entries, observe) => {
+        let scrollHeight = document.documentElement.scrollHeight + 100;
+        if (scrollHeight > marginTop) {
+          observe.disconnect();
+          createIntersectionObserver(scrollHeight);
+          return;
+        }
+        let index = findIndex(entries);
+        activateNavByIndex(navItems[index]);
+      },
+      {
+        rootMargin: marginTop + "px 0px -100% 0px",
+        threshold: 0,
+      }
+    );
+    sections.forEach((element) => {
+      element && intersectionObserver.observe(element);
+    });
+  }
+  createIntersectionObserver(document.documentElement.scrollHeight);
+}
+
+document.addEventListener("DOMContentLoaded", listennSidebarTOC);
+document.addEventListener("pjax:success", listennSidebarTOC);
+</script>
+
+<!-- more -->
+
+ 
+	   
+	    
+
+
+<script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script>
+
+
+<script>
+    var pjax;
+    document.addEventListener('DOMContentLoaded', function () {
+      pjax = new Pjax({
+        elements: 'a[href]:not([href^="#"]):not([href="javascript:void(0)"]):not([pjax-fancybox])',
+        selectors: [
+          "title",
+          
+          "#pjax-container",
+          "#pjax-header-nav-list"
+        ],
+        cacheBust: false,   // url 地址追加时间戳，用以避免浏览器缓存
+        timeout: 5000
+      });
+    });
+
+    document.addEventListener('pjax:send', function (e) {
+      //window.stop(); // 相当于点击了浏览器的停止按钮
+
+      try {
+        var currentUrl = window.location.pathname;
+        var targetUrl = e.triggerElement.href;
+        var banUrl = [""];
+        if (banUrl[0] != "") {
+          banUrl.forEach(item => {
+            if(currentUrl.indexOf(item) != -1 || targetUrl.indexOf(item) != -1) {
+              window.location.href = targetUrl;
+            }
+          });
+        }
+      } catch (error) {}
+
+      window.subData = null; // 移除标题（用于一二级导航栏切换处）
+
+      volantis.$switcher.removeClass('active'); // 关闭移动端激活的搜索框
+      volantis.$header.removeClass('z_search-open'); // 关闭移动端激活的搜索框
+      volantis.$wrapper.removeClass('sub'); // 跳转页面时关闭二级导航
+
+      // 解绑事件 避免重复监听
+      volantis.$topBtn.unbind('click');
+      $('.menu a').unbind('click');
+      $(window).unbind('resize');
+      $(window).unbind('scroll');
+      $(document).unbind('scroll');
+      $(document).unbind('click');
+      $('body').unbind('click');
+	  // 使用 volantis.pjax.send 方法传入pjax:send回调函数 参见layout/_partial/scripts/global.ejs
+	  volantis.pjax.method.send.start();
+    });
+
+    document.addEventListener('pjax:complete', function () {
+      $('.nav-main').find('.list-v').not('.menu-phone').removeAttr("style",""); // 移除小尾巴的移除
+      $('.menu-phone.list-v').removeAttr("style",""); // 移除小尾巴的移除
+      $('script[data-pjax], .pjax-reload script').each(function () {
+        $(this).parent().append($(this).remove());
+      });
+      try{
+		// 使用 volantis.pjax.push 方法传入重载函数 参见layout/_partial/scripts/global.ejs
+		volantis.pjax.method.complete.start();
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    document.addEventListener('pjax:error', function (e) {
+	  // 使用 volantis.pjax.error 方法传入pjax:error回调函数 参见layout/_partial/scripts/global.ejs
+	  volantis.pjax.method.error.start();
+      window.location.href = e.triggerElement.href;
+    });
+</script>
+ 
+	  
+    </div>
+  </body>
+</html>
