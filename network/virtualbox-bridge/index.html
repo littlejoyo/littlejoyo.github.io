@@ -409,6 +409,13 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
               <p>留言板</p>
             </a>
           
+            <a target="_blank" rel="noopener" href="https://volantis.js.org/v5/getting-started/"
+              
+              
+              id="https:volantisjsorgv5getting-started">
+              <p>主题文档</p>
+            </a>
+          
         
       </div>
     </div>
@@ -663,7 +670,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 <blockquote>
 <p>上面的方面都是在namespace外通过命令指定来执行，每一句都带有<code>ip netns exec foo</code>,有没有方法在namespace里面直接执行命令呢？答案是肯定的，通过末尾增加<code>bash</code>命令即可进入</p>
 </blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 通过指定bash命令进入namespace</span></span></span><br><span class="line">ip netns exec foo bash</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 直接执行Linux命令</span></span></span><br><span class="line">ip addr</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 退出namespace</span></span></span><br><span class="line">exit</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 通过修改 bash 的前缀信息可以区分当前处在哪一个namespace</span></span></span><br><span class="line">ip netns exec foo /bin/bash --rcfile &lt;(echo &quot;PS1=\&quot;namespace foo&gt; \&quot;&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 通过指定bash命令进入namespace</span></span></span><br><span class="line">ip netns exec foo bash</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 直接执行Linux命令</span></span></span><br><span class="line">ip addr</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 退出namespace</span></span></span><br><span class="line">exit</span><br><span class="line"><span class="meta"></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 通过修改 bash 的前缀信息可以区分当前处在哪一个namespace</span></span></span><br><span class="line">ip netns exec foo /bin/bash --rcfile &lt;(echo &quot;PS1=\&quot;namespace foo&gt; \&quot;&quot;)</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>删除namespace </li>
@@ -743,10 +750,10 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-06-14T22:58:28+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-09-16T22:09:15+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
-    <p>更新于：2021年6月14日</p>
+    <p>更新于：2021年9月16日</p>
   </a>
 </div>
 
