@@ -545,29 +545,68 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 <h1 id="2-什么是PicGo"><a href="#2-什么是PicGo" class="headerlink" title="2.什么是PicGo"></a>2.什么是PicGo</h1><p>PicGo是一个用于快速上传图片并获取图片 URL 链接的工具，支持多种图床例如Github、Gitee、七牛云、腾讯云、又拍云、阿里云、sm.ms等等，并且支持插件扩展功能，甚至可以直接搭配Typora编辑器进行图片复制上传。</p>
 <p>具体的介绍请参见Github仓库：<a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/PicGo">PicGo Github</a></p>
 <p>软件下载地址：<a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/PicGo/releases">PicGo Releases</a></p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143204.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143204.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="PicGo"></p>
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143204.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143204.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="PicGo"></p>
+            </div>
+
+
 <h1 id="3-利用Github搭建图床"><a href="#3-利用Github搭建图床" class="headerlink" title="3.利用Github搭建图床"></a>3.利用Github搭建图床</h1><p>首先，在Github中创建个人仓库，权限选用public</p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143746.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143746.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="创建Github仓库"></p>
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143746.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143746.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="创建Github仓库"></p>
+            </div>
+
 <p>申请token，【Settings】-【Developer settings】-【Personal access tokens】-【Generate new token】，填写好描述，勾选【repo】，然后点击【Generate token】生成一个Token，注意这个Token只会显示一次，自己先保存下来，或者等后面配置好PicGo后再关闭此网页</p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121135754.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121135754.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="申请token"></p>
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121135754.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121135754.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="申请token"></p>
+            </div>
+
+
 <p>另外，还要介绍一个Github图床访问加速的内容就是我们可以<strong>jsDelivr</strong>进行CDN加速，使用方法非常简单，即把图片链接地址的域名改为<strong>jsDelivr  CDN</strong>的域名（cdn.jsdelivr.net/gh/）就可以。替换格式如下：</p>
 <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">原图片访问地址：</span><br><span class="line">https://github.com/&lt;你的github用户名&gt;/&lt;你的图床仓库名&gt;/图片的路径</span><br><span class="line"></span><br><span class="line">CDN加速访问地址：</span><br><span class="line">https://cdn.jsdelivr.net/gh/&lt;你的github用户名&gt;/&lt;你的图床仓库名&gt;/图片的路径</span><br></pre></td></tr></table></figure>
 
 <p>那么，最后就是配置PicGo实现远程图片管理了，打开PicGo的【图床设置】—【Github图床】，填入上面准备好的配置信息，确定后就可以到【上传区】进行图片上传了，上传成功后能在【相册】中看到图片，同时登陆Github页面也能看到对应的图片数据。</p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143227.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143227.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="PicGo配置"></p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143230.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143230.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="上传图片"></p>
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143227.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143227.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="PicGo配置"></p>
+            </div>
+
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143230.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143230.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="上传图片"></p>
+            </div>
+
+
 <h1 id="3-利用Gitee搭建图床"><a href="#3-利用Gitee搭建图床" class="headerlink" title="3.利用Gitee搭建图床"></a>3.利用Gitee搭建图床</h1><p>Gitee的操作过程和Github是相似的，首先还是需要创建一个公开的仓库存放图片</p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144111.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144111.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="创建仓库"></p>
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144111.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144111.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="创建仓库"></p>
+            </div>
+
 <p>创建成功后，申请token，点击【右上角头像】—【设置】—【私人令牌】—【生成新令牌】—【勾选project】—【提交】，然后复制保存好token，配置好PicGo再关闭就可以。</p>
-<p><img src="C:/Users/Joyo/AppData/Roaming/Typora/typora-user-images/image-20211121144502255.png" class="lazyload" data-srcset="C:/Users/Joyo/AppData/Roaming/Typora/typora-user-images/image-20211121144502255.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="申请令牌"></p>
+<div class="gallery ">
+              <p><img src="C:/Users/Joyo/AppData/Roaming/Typora/typora-user-images/image-20211121144502255.png" class="lazyload" data-srcset="C:/Users/Joyo/AppData/Roaming/Typora/typora-user-images/image-20211121144502255.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="申请令牌"></p>
+            </div>
+
 <p>接下来就是到PicGo中配置，默认不支持Gitee，需要安装扩展插件，打开【PicGo】—【插件设置】—【搜索gitee】—【安装gitee-uploader】，然后就会在图床列表中出现gitee的选项，点击进去就可以开始配置</p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144859.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144859.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="gitee插件"></p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145051.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145051.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Gitee配置"></p>
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144859.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144859.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="gitee插件"></p>
+            </div>
+
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145051.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145051.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Gitee配置"></p>
+            </div>
+
 <p>最后上传图片，可以在gitee的页面查看到对应的图片，同时gitee仓库也有对应的数据。</p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145612.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145612.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="查看图片"></p>
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145612.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145612.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="查看图片"></p>
+            </div>
+
 <h1 id="5-Typora配置图床"><a href="#5-Typora配置图床" class="headerlink" title="5.Typora配置图床"></a>5.Typora配置图床</h1><p>Typora是一个Markdown编辑器，编辑内容时支持上传截图和图片，但是默认都是上传到本地，修改一下设置即可，【偏好设置】—【图像】,其中【插入图片时…】,选中<strong>上传图片</strong>，勾选<strong>对本地位置的图片应用上述规则</strong>和<strong>插入时自动转义图片URL</strong>，【上传服务设定】，上传服务选择使用<strong>PicGo app</strong>，PicGo路径选择本地安装路径，最后点击【验证图片上传选项】判断是否可以成功。成功后再到编辑器上编辑内容并上传图片就会直接上传到PicGo设置好的默认图床了。</p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150827.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150827.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Typora设置"></p>
-<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150912.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150912.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="验证上传"></p>
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150827.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150827.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Typora设置"></p>
+            </div>
+
+<div class="gallery ">
+              <p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150912.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150912.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="验证上传"></p>
+            </div>
+
 <h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
 <p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
 </blockquote>
@@ -606,7 +645,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-11-21T20:12:33+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-11-21T20:18:37+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
     <p>更新于：2021年11月21日</p>
