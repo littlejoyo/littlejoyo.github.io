@@ -5,8 +5,6 @@
   <!-- SEO相关 -->
   
     
-      <meta name="robots" content="noindex,follow">
-    
   
   <!-- 渲染优化 -->
   <meta http-equiv='x-dns-prefetch-control' content='on' />
@@ -24,9 +22,20 @@
 
   <!-- 页面元数据 -->
   
-  <title>标签：测试 - JoyoHub</title>
+  <title>【生产力】搭建个人云图床+PicGo管理 - JoyoHub</title>
+  
+    <meta name="keywords" content="图床">
   
 
+  
+    <meta name="description" content="
+写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片
+
+那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路
+
+除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力
+
+">
   
 
   <!-- feed -->
@@ -347,7 +356,7 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
       <div id="l_cover">
   
     
-        <div id="full" class='cover-wrapper  search' style="display: none;">
+        <div id="full" class='cover-wrapper post search' style="display: none;">
           
             <div class='cover-bg lazyload placeholder' data-bg="https://gitee.com/joyohub/hubpic/raw/master/img/20211121190730.png"></div>
           
@@ -423,84 +432,310 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
         <div class="body-wrapper" id="pjax-container">
           
 
-
 <div class='l_main'>
+  <article class="article post white-box reveal md shadow article-type-post" id="post" itemscope itemprop="blogPost">
+  
+
+
+  
+    <div class='headimg-div'>
+      <a class='headimg-a'>
+        <img class='headimg' src='https://gitee.com/joyohub/hubpic/raw/master/img/20211121201218.png'/>
+      </a>
+    </div>
+  
+  <div class="article-meta" id="top">
+    
+    
+    
+      <h1 class="title">
+        【生产力】搭建个人云图床+PicGo管理
+      </h1>
+      <div class='new-meta-box'>
+        
+          
+            
+<div class='new-meta-item author'>
+  <a class='author' href="/" rel="nofollow">
+    <img no-lazy src="https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg">
+    <p>Joyo</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class='new-meta-item category'>
+    <a class='notlink'>
+      <i class="fas fa-folder-open fa-fw" aria-hidden="true"></i>
+      <a class="category-link" href="/categories/%E7%94%9F%E4%BA%A7%E5%8A%9B/">生产力</a>
+    </a>
+  </div>
+
+
+          
+        
+          
+            <div class="new-meta-item date">
+  <a class='notlink'>
+    <i class="fas fa-calendar-alt fa-fw" aria-hidden="true"></i>
+    <p>发布于：2021年11月21日</p>
+  </a>
+</div>
+
+          
+        
+          
+            
+  <div class="new-meta-item browse leancloud">
+    <a class='notlink'>
+      
+      <div id="lc-pv" data-title="【生产力】搭建个人云图床+PicGo管理" data-path="/tools/cloud-picture/">
+        <i class="fas fa-eye fa-fw" aria-hidden="true"></i>
+        <span id='number'><i class="fas fa-circle-notch fa-spin fa-fw" aria-hidden="true"></i></span>
+        次浏览
+      </div>
+    </a>
+  </div>
+
+
+          
+        
+          
+            
+  <div class="new-meta-item wordcount">
+    <a class='notlink'>
+      <i class="fas fa-keyboard fa-fw" aria-hidden="true"></i>
+      <p>字数：1.2k字</p>
+    </a>
+  </div>
+  <div class="new-meta-item readtime">
+    <a class='notlink'>
+      <i class="fas fa-hourglass-half fa-fw" aria-hidden="true"></i>
+      <p>时长：4分钟</p>
+    </a>
+  </div>
+
+
+          
+        
+      </div>
+    
+  </div>
+
+
+  
+  
+  <ul>
+<li><p>写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片</p>
+</li>
+<li><p>那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路</p>
+</li>
+<li><p>除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="1-什么是图床"><a href="#1-什么是图床" class="headerlink" title="1.什么是图床"></a>1.什么是图床</h1><p>图床是一个存放图片并提供访问链接的地方，那么自然也可以是一个仓库，所以我们可以使用Github创建个人仓库来存放图片，然后通过Github服务器提供访问链接就可以实现自己的个人图床了，缺点就是Github在国内的访问速度有限，图片加载速度会比较慢，所以存放的地方可以从Github切换到Gitee或者直接使用七牛云，基本原理都是一样的。</p>
+<p>另一个需要操作的地方就是需要生成服务访问令牌，保证我们能够远程操作存放图片的仓库，管理我们的图床的数据，然后就可以依赖一款叫<code>PicGo</code>的图床管理软件实现对图床的远程管理。</p>
+<blockquote>
+<p>当然，如果不想折腾，可以使用收费的图床服务，一般都会提供客户端管理工具或者web管理页面和存放服务，现买先用，免费的图床也有一个很受欢迎的就是<a target="_blank" rel="noopener" href="https://sm.ms/">SM.MS</a>,注册用户后就能在提供的web管理页面进行图片上传，也提供了二次开发的API，也是不错的选择。</p>
+</blockquote>
+<h1 id="2-什么是PicGo"><a href="#2-什么是PicGo" class="headerlink" title="2.什么是PicGo"></a>2.什么是PicGo</h1><p>PicGo是一个用于快速上传图片并获取图片 URL 链接的工具，支持多种图床例如Github、Gitee、七牛云、腾讯云、又拍云、阿里云、sm.ms等等，并且支持插件扩展功能，甚至可以直接搭配Typora编辑器进行图片复制上传。</p>
+<p>具体的介绍请参见Github仓库：<a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/PicGo">PicGo Github</a></p>
+<p>软件下载地址：<a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/PicGo/releases">PicGo Releases</a></p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143204.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143204.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="PicGo"></p>
+<h1 id="3-利用Github搭建图床"><a href="#3-利用Github搭建图床" class="headerlink" title="3.利用Github搭建图床"></a>3.利用Github搭建图床</h1><p>首先，在Github中创建个人仓库，权限选用public</p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143746.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143746.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="创建Github仓库"></p>
+<p>申请token，【Settings】-【Developer settings】-【Personal access tokens】-【Generate new token】，填写好描述，勾选【repo】，然后点击【Generate token】生成一个Token，注意这个Token只会显示一次，自己先保存下来，或者等后面配置好PicGo后再关闭此网页</p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121135754.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121135754.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="申请token"></p>
+<p>另外，还要介绍一个Github图床访问加速的内容就是我们可以<strong>jsDelivr</strong>进行CDN加速，使用方法非常简单，即把图片链接地址的域名改为<strong>jsDelivr  CDN</strong>的域名（cdn.jsdelivr.net/gh/）就可以。替换格式如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">原图片访问地址：</span><br><span class="line">https://github.com/&lt;你的github用户名&gt;/&lt;你的图床仓库名&gt;/图片的路径</span><br><span class="line"></span><br><span class="line">CDN加速访问地址：</span><br><span class="line">https://cdn.jsdelivr.net/gh/&lt;你的github用户名&gt;/&lt;你的图床仓库名&gt;/图片的路径</span><br></pre></td></tr></table></figure>
+
+<p>那么，最后就是配置PicGo实现远程图片管理了，打开PicGo的【图床设置】—【Github图床】，填入上面准备好的配置信息，确定后就可以到【上传区】进行图片上传了，上传成功后能在【相册】中看到图片，同时登陆Github页面也能看到对应的图片数据。</p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143227.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143227.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="PicGo配置"></p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143230.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121143230.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="上传图片"></p>
+<h1 id="3-利用Gitee搭建图床"><a href="#3-利用Gitee搭建图床" class="headerlink" title="3.利用Gitee搭建图床"></a>3.利用Gitee搭建图床</h1><p>Gitee的操作过程和Github是相似的，首先还是需要创建一个公开的仓库存放图片</p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144111.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144111.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="创建仓库"></p>
+<p>创建成功后，申请token，点击【右上角头像】—【设置】—【私人令牌】—【生成新令牌】—【勾选project】—【提交】，然后复制保存好token，配置好PicGo再关闭就可以。</p>
+<p><img src="C:/Users/Joyo/AppData/Roaming/Typora/typora-user-images/image-20211121144502255.png" class="lazyload" data-srcset="C:/Users/Joyo/AppData/Roaming/Typora/typora-user-images/image-20211121144502255.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="申请令牌"></p>
+<p>接下来就是到PicGo中配置，默认不支持Gitee，需要安装扩展插件，打开【PicGo】—【插件设置】—【搜索gitee】—【安装gitee-uploader】，然后就会在图床列表中出现gitee的选项，点击进去就可以开始配置</p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144859.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121144859.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="gitee插件"></p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145051.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145051.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Gitee配置"></p>
+<p>最后上传图片，可以在gitee的页面查看到对应的图片，同时gitee仓库也有对应的数据。</p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145612.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121145612.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="查看图片"></p>
+<h1 id="5-Typora配置图床"><a href="#5-Typora配置图床" class="headerlink" title="5.Typora配置图床"></a>5.Typora配置图床</h1><p>Typora是一个Markdown编辑器，编辑内容时支持上传截图和图片，但是默认都是上传到本地，修改一下设置即可，【偏好设置】—【图像】,其中【插入图片时…】,选中<strong>上传图片</strong>，勾选<strong>对本地位置的图片应用上述规则</strong>和<strong>插入时自动转义图片URL</strong>，【上传服务设定】，上传服务选择使用<strong>PicGo app</strong>，PicGo路径选择本地安装路径，最后点击【验证图片上传选项】判断是否可以成功。成功后再到编辑器上编辑内容并上传图片就会直接上传到PicGo设置好的默认图床了。</p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150827.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150827.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="Typora设置"></p>
+<p><img src="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150912.png" class="lazyload" data-srcset="https://gitee.com/joyohub/hubpic/raw/master/img/20211121150912.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="验证上传"></p>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" class="lazyload" data-srcset="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=" alt="weixin-a"></p>
+
+  
   
     
+    <div class='footer'>
       
-  <section class="post-list">
+      
+      
+        <div class='copyright'>
+          <blockquote>
+            
+              
+                <p>博客内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议</p>
+
+              
+            
+              
+                <p>本文永久链接是：<a href=https://littlejoyo.github.io/tools/cloud-picture/>https://littlejoyo.github.io/tools/cloud-picture/</a></p>
+              
+            
+          </blockquote>
+        </div>
+      
+      
+    </div>
+  
+  
     
+
+
+  <div class='article-meta' id="bottom">
+    <div class='new-meta-box'>
+      
+        
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2021-11-21T20:12:33+08:00">
+  <a class='notlink'>
+    <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
+    <p>更新于：2021年11月21日</p>
+  </a>
+</div>
+
+        
       
         
           
+  
+  <div class="new-meta-item meta-tags"><a class="tag" href="/tags/%E5%9B%BE%E5%BA%8A/" rel="nofollow"><i class="fas fa-hashtag fa-fw" aria-hidden="true"></i><p>图床</p></a></div>
+
+
         
       
-    
+        
+          
+  <div class="new-meta-item share -mob-share-list">
+  <div class="-mob-share-list share-body">
     
       
-        
-          <div class='post-wrapper'>
-            <div class="post post-v3 white-box reveal shadow">
-  
-  
-  
-    <div class='headimg-div'>
-      <a class='headimg-a' href="/go/go-test/">
-        <img class='headimg' src='https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210815223447.png'/>
-      </a>
-    </div>
-  
-  
+        <a class="-mob-share-qq" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://littlejoyo.github.io/tools/cloud-picture/&title=【生产力】搭建个人云图床+PicGo管理 - JoyoHub&summary=
+写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片
+
+那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路
+
+除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qq.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
     
-    <h2 class="article-title" >
-      <a href="/go/go-test/">
-        【Go】利用go test编写单元测试
-      </a>
-    </h2>
-  
-  <div class='md'>
+      
+        <a class="-mob-share-qzone" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="https://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?url=https://littlejoyo.github.io/tools/cloud-picture/&title=【生产力】搭建个人云图床+PicGo管理 - JoyoHub&summary=
+写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片
+
+那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路
+
+除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/qzone.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
     
-      <ul>
-<li><p>单元测试能够最小范围测试程序代码，从而保证程序的正确性和健壮性</p>
-</li>
-<li><p>平时我们可以编写单元测试代码快速了解当前的程序模块的情况，作出问题快速定位</p>
-</li>
-<li><p>那么，在Go该如何编写单元测试呢？那必须是go test工具</p>
-</li>
-</ul>
+      
+        <a class="-mob-share-weibo" title="" rel="external nofollow noopener noreferrer noopener"
+          
+          target="_blank" href="http://service.weibo.com/share/share.php?url=https://littlejoyo.github.io/tools/cloud-picture/&title=【生产力】搭建个人云图床+PicGo管理 - JoyoHub&summary=
+写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片
+
+那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路
+
+除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力
+
+"
+          
+          >
+          
+            <img src="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" class="lazyload" data-srcset="https://cdn.jsdelivr.net/gh/volantis-x/cdn-org/logo/128/weibo.png" srcset="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAABGdBTUEAALGPC/xhBQAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAAaADAAQAAAABAAAAAQAAAADa6r/EAAAAC0lEQVQIHWNgAAIAAAUAAY27m/MAAAAASUVORK5CYII=">
+          
+        </a>
+      
+    
+      
+    
+      
     
   </div>
-  
-    <div class='meta-v3' line_style='dotted'>
-      <div>
+</div>
+
+
+
         
-        <time>2021-07-07</time>
-        
-      </div>
       
-        <div>
-          <a class='readmore' href='/go/go-test/'>
-            阅读全文
-          </a>
-        </div>
+    </div>
+  </div>
+
+
+  
+  
+
+  
+    <div class="prev-next">
+      
+      
+        <a class='next' href='/network/tcp-ip-frame/'>
+          <p class='title'>【计算机网络】区分tcp分段和ip分片<i class="fas fa-chevron-right" aria-hidden="true"></i></p>
+          <p class='content'>
+tcp分段和ip分片很多人搞不清楚，事实上两者代表的内容并不相同
+
+既然有了tcp分段为什么还要ip分片呢？tcp协议在网络上还会出现ip分片吗？
+
+什么是链路MTU？什么又是MSS？MTU和...</p>
+        </a>
       
     </div>
   
+</article>
 
-</div>
 
-          </div>
-        
-      
-    
-  </section>
-  
-    
   
 
-
+  <article class="post white-box reveal shadow" id="comments">
+    <p ct><i class='fas fa-comments'></i> 评论</p>
     
-  
+    <div id="gitalk-container"></div>
+
+  </article>
+
+
+
+
+
+
 </div>
 <aside class='l_side'>
   
@@ -508,143 +743,19 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
     
     
 
-<section class="widget blogger shadow desktop mobile">
-  <div class='content'>
-    
-      
-        <a class='avatar flat-box rectangle' href='/about/'>
-          <img no-lazy src='https://i.loli.net/2019/11/26/rMENFR9PhXZ6yj8.jpg'/>
-        </a>
-      
-    
-    
-      <div class='text'>
-        
-        
-        
-          <p><span id="jinrishici-sentence">JoyoHub</span></p>
-          <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
-        
-      </div>
-    
-    
-      <div class="social-wrapper">
-        
-          
-        
-          
-        
-          
-        
-          
-        
-      </div>
-    
-  </div>
-</section>
 
-  
 
-  
-    
-    
-  
-
-  <section class="widget category shadow desktop">
+  <section class="widget toc-wrapper shadow desktop mobile" id="toc-div" >
     
   <header>
     
-      <a href='/blog/categories/'><i class="fas fa-folder-open fa-fw" aria-hidden="true"></i><span class='name'>文章分类</span></a>
+      <i class="fas fa-list fa-fw" aria-hidden="true"></i><span class='name'>本文目录</span>
     
   </header>
 
 
     <div class='content'>
-      <ul class="entry navigation">
-        
-          <li><a class="flat-box"
-            title="/categories/Git/" href="/categories/Git/"
-            id="categoriesGit"
-            ><div class='name'>Git</div><div class='badge'>(2)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/Go/" href="/categories/Go/"
-            id="categoriesGo"
-            ><div class='name'>Go</div><div class='badge'>(9)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/Linux/" href="/categories/Linux/"
-            id="categoriesLinux"
-            ><div class='name'>Linux</div><div class='badge'>(2)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/Mysql/" href="/categories/Mysql/"
-            id="categoriesMysql"
-            ><div class='name'>Mysql</div><div class='badge'>(4)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/Redis/" href="/categories/Redis/"
-            id="categoriesRedis"
-            ><div class='name'>Redis</div><div class='badge'>(8)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/"
-            id="categoriesE58886E5B883E5BC8F"
-            ><div class='name'>分布式</div><div class='badge'>(1)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"
-            id="categoriesE5BEAEE69C8DE58AA1"
-            ><div class='name'>微服务</div><div class='badge'>(3)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"
-            id="categoriesE695B0E68DAEE5BA93"
-            ><div class='name'>数据库</div><div class='badge'>(12)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/%E6%9C%8D%E5%8A%A1%E5%99%A8/" href="/categories/%E6%9C%8D%E5%8A%A1%E5%99%A8/"
-            id="categoriesE69C8DE58AA1E599A8"
-            ><div class='name'>服务器</div><div class='badge'>(2)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/%E7%94%9F%E4%BA%A7%E5%8A%9B/" href="/categories/%E7%94%9F%E4%BA%A7%E5%8A%9B/"
-            id="categoriesE7949FE4BAA7E58A9B"
-            ><div class='name'>生产力</div><div class='badge'>(1)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/" href="/categories/%E7%AE%97%E6%B3%95%E9%A2%98/"
-            id="categoriesE7AE97E6B395E9A298"
-            ><div class='name'>算法题</div><div class='badge'>(11)</div></a></li>
-        
-          <li><a class="flat-box"
-            title="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/"
-            id="categoriesE8AEA1E7AE97E69CBAE7BD91E7BB9C"
-            ><div class='name'>计算机网络</div><div class='badge'>(4)</div></a></li>
-        
-      </ul>
-    </div>
-  </section>
-
-
-  
-
-  
-    
-    
-  
-
-  <section class="widget tagcloud shadow desktop mobile">
-    
-  <header>
-    
-      <a href='/blog/tags/'><i class="fas fa-tags fa-fw" aria-hidden="true"></i><span class='name'>热门标签</span></a>
-    
-  </header>
-
-
-    <div class='content'>
-      <a href="/tags/Git/" style="font-size: 15.43px; color: #8f8f8f">Git</a> <a href="/tags/Go/" style="font-size: 21.14px; color: #686868">Go</a> <a href="/tags/Linux/" style="font-size: 15.43px; color: #8f8f8f">Linux</a> <a href="/tags/Mysql/" style="font-size: 18.29px; color: #7c7c7c">Mysql</a> <a href="/tags/Redis/" style="font-size: 19.71px; color: #727272">Redis</a> <a href="/tags/strings/" style="font-size: 14px; color: #999">strings</a> <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" style="font-size: 14px; color: #999">分布式</a> <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" style="font-size: 14px; color: #999">分布式锁</a> <a href="/tags/%E5%9B%BE%E5%BA%8A/" style="font-size: 14px; color: #999">图床</a> <a href="/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" style="font-size: 16.86px; color: #868686">微服务</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" style="font-size: 24px; color: #555">数据库</a> <a href="/tags/%E6%97%A5%E5%BF%97/" style="font-size: 14px; color: #999">日志</a> <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/" style="font-size: 15.43px; color: #8f8f8f">服务器</a> <a href="/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 16.86px; color: #868686">架构</a> <a href="/tags/%E6%A0%87%E5%87%86%E5%BA%93/" style="font-size: 18.29px; color: #7c7c7c">标准库</a> <a href="/tags/%E6%B5%8B%E8%AF%95/" style="font-size: 14px; color: #999">测试</a> <a href="/tags/%E7%AE%97%E6%B3%95/" style="font-size: 22.57px; color: #5f5f5f">算法</a> <a href="/tags/%E7%B4%A2%E5%BC%95/" style="font-size: 15.43px; color: #8f8f8f">索引</a> <a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 16.86px; color: #868686">网络</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" style="font-size: 14px; color: #999">网络协议</a> <a href="/tags/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C/" style="font-size: 15.43px; color: #8f8f8f">虚拟网络</a>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AF%E5%9B%BE%E5%BA%8A"><span class="toc-text">1.什么是图床</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E4%BB%80%E4%B9%88%E6%98%AFPicGo"><span class="toc-text">2.什么是PicGo</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%88%A9%E7%94%A8Github%E6%90%AD%E5%BB%BA%E5%9B%BE%E5%BA%8A"><span class="toc-text">3.利用Github搭建图床</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E5%88%A9%E7%94%A8Gitee%E6%90%AD%E5%BB%BA%E5%9B%BE%E5%BA%8A"><span class="toc-text">3.利用Gitee搭建图床</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-Typora%E9%85%8D%E7%BD%AE%E5%9B%BE%E5%BA%8A"><span class="toc-text">5.Typora配置图床</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%8F%B7"><span class="toc-text">微信公众号</span></a></li></ol>
     </div>
   </section>
 
@@ -655,14 +766,15 @@ if (/*@cc_on!@*/false || (!!window.MSInputMethodContext && !!document.documentMo
 </aside>
 
 
+
 		  
 		  <!--此文件用来存放一些不方便取值的变量-->
 <!--思路大概是将值藏到重加载的区域内-->
 
 <script>
   window.pdata={}
-  pdata.ispage=false;
-  pdata.postTitle="";
+  pdata.ispage=true;
+  pdata.postTitle="【生产力】搭建个人云图床+PicGo管理";
   pdata.commentPath="";
   pdata.commentPlaceholder="";
   // header 这里无论是否开启pjax都需要
