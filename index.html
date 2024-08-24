@@ -68,7 +68,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":"08cb76f3e10f9858f7b56ffd9f9838f1","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":"08cb76f3e10f9858f7b56ffd9f9838f1","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -78,30 +78,6 @@
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
   
-
-  
-    <!-- Baidu Analytics -->
-    <script async>
-      if (!Fluid.ctx.dnt) {
-        var _hmt = _hmt || [];
-        (function() {
-          var hm = document.createElement("script");
-          hm.src = "https://hm.baidu.com/hm.js?08cb76f3e10f9858f7b56ffd9f9838f1";
-          var s = document.getElementsByTagName("script")[0];
-          s.parentNode.insertBefore(hm, s);
-        })();
-      }
-    </script>
-  
-
-  
-
-  
-
-  
-
-  
-
 
 
   
@@ -256,7 +232,7 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2021/12/25/kernel-module/" target="_self">
+        <a href="/2021/12/25/linux/kernel-module/" target="_self">
           <img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328220120.png" srcset="/img/loading.gif" lazyload alt="【Linux】依赖Netfilter Hook编写自定义内核模块">
         </a>
       </div>
@@ -264,13 +240,13 @@
     <article class="col-12 col-md-8 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2021/12/25/kernel-module/" target="_self">
+        <a href="/2021/12/25/linux/kernel-module/" target="_self">
           【Linux】依赖Netfilter Hook编写自定义内核模块
         </a>
       </h2>
 
       
-      <a class="index-excerpt " href="/2021/12/25/kernel-module/" target="_self">
+      <a class="index-excerpt " href="/2021/12/25/linux/kernel-module/" target="_self">
         <div>
           1.什么是内核模块模块是可以根据需要加载和卸载到内核中的代码片段,通过动态挂载的方式可以扩展内核的功能，而无需重启系统。 例如，一种类型的模块是设备驱动程序，它允许内核访问连接到系统的硬件。如果没有内核模块，我们必须修改内核代码，将新功能代码片段兼容添加到内核源码中，然后重新编译内核镜像。除了会让内核越来越大之外，还有一个缺点，即每次我们想要新功能时都需要我们重建和重启内核，并且一旦代码质量过低就
         </div>
@@ -312,6 +288,593 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97/">#内核模块</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/11/21/tools/cloud-picture/" target="_self">
+          <img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221310.png" srcset="/img/loading.gif" lazyload alt="【生产力】搭建个人云图床+PicGo管理">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2021/11/21/tools/cloud-picture/" target="_self">
+          【生产力】搭建个人云图床+PicGo管理
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt " href="/2021/11/21/tools/cloud-picture/" target="_self">
+        <div>
+          写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片  那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路  除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-11-21 19:17" pubdate>
+              2021-11-21
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%94%9F%E4%BA%A7%E5%8A%9B/" class="category-chain-item">生产力</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%9B%BE%E5%BA%8A/">#图床</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/09/16/network/tcp-ip-frame/" target="_self">
+          <img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210928233718.png" srcset="/img/loading.gif" lazyload alt="【计算机网络】区分tcp分段和ip分片">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2021/09/16/network/tcp-ip-frame/" target="_self">
+          【计算机网络】区分tcp分段和ip分片
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt " href="/2021/09/16/network/tcp-ip-frame/" target="_self">
+        <div>
+          tcp分段和ip分片很多人搞不清楚，事实上两者代表的内容并不相同  既然有了tcp分段为什么还要ip分片呢？tcp协议在网络上还会出现ip分片吗？  什么是链路MTU？什么又是MSS？MTU和MSS都是有什么关联？分段和分片究竟有没有可能同时发生？
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-09-16 22:31" pubdate>
+              2021-09-16
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">#网络协议</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/05/23/network/virtualbox-bridge/" target="_self">
+          <img src="https://i.loli.net/2021/05/23/IiKh9P6Nmz4QTkv.png" srcset="/img/loading.gif" lazyload alt="【计算机网络】使用VirtualBox和namespace搭建桥接环境">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2021/05/23/network/virtualbox-bridge/" target="_self">
+          【计算机网络】使用VirtualBox和namespace搭建桥接环境
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt " href="/2021/05/23/network/virtualbox-bridge/" target="_self">
+        <div>
+          在工作中遇到需要使用Virtualbox基于Bridge搭建桥接环境，由此做个记录  主要是Virtualbox实现bridge桥接还需要一些黑手段，跟Vmware的LAN Segment还有些许不同  另外，基于namespace在一台虚拟机上搭建桥接环境的方法也是一种不错的方案
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-05-23 19:01" pubdate>
+              2021-05-23
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C/">#网络</a>
+            
+              <a href="/tags/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C/">#虚拟网络</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/03/13/network/virtoolbox-network/" target="_self">
+          <img src="https://i.loli.net/2021/03/13/enFEHXuoCqVtiLg.png" srcset="/img/loading.gif" lazyload alt="【计算机网络】：一次性理清Virtualbox虚拟机网络模型">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2021/03/13/network/virtoolbox-network/" target="_self">
+          【计算机网络】：一次性理清Virtualbox虚拟机网络模型
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt " href="/2021/03/13/network/virtoolbox-network/" target="_self">
+        <div>
+          平时我们基于VirtualBox或者VMware软件可以随意创建虚拟机  虚拟机的网络模型有多种，不理清它们之间的区别很容易出现网络不通的头痛问题  通过分析各种虚拟网络模型，解决虚拟机平台和物理机的网络连接问题
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-03-13 20:03" pubdate>
+              2021-03-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C/">#网络</a>
+            
+              <a href="/tags/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C/">#虚拟网络</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2020/04/10/network/network-osi/" target="_self">
+          【计算机网络】：OSI七层模型和各种协议介绍
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2020/04/10/network/network-osi/" target="_self">
+        <div>
+          了解OSI模型可以更清晰掌握数据在网络互联的各个层次的传输过程  OSI七层模型也是面试热点问题，从中可以引申出大量的相关知识  另外，各层次的代表协议和硬件、TCP四层模型你是否都掌握了解呢？
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-04-10 22:40" pubdate>
+              2020-04-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E7%BD%91%E7%BB%9C/">#网络</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2020/04/06/development/git-rebase/" target="_self">
+          【Git】：git rebase和git merge有什么区别？
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2020/04/06/development/git-rebase/" target="_self">
+        <div>
+          git rebase和git merge都是Git用来合并分支代码基本命令  在 Git 工作流中，两者作用一致，但是原理上却不相同  另外，git rebase为什么在某些场景下会被限制使用呢？
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-04-06 21:29" pubdate>
+              2020-04-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Git/" class="category-chain-item">Git</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Git/">#Git</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2020/03/10/development/git-multpush/" target="_self">
+          【Git】：如何将代码支持同时上传github和gitee
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2020/03/10/development/git-multpush/" target="_self">
+        <div>
+          Github和Gitee的区别主要是服务器位于国外和国内，访问速度有区别  那么能将本地代码通过git分别传到两个不同的托管平台吗？能的  本文主要介绍如何通过git remote设置，将代码分别上传到github和gitee
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-03-10 10:00" pubdate>
+              2020-03-10
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Git/" class="category-chain-item">Git</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Git/">#Git</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2020/03/06/linux/linux-version/" target="_self">
+          【Linux】：如何查看内核版本和系统版本？
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2020/03/06/linux/linux-version/" target="_self">
+        <div>
+          诸如 RHEL、Debian、openSUSE、Arch Linux 这几种主流发行版来说，它们各自拥有不同的包管理器来管理系统上的软件包  如果不知道所使用的是哪一个发行版的系统，在软件包安装的时候就会无从下手   1.查看内核版本1.1 uname 命令 uname（unix name） 是一个打印系统信息的工具，内容包括内核名称、版本号、系统详细信息以及所运行的操作系统等等。  12$ u
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2020-03-06 23:34" pubdate>
+              2020-03-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Linux/" class="category-chain-item">Linux</a>
+  
+  
+
+      </span>
+    
+  
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Linux/">#Linux</a>
+            
+              <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/">#服务器</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2019/12/19/linux/linux-log/" target="_self">
+          【Linux】：如何优雅的查看生产日志？
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2019/12/19/linux/linux-log/" target="_self">
+        <div>
+          我们都知道，生产环境下的日志迭代速度是非常快  倘若仅使用cat命令来查看日志文件，不但无法查看实时日志，严重的甚至还可能影响服务器的运行  本篇重点介绍：如何使用Linux命令优雅的查看日志，快速查询到想要的日志内容！
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2019-12-19 15:03" pubdate>
+              2019-12-19
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Linux/" class="category-chain-item">Linux</a>
+  
+  
+
+      </span>
+    
+  
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Linux/">#Linux</a>
+            
+              <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/">#服务器</a>
+            
+              <a href="/tags/%E6%97%A5%E5%BF%97/">#日志</a>
             
           </div>
         

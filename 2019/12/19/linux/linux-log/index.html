@@ -1,0 +1,924 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  <link rel="icon" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Joyo">
+  <meta name="keywords" content="Joyo,Blog,hexo,go,linux">
+  
+    <meta name="description" content="我们都知道，生产环境下的日志迭代速度是非常快  倘若仅使用cat命令来查看日志文件，不但无法查看实时日志，严重的甚至还可能影响服务器的运行  本篇重点介绍：如何使用Linux命令优雅的查看日志，快速查询到想要的日志内容！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Linux】：如何优雅的查看生产日志？">
+<meta property="og:url" content="https://littlejoyo.github.io/2019/12/19/linux/linux-log/index.html">
+<meta property="og:site_name" content="JoyoHub">
+<meta property="og:description" content="我们都知道，生产环境下的日志迭代速度是非常快  倘若仅使用cat命令来查看日志文件，不但无法查看实时日志，严重的甚至还可能影响服务器的运行  本篇重点介绍：如何使用Linux命令优雅的查看日志，快速查询到想要的日志内容！">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png">
+<meta property="article:published_time" content="2019-12-19T07:03:42.000Z">
+<meta property="article:modified_time" content="2024-08-19T14:40:09.605Z">
+<meta property="article:author" content="Joyo">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="服务器">
+<meta property="article:tag" content="日志">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>【Linux】：如何优雅的查看生产日志？ - JoyoHub</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":"08cb76f3e10f9858f7b56ffd9f9838f1","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>JoyoHub</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【Linux】：如何优雅的查看生产日志？"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2019-12-19 15:03" pubdate>
+          2019年12月19日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【Linux】：如何优雅的查看生产日志？</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <ul>
+<li><p>我们都知道，生产环境下的日志迭代速度是非常快</p>
+</li>
+<li><p>倘若仅使用cat命令来查看日志文件，不但无法查看实时日志，严重的甚至还可能影响服务器的运行</p>
+</li>
+<li><p>本篇重点介绍：如何使用Linux命令优雅的查看日志，快速查询到想要的日志内容！</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<blockquote>
+<p>Github issues:<a target="_blank" rel="noopener" href="https://github.com/littlejoyo/Blog/issues/">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h1 id="1-tail-命令"><a href="#1-tail-命令" class="headerlink" title="1.tail 命令"></a>1.tail 命令</h1><blockquote>
+<p>tail 命令可以查看实时日志的更新，当日志有更新的时候，实时打印到控制台显示。</p>
+</blockquote>
+<h2 id="1-1-常用命令"><a href="#1-1-常用命令" class="headerlink" title="1.1 常用命令"></a>1.1 常用命令</h2><ul>
+<li><p><code>tail -f online.log</code> : 把生产日志文件里的最尾部的内容显示在屏幕上，并且不断刷新，只要文件更新就可以看到最新的文件内容。(停止显示：ctrl+c)</p>
+</li>
+<li><p><code>tail online.log</code> : 显示 online.log 文件的最后 10 行</p>
+</li>
+<li><p><code>tail -n 10 online.log</code> : 显示文件 online.log 的最后 10 行日志</p>
+</li>
+<li><p><code>tail -n +10 online.log</code> : 显示第10行之后的所有日志内容</p>
+</li>
+<li><p><code>tail -100f online.log</code> : 实时监控100行日志内容（不停刷新，保持100条日志）</p>
+</li>
+<li><p><code>tail -c 10 online.log</code> : 显示日志文件 online.log 的最后10个字符</p>
+</li>
+</ul>
+<h2 id="1-2-tail-参数说明"><a href="#1-2-tail-参数说明" class="headerlink" title="1.2 tail 参数说明"></a>1.2 tail 参数说明</h2><table>
+<thead>
+<tr>
+<th align="center">参数</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">-f</td>
+<td align="center">循环读取</td>
+</tr>
+<tr>
+<td align="center">-q</td>
+<td align="center">不显示处理信息</td>
+</tr>
+<tr>
+<td align="center">-v</td>
+<td align="center">显示详细的处理信息</td>
+</tr>
+<tr>
+<td align="center">-c &lt;行数&gt;</td>
+<td align="center">显示的字符数</td>
+</tr>
+<tr>
+<td align="center">-n &lt;行数&gt;</td>
+<td align="center">显示文件的尾部n行内容</td>
+</tr>
+</tbody></table>
+<h1 id="2-head命令"><a href="#2-head命令" class="headerlink" title="2.head命令"></a>2.head命令</h1><blockquote>
+<p>head命令的用法和tail命令相似，但是前者从头部开始扫描内容，后者是从尾部开始输出内容</p>
+</blockquote>
+<h2 id="2-1-常用命令"><a href="#2-1-常用命令" class="headerlink" title="2.1 常用命令"></a>2.1 常用命令</h2><ul>
+<li><p><code>head online.log</code> : 显示 online.log 文件的从头开始的前10 行日志内容</p>
+</li>
+<li><p><code>head -n 10 online.log</code> : 显示文件 online.log 的从首行开始的 10 行日志</p>
+</li>
+<li><p><code>head -n +100 online.log</code> : 显示第100行之前的所有日志内容</p>
+</li>
+<li><p><code>head -c 10 online.log</code> : 显示日志文件 online.log 的最开始的10个字符</p>
+</li>
+</ul>
+<h1 id="3-grep-命令"><a href="#3-grep-命令" class="headerlink" title="3.grep 命令"></a>3.grep 命令</h1><blockquote>
+<p>Linux grep 命令用于查找文件里符合条件的字符串。</p>
+</blockquote>
+<h2 id="3-1-常用命令"><a href="#3-1-常用命令" class="headerlink" title="3.1 常用命令"></a>3.1 常用命令</h2><ul>
+<li><p><code>grep &#39;12:00:00&#39; online.log</code> : 打印符合<code>12:00:00</code>匹配行的日志内容</p>
+</li>
+<li><p><code>grep -n &#39;12:00:00&#39; online.log </code> : 打印符合<code>12:00:00</code>匹配行的日志内容并显示日志行数</p>
+</li>
+<li><p><code>grep -n -A 3 &#39;12:00:00&#39; online.log</code> : 打印匹配行的日志内容和之后3行的日志</p>
+</li>
+<li><p><code>grep -n -B 3 &#39;12:00:00&#39; online.log</code> : 打印匹配行的日志内容和之前3行的日志</p>
+</li>
+<li><p><code>grep -n -C 3 &#39;12:00:00&#39; online.log</code> : 打印匹配行的日志内容和前后各3行的日志</p>
+</li>
+<li><p><code>grep -e &#39;正则表达式&#39; online.log </code> : 从online.log中查找与正则表达式匹配的行</p>
+</li>
+<li><p><code>grep –i &quot;被查找的字符串&quot; oneline.log</code> : 查找时不区分大小写</p>
+</li>
+<li><p><code>grep &#39;123&#39; online.log | grep &#39;456&#39;</code> : 显示既匹配 ‘123’又匹配 ‘456’的行</p>
+</li>
+</ul>
+<h2 id="3-2-grep-参数说明"><a href="#3-2-grep-参数说明" class="headerlink" title="3.2 grep 参数说明"></a>3.2 grep 参数说明</h2><p><a target="_blank" rel="noopener" href="https://www.linuxcool.com/grep">grep命令和参数介绍</a></p>
+<h1 id="4-sed-命令"><a href="#4-sed-命令" class="headerlink" title="4.sed 命令"></a>4.sed 命令</h1><blockquote>
+<p>Linux sed 命令是利用脚本来处理文本文件。此处只说明如何用来查看具体时间段的日志内容。</p>
+</blockquote>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs markdown">sed -n &#x27;/起始时间/,/结束时间/p&#x27; 日志文件<br>例如：<br>sed -n &#x27;/2019-12-17 12:00:00/,/2019-12-17 12:10:10/p&#x27;  online.log<br>// 查看2019-12-17 12:00:00-12:10:10 时间段内的日志内容<br></code></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://www.linuxcool.com/sed">sed命令和参数介绍</a></p>
+<h1 id="5-less-命令-和-more-命令"><a href="#5-less-命令-和-more-命令" class="headerlink" title="5.less 命令 和 more 命令"></a>5.less 命令 和 more 命令</h1><blockquote>
+<p>less和more都可以对读取文件内容并进行分页处理，但是两者最大的区别就是less更加的灵活。</p>
+</blockquote>
+<h2 id="5-1-more"><a href="#5-1-more" class="headerlink" title="5.1 more"></a>5.1 more</h2><ul>
+<li><p>more功能类似 cat ，cat命令是整个文件的内容从上到下显示在屏幕上。 more会以一页一页的显示方便使用者逐页阅读。</p>
+</li>
+<li><p>让画面在显示满一页时暂停，此时可按空格健继续显示下一个画面，或按Q键停止显示。</p>
+</li>
+<li><p>more不可以回去，就是不可以向前，只能向后，况且只能使用Enter和Space向后翻动。</p>
+</li>
+<li><p>more会读取整个文件的内容进行分页处理，加载速度低于less</p>
+</li>
+</ul>
+<h2 id="5-2-less"><a href="#5-2-less" class="headerlink" title="5.2 less"></a>5.2 less</h2><h3 id="5-2-1-less-命令介绍"><a href="#5-2-1-less-命令介绍" class="headerlink" title="5.2.1 less 命令介绍"></a>5.2.1 less 命令介绍</h3><ul>
+<li><p>less 工具也是对文件或其它输出进行分页显示的工具，应该说是linux正统查看文件内容的工具，功能极其强大。</p>
+</li>
+<li><p>less与more最大的不同就是能够前后翻页，不必读取整个文件，加载速度比more更快。</p>
+</li>
+</ul>
+<h3 id="5-2-2-less命令用法"><a href="#5-2-2-less命令用法" class="headerlink" title="5.2.2 less命令用法"></a>5.2.2 less命令用法</h3><ul>
+<li><p><code>less -N online.log</code> : 查看online.log文件并显示行号，支持前后翻页</p>
+</li>
+<li><p><code>less -N +10g online.log</code> : 定位到online.log文件的第10行开始显示内容</p>
+</li>
+<li><p>less查看文件后，<code>/2019-12-19 10:00:00</code> : 自动高亮显示查找到的内容，后续n下一个，N上一个</p>
+</li>
+<li><p><code>cat -n online.log | grep &#39;debug&#39; | less</code> : 分页显示过滤到的内容（less和more一般都会搭配管道符<code>|</code> 一起使用）</p>
+</li>
+</ul>
+<h3 id="5-2-3-less命令参数"><a href="#5-2-3-less命令参数" class="headerlink" title="5.2.3 less命令参数"></a>5.2.3 less命令参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>详解</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>d</td>
+<td>向下翻页</td>
+</tr>
+<tr>
+<td>u</td>
+<td>向上翻页</td>
+</tr>
+<tr>
+<td>g</td>
+<td>跳到首行</td>
+</tr>
+<tr>
+<td>G</td>
+<td>跳到底部</td>
+</tr>
+<tr>
+<td>？查找内容</td>
+<td>向上查找匹配的内容并高亮显示</td>
+</tr>
+<tr>
+<td>&#x2F; 查找内容</td>
+<td>向下查找匹配的内容并高亮显示</td>
+</tr>
+<tr>
+<td>n</td>
+<td>下一个</td>
+</tr>
+<tr>
+<td>N</td>
+<td>上一个</td>
+</tr>
+<tr>
+<td>q</td>
+<td>退出less命令</td>
+</tr>
+</tbody></table>
+<p><a target="_blank" rel="noopener" href="https://www.linuxcool.com/less">less命令和参数介绍</a></p>
+<h1 id="6-总结"><a href="#6-总结" class="headerlink" title="6.总结"></a>6.总结</h1><ul>
+<li><p><code>tail</code> 、<code>grep</code>、<code>sed</code> 、<code>less</code> 等命令都可以实现日志的查看</p>
+</li>
+<li><p>不要再单纯使用<code>cat</code> 去查看日志文件，学会以上的命令灵活变通，根据需求选择合适的命令</p>
+</li>
+<li><p>大部分情况下，都会再加入管道符 <code>|</code> 进行多重条件的筛选，所以命令的应用会变得更加的灵活 </p>
+</li>
+<li><p>管道符 <code>|</code> 的作用 ：<code>命令1|命令2</code> （将命令1的输出内容作为命令2的输入）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">cat -n online.log | grep &#x27;abc&#x27; | less<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h1 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h1><blockquote>
+<p>扫一扫关注Joyo说公众号，共同学习和研究开发技术。</p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/01/11/HQT8NMsmDhIkXZv.png" srcset="/img/loading.gif" lazyload alt="weixin-a"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Linux/" class="category-chain-item">Linux</a>
+  
+  
+
+      </span>
+    
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="category-chain-item">服务器</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Linux/" class="print-no-link">#Linux</a>
+      
+        <a href="/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/" class="print-no-link">#服务器</a>
+      
+        <a href="/tags/%E6%97%A5%E5%BF%97/" class="print-no-link">#日志</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【Linux】：如何优雅的查看生产日志？</div>
+      <div>https://littlejoyo.github.io/2019/12/19/linux/linux-log/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Joyo</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2019年12月19日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/03/06/linux/linux-version/" title="【Linux】：如何查看内核版本和系统版本？">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【Linux】：如何查看内核版本和系统版本？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liZ3sDaPEbpnmKLz","clientSecret":"4b92b796ad1e3942fec1053c52b52f6801203b5e","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '70558e35681c0cd6748710a41e0f8746'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://littlejoyo.github.io" target="_blank" rel="nofollow noopener"><span>JoyoHub</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

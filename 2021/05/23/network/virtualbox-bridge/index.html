@@ -1,0 +1,889 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  <link rel="icon" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Joyo">
+  <meta name="keywords" content="Joyo,Blog,hexo,go,linux">
+  
+    <meta name="description" content="在工作中遇到需要使用Virtualbox基于Bridge搭建桥接环境，由此做个记录  主要是Virtualbox实现bridge桥接还需要一些黑手段，跟Vmware的LAN Segment还有些许不同  另外，基于namespace在一台虚拟机上搭建桥接环境的方法也是一种不错的方案">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【计算机网络】使用VirtualBox和namespace搭建桥接环境">
+<meta property="og:url" content="https://littlejoyo.github.io/2021/05/23/network/virtualbox-bridge/index.html">
+<meta property="og:site_name" content="JoyoHub">
+<meta property="og:description" content="在工作中遇到需要使用Virtualbox基于Bridge搭建桥接环境，由此做个记录  主要是Virtualbox实现bridge桥接还需要一些黑手段，跟Vmware的LAN Segment还有些许不同  另外，基于namespace在一台虚拟机上搭建桥接环境的方法也是一种不错的方案">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/05/23/IiKh9P6Nmz4QTkv.png">
+<meta property="article:published_time" content="2021-05-23T11:01:25.000Z">
+<meta property="article:modified_time" content="2024-08-24T13:21:28.495Z">
+<meta property="article:author" content="Joyo">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="虚拟网络">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2021/05/23/IiKh9P6Nmz4QTkv.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>【计算机网络】使用VirtualBox和namespace搭建桥接环境 - JoyoHub</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":"08cb76f3e10f9858f7b56ffd9f9838f1","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>JoyoHub</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【计算机网络】使用VirtualBox和namespace搭建桥接环境"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-05-23 19:01" pubdate>
+          2021年5月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          20 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【计算机网络】使用VirtualBox和namespace搭建桥接环境</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <ul>
+<li><p>在工作中遇到需要使用Virtualbox基于Bridge搭建桥接环境，由此做个记录</p>
+</li>
+<li><p>主要是Virtualbox实现bridge桥接还需要一些黑手段，跟Vmware的LAN Segment还有些许不同</p>
+</li>
+<li><p>另外，基于namespace在一台虚拟机上搭建桥接环境的方法也是一种不错的方案</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<p><img src="https://i.loli.net/2021/06/02/LbACyUODlzq7K5S.png" srcset="/img/loading.gif" lazyload alt="本文大纲"></p>
+<h1 id="1-桥接拓补介绍"><a href="#1-桥接拓补介绍" class="headerlink" title="1.桥接拓补介绍"></a>1.桥接拓补介绍</h1><p><img src="https://i.loli.net/2021/05/23/IiKh9P6Nmz4QTkv.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>如上图，使用Virtualbox创建三台Linux主机，然后主机A和主机C分别连接于主机B</p>
+<p>主机B上创建bridge设备绑定无ip的双网卡，然后确保主机A和主机C能够网络互通</p>
+<p>主机A和主机C的网卡分配1.1.1.0&#x2F;24同一网段下的ip</p>
+<h1 id="2-VirtualBox上分配网卡"><a href="#2-VirtualBox上分配网卡" class="headerlink" title="2.VirtualBox上分配网卡"></a>2.VirtualBox上分配网卡</h1><p>VirtualBox有一种虚拟网络叫做Internal Network，能提供内部的私有网络</p>
+<p>1.首先，在VirtualBox中新建三台基于CentOS8的Linux主机，分配的网卡如下：</p>
+<p>主机A</p>
+<ul>
+<li>名称：centos-1</li>
+<li>网卡：enp0s3（桥接模式&#x3D;&#x3D;&gt;管理网卡，方便本地ssh连接）和enp0s8（内部网络模式&#x3D;&#x3D;&gt;界面名称为<code>intnet-1</code>）</li>
+</ul>
+<p>主机B</p>
+<ul>
+<li>名称：centos-2</li>
+<li>网卡：enp0s3（桥接模式&#x3D;&#x3D;&gt;管理网卡，方便本地ssh连接）、enp0s8（内部网络模式&#x3D;&#x3D;&gt;界面名称为<code>intnet-1</code>）、enp0s9（内部网络模式&#x3D;&#x3D;&gt;界面名称为<code>intnet-2</code>）</li>
+</ul>
+<p>主机C</p>
+<ul>
+<li>名称：centos-3</li>
+<li>网卡：enp0s3（桥接模式&#x3D;&#x3D;&gt;管理网卡，方便本地ssh连接）和enp0s8（内部网络模式&#x3D;&#x3D;&gt;界面名称为<code>intnet-2</code>）</li>
+</ul>
+<blockquote>
+<p>注意：主机A和C到主机B的内部网络网卡，对应的界面名称在Virtualbox的选定要匹配起来，流量才能到达对应的网卡。</p>
+</blockquote>
+<p>2.登录Linux主机并分配网卡ip如下，管理网卡在此就省略不写，只要保证能够在本地ssh连接即可</p>
+<p>主机A</p>
+<p><code>ifconfig enp0s8 1.1.1.10/24</code></p>
+<p>主机C</p>
+<p><code>ifconfig enp0s8 1.1.1.20/24</code></p>
+<p>主机B</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs linux">ip link add dev br0 type bridge<br>ip link set dev enp0s8 master br0<br>ip link set dev enp0s9 master br0<br>ifconfig br0 up<br></code></pre></td></tr></table></figure>
+<p>3.验证网络连通</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">主机A：ping 1.1.1.20  ==&gt; 不通<br>主机B：ping 1.1.1.10  ==&gt; 不通<br></code></pre></td></tr></table></figure>
+
+<p>此时在主机A和主机C分别进行互ping，发现并没有ping通，那这是什么问题呢？</p>
+<h1 id="3-原理探究"><a href="#3-原理探究" class="headerlink" title="3.原理探究"></a>3.原理探究</h1><p>经过上面的问题，搜索相关的资料发现Virtualbox的独特性，<a target="_blank" rel="noopener" href="https://blog.csdn.net/dog250/article/details/102972031">参考链接传送门</a></p>
+<a href="https://blog.csdn.net/dog250/article/details/102972031," title="https:&#x2F;&#x2F;cdn.jsdelivr.net&#x2F;gh&#x2F;littlejoyo&#x2F;cdn&#x2F;img&#x2F;20210614225658.png" target="">对Virtualbox注册型交换机解释,</a>
+
+<p>总的来说，和VMWare的LAN Segment内部有一个虚拟学习型交换机(早期是广播式Hub) 不同， VirtualBox的Internal Network内部的交换机不是学习型的，而是注册型的！</p>
+<p>所谓的注册型交换机就是，只有注册过的Mac地址，该交换机才会帮你转发！这类交换机只有两种转发策略</p>
+<ul>
+<li>对于广播帧，所有的端口都发一份。</li>
+<li>对于单播帧，仅向注册该目标Mac地址的端口发送。</li>
+</ul>
+<p>那么交换机（内部网络网卡）是如何注册Mac地址的呢？或者说，从哪里可以看到一个虚拟机的网卡注册了哪个Mac呢？</p>
+<p><img src="https://i.loli.net/2021/05/23/g1adHIfn2W3LtvA.png" srcset="/img/loading.gif" lazyload alt="如何查看mac地址"></p>
+<p>上面的实验不通的原因：H1 ping H2时，经由Linux Bridge，ARP请求可以广播到H2，此时H2收到的ARP广播中，源MAC自然是H1的MAC地址，当H2回复ARP Reply时，目标MAC为H1的MAC地址，而H1的MAC地址没有注册在intnet2的虚拟交换机中，所以intnet2的交换机不会转发这个帧。最终导致请求响应无法到达H1，因此而不通。</p>
+<h1 id="4-如何注册virtualbox的网卡"><a href="#4-如何注册virtualbox的网卡" class="headerlink" title="4.如何注册virtualbox的网卡"></a>4.如何注册virtualbox的网卡</h1><p>注册步骤：</p>
+<p>1.将centos-1上的intnet-1对应的MAC地址注册在centos-2上的intnet-2</p>
+<p>2.将centos-3上的intnet-1对应的MAC地址注册在centos-2上的intnet-1</p>
+<p>3.centos-2主机启动后，通过ifconfig命令将intnet-1和intnet-2对应enp0s9，enp0s10网卡MAC改成其他，防止冲突即可。</p>
+<p><img src="https://i.loli.net/2021/05/29/EtKTkeacpdgGSAq.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>例如我的mac地址替换情况如下：</p>
+<p>centos-1</p>
+<ul>
+<li>intnet-1 ：<strong>080027431935</strong></li>
+</ul>
+<p>centos-2 </p>
+<ul>
+<li>intnet-1 ：<strong>080027CADC26(原mac) –&gt; 0800279DD011</strong></li>
+<li>intnet-2 ：<strong>0800270083A6(原mac) –&gt; 080027431935</strong></li>
+</ul>
+<p>centos-3</p>
+<ul>
+<li>intnet-2 ：<strong>0800279DD011</strong></li>
+</ul>
+<p><strong>centos-2替换后的地址如下图：</strong></p>
+<p><img src="https://i.loli.net/2021/05/29/1vPRZmz6XYNydr9.png" srcset="/img/loading.gif" lazyload alt="centos-2的网络配置"></p>
+<blockquote>
+<p>新版的virtualbox中mac地址拦可以直接在文本框，复制粘贴进行修改，旧版的有些不支持，呈现灰色状态，这个时候如果想修改可以使用<code>VBoxManage</code>命令指定特定网卡的MAC地址</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs shell">VBoxManage modifyvm &quot;centos-2&quot; --macaddress4 080027431935<br>VBoxManage modifyvm &quot;centos-2&quot; --macaddress3 0800279DD011<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>最后再说明第三步的作用，之所以需要这一步，是防止地址冲突导致Bridge的转发表中毒</p>
+</blockquote>
+<ul>
+<li>mac地址<code>080027431935</code>可以从centos-1的intnet-1学习到</li>
+<li>mac地址<code>080027431935</code>被配置在自己的enp0s9上</li>
+</ul>
+<p>这会导致bridge的转发出现无法工作的错误，所以必须把centos-2的enp0s8，enp0s9这两个网卡的mac地址改成别的，而这个修改动作VirtualBox的Internal Network交换机并不知道(只有新的网卡激活或者重新注册新的MAC会改变转发表，即点击那个小按钮或者执行VBoxManage命令改变MAC地址)，所以并不影响bridge的转发表。</p>
+<blockquote>
+<p>启动centos-2后的命令操作如下：</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 修改网卡的mac地址</span></span><br>ifconfig enp0s8 hw ether 08:00:27:9D:D0:12 <br>ifconfig enp0s9 hw ether 08:00:27:43:19:36<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 新增bridge设备，并加入网卡</span></span><br>ip link add dev br0 type bridge<br>ip link set dev enp0s8 master br0<br>ip link set dev enp0s9 master br0<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 启动网桥</span></span><br>ifconfig br0 up<br></code></pre></td></tr></table></figure>
+
+<h1 id="5-验证桥接网络"><a href="#5-验证桥接网络" class="headerlink" title="5.验证桥接网络"></a>5.验证桥接网络</h1><p>此时再在centos-1和centos-3上进行互ping就无问题了，网络通了</p>
+<p><img src="https://i.loli.net/2021/05/29/ivnVd43RGIuoX8E.png" srcset="/img/loading.gif" lazyload alt="确保网络已通"></p>
+<p>在centos-2中利用tcpdump成功抓取br0网口的网络包</p>
+<p><img src="https://i.loli.net/2021/05/29/udkFYy9X8UAa5jo.png" srcset="/img/loading.gif" lazyload alt="网桥抓包情况"></p>
+<h1 id="6-了解namespace"><a href="#6-了解namespace" class="headerlink" title="6.了解namespace"></a>6.了解namespace</h1><h2 id="6-1-什么是namespace？"><a href="#6-1-什么是namespace？" class="headerlink" title="6.1 什么是namespace？"></a>6.1 什么是namespace？</h2><p>学习过docker底层实现的可能了解过docker是基于namespace和cgroup实现的，其中namespace 是 Linux 内核用来隔离内核资源的方式。</p>
+<p>通过 namespace 可以让一些进程只能看到与自己相关的一部分资源，而另外一些进程也只能看到与它们自己相关的资源，他们之间保持着不可见的状态，也就是感觉不到对方的存在，但是实际却存在同一个Linux系统上</p>
+<p>总结一下就是，Linux namespaces 是对全局系统资源的一种封装隔离，使得处于不同 namespace 的进程拥有独立的全局系统资源，改变一个 namespace 中的系统资源只会影响当前 namespace 里的进程，对其他 namespace 中的进程没有影响</p>
+<blockquote>
+<p>注意：对于每个 network namespace 来说，它会有自己独立的网卡、路由表、ARP 表、iptables 等和网络相关的资源。</p>
+</blockquote>
+<h2 id="6-2-namespace的基本操作"><a href="#6-2-namespace的基本操作" class="headerlink" title="6.2 namespace的基本操作"></a>6.2 namespace的基本操作</h2><blockquote>
+<p>基于来自于 iproute2 安装包的 <code>ip</code> 命令可以实现对namespace的操作</p>
+</blockquote>
+<ul>
+<li>创建一个新的namespace,并命名为foo</li>
+</ul>
+<p><code>ip netns add foo</code></p>
+<ul>
+<li>查看Linux系统下存在的namespace列表</li>
+</ul>
+<p><code>ip netns ls</code></p>
+<ul>
+<li>在namespace中执行Linux命令</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs shell">ip netns exec foo `Linux 命令`<br><br>ip netns exec foo ip addr<br><br>ip netns exec foo ls -l<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上面的方面都是在namespace外通过命令指定来执行，每一句都带有<code>ip netns exec foo</code>,有没有方法在namespace里面直接执行命令呢？答案是肯定的，通过末尾增加<code>bash</code>命令即可进入</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 通过指定bash命令进入namespace</span></span><br>ip netns exec foo bash<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 直接执行Linux命令</span></span><br>ip addr<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 退出namespace</span></span><br>exit<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 通过修改 bash 的前缀信息可以区分当前处在哪一个namespace</span></span><br>ip netns exec foo /bin/bash --rcfile &lt;(echo &quot;PS1=\&quot;namespace foo&gt; \&quot;&quot;)<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>删除namespace</li>
+</ul>
+<p><code>ip netns del foo</code></p>
+<h2 id="6-3-namespace的通信"><a href="#6-3-namespace的通信" class="headerlink" title="6.3 namespace的通信"></a>6.3 namespace的通信</h2><p>默认情况下，namespace是不能和主机网络，也不能和其他namespace通信的</p>
+<p>每个 namespace 在创建的时候会自动创建一个<code>lo</code>的网卡，它的作用和Linux系统中默认看到的<code>lo</code>一样，都是为了实现<code>loopback</code>通信。如果希望 lo 能工作，不要忘记启用它：<br><code>ip netns exec net1 ip link set lo up</code></p>
+<p>每个namespace都实现了网络的隔离，如果要使他们彼此之间通信起来就需要用Linux <code>veth peer</code>,可以把<code>veth peer</code>当做是全双工的管道，从一个方向发送的网络数据，可以使两个namespace实现网络数据的通信，<code>veth peer</code>也就是Linux下的虚拟网卡，namespace基于虚拟网卡实现了彼此之间的通信</p>
+<p>可以使用<code>ip link add type veth</code>来创建一对<code>veth peer</code>出来，需要记住的是<code>veth peer</code> 无法单独存在，删除其中一个，另一个也会自动消失。另外,创建<code>veth peer</code>的时候也指定它们的名字，比如<code>ip link add dev vethfoo type veth peer name vethbar</code>创建出来的两个名字就是 <code>vethfoo</code>和<code>vethbar</code></p>
+<p>创建了虚拟网卡后，接下来就是分别将虚拟网卡分配给对应的namespace实现网卡之间的通信，通过使用<code>ip link set 虚拟网卡名称 netns 命名空间名称</code>来实现，比如：<code>ip link set vethfoo netns foo</code></p>
+<p>分配好网卡后再配置网卡ip地址和生成路由表就可以实现namespace之间的通信了，接下来看一个案例，如何实现两个namespace之间的通信</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 创建两个namespace</span></span><br>ip netns add foo <br>ip netns add bar<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 创建虚拟网卡对</span></span><br>ip link add dev vethfoo type veth peer name vethbar<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 为namespace分配网卡</span></span><br>ip link set vethfoo netns foo<br>ip link set vethbar netns bar<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 为namespace中的虚拟网卡分配ip地址并启动网卡</span></span><br>ip netns exec foo ip link set vethfoo up<br>ip netns exec foo ip addr add 1.1.1.10/24 dev vethfoo<br>ip netns exec bar ip link set vethbar up<br>ip netns exec bar ip addr add 1.1.1.20/24 dev vethbar<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 启动lo网卡</span></span><br>ip netns exec foo ip link set lo up<br>ip netns exec bar ip link set lo up<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 最后通过ping验证网络是否连通</span></span><br>ip netns exec foo ping 1.1.1.20 <br></code></pre></td></tr></table></figure>
+
+<h1 id="7-使用bridge连接不同的namespace"><a href="#7-使用bridge连接不同的namespace" class="headerlink" title="7.使用bridge连接不同的namespace"></a>7.使用bridge连接不同的namespace</h1><p>通过上面掌握到的namespace知识，结合桥接的网络拓补，发现通过来实现bridge来实现多个namespace之间的通信也是无问题的，有了上面的知识铺垫，下面就直接写出具体的命令实现</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 创建三个namespace</span></span><br>ip netns add ns1<br>ip netns add ns2<br>ip netns add ns3<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 启动各个namespace的lo网卡</span></span><br>ip netns exec ns1 ip link set lo up<br>ip netns exec ns2 ip link set lo up<br>ip netns exec ns3 ip link set lo up<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 创建两对虚拟网卡对</span></span><br>ip link add dev vetha type veth peer name vethb1<br>ip link add dev vethc type veth peer name vethb2<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 分配虚拟网卡给对应的namespace</span></span><br>ip link set vetha netns ns1<br>ip link set vethb1 netns ns2<br>ip link set vethb2 netns ns2<br>ip link set vethc netns ns3<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 配置ns1和ns3的网卡ip并启动网卡</span></span><br>ip netns exec ns1 ip link set dev vetha up<br>ip netns exec ns3 ip link set dev vethc up<br>ip netns exec ns1 ip addr add 1.1.1.10/24 dev vetha<br>ip netns exec ns3 ip addr add 1.1.1.20/24 dev vethc<br><span class="hljs-meta prompt_"></span><br><span class="hljs-meta prompt_">#</span><span class="language-bash"><span class="hljs-comment"># 配置ns2中的bridge和绑定网卡，最后启动网卡</span></span><br>ip netns exec ns2 ip link add dev br0 type bridge<br>ip netns exec ns2 ip link set dev vethb1 master br0<br>ip netns exec ns2 ip link set dev vethb2 master br0<br>ip netns exec ns2 ip link set dev vethb1 up<br>ip netns exec ns2 ip link set dev vethb2 up<br>ip netns exec ns2 ip link set dev br0 up<br></code></pre></td></tr></table></figure>
+
+<p>上面的命令集合基于namespace成功搭建了桥接的网络拓补，接下来就是在ns1和ns3进行互ping查看网络是否已经连通</p>
+<h1 id="8-验证namespace桥接网络效果"><a href="#8-验证namespace桥接网络效果" class="headerlink" title="8.验证namespace桥接网络效果"></a>8.验证namespace桥接网络效果</h1><blockquote>
+<p>配置后查看各个namespace里面的网卡情况</p>
+</blockquote>
+<ul>
+<li>ns1和ns3的网卡情况</li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/01/ktuISRBxbJUYaj8.png" srcset="/img/loading.gif" lazyload alt="ns1和ns3的网卡情况"></p>
+<ul>
+<li>ns2的网卡情况</li>
+</ul>
+<p><img src="https://i.loli.net/2021/06/01/jhkqgbSTvM175mZ.png" srcset="/img/loading.gif" lazyload alt="ns2的网卡情况"></p>
+<blockquote>
+<p>ns1和ns3互ping均成功</p>
+</blockquote>
+<p><img src="https://i.loli.net/2021/06/01/LuXFrEoDim5Gx7c.png" srcset="/img/loading.gif" lazyload alt="ns1和ns3互ping均成功"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C/" class="print-no-link">#网络</a>
+      
+        <a href="/tags/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C/" class="print-no-link">#虚拟网络</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【计算机网络】使用VirtualBox和namespace搭建桥接环境</div>
+      <div>https://littlejoyo.github.io/2021/05/23/network/virtualbox-bridge/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Joyo</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年5月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/09/16/network/tcp-ip-frame/" title="【计算机网络】区分tcp分段和ip分片">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【计算机网络】区分tcp分段和ip分片</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/03/13/network/virtoolbox-network/" title="【计算机网络】：一次性理清Virtualbox虚拟机网络模型">
+                        <span class="hidden-mobile">【计算机网络】：一次性理清Virtualbox虚拟机网络模型</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liZ3sDaPEbpnmKLz","clientSecret":"4b92b796ad1e3942fec1053c52b52f6801203b5e","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '0333cbaeb7a2fa015b76e21d8471f928'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://littlejoyo.github.io" target="_blank" rel="nofollow noopener"><span>JoyoHub</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

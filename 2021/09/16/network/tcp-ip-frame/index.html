@@ -1,0 +1,862 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  <link rel="icon" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Joyo">
+  <meta name="keywords" content="Joyo,Blog,hexo,go,linux">
+  
+    <meta name="description" content="tcp分段和ip分片很多人搞不清楚，事实上两者代表的内容并不相同  既然有了tcp分段为什么还要ip分片呢？tcp协议在网络上还会出现ip分片吗？  什么是链路MTU？什么又是MSS？MTU和MSS都是有什么关联？分段和分片究竟有没有可能同时发生？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【计算机网络】区分tcp分段和ip分片">
+<meta property="og:url" content="https://littlejoyo.github.io/2021/09/16/network/tcp-ip-frame/index.html">
+<meta property="og:site_name" content="JoyoHub">
+<meta property="og:description" content="tcp分段和ip分片很多人搞不清楚，事实上两者代表的内容并不相同  既然有了tcp分段为什么还要ip分片呢？tcp协议在网络上还会出现ip分片吗？  什么是链路MTU？什么又是MSS？MTU和MSS都是有什么关联？分段和分片究竟有没有可能同时发生？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210928233718.png">
+<meta property="article:published_time" content="2021-09-16T14:31:07.000Z">
+<meta property="article:modified_time" content="2024-08-24T13:12:18.260Z">
+<meta property="article:author" content="Joyo">
+<meta property="article:tag" content="网络协议">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210928233718.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>【计算机网络】区分tcp分段和ip分片 - JoyoHub</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":"08cb76f3e10f9858f7b56ffd9f9838f1","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>JoyoHub</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【计算机网络】区分tcp分段和ip分片"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-09-16 22:31" pubdate>
+          2021年9月16日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          38 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【计算机网络】区分tcp分段和ip分片</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <ul>
+<li><p>tcp分段和ip分片很多人搞不清楚，事实上两者代表的内容并不相同</p>
+</li>
+<li><p>既然有了tcp分段为什么还要ip分片呢？tcp协议在网络上还会出现ip分片吗？</p>
+</li>
+<li><p>什么是链路MTU？什么又是MSS？MTU和MSS都是有什么关联？分段和分片究竟有没有可能同时发生？</p>
+</li>
+</ul>
+<span id="more"></span>
+
+
+<h1 id="1-什么是TCP分段？"><a href="#1-什么是TCP分段？" class="headerlink" title="1.什么是TCP分段？"></a>1.什么是TCP分段？</h1><p>在学习TCP&#x2F;IP协议时都知道，TCP协议是基于连接和流的传输协议，当需要传输的TCP报文很大的时候就会发生分段的操作，所谓TCP分段就是将需要传输的大TCP包切割成n个适合链路传输的小段，然后这些小段就称之为TCP分段，这些TCP分段达到目的端可以进行重组，重组后就会构成原来的大TCP包。</p>
+<p>既然都指定了是TCP分段，那么很明显，TCP分段的操作发生于传输层，分段的操作只会在TCP协议中发生，同样为传输层的协议，UDP协议不会出现分段操作，只会出现ip分片的行为，具体原因可以见下文介绍</p>
+<h1 id="2-什么是IP分片"><a href="#2-什么是IP分片" class="headerlink" title="2.什么是IP分片"></a>2.什么是IP分片</h1><p>IP分片和分段行为不同，虽然也是对大数据包切割为n个小片，但是IP分片是工作在网络层，TCP协议和UDP协议的数据包在传输到网络层的时候均有可能发生IP分片的操作，但是IP分片和IP重组会影响数据传输的性能，所以一般情况基于TCP协议工作都会尝试避免IP分片。</p>
+<p>这里你一定开始有了几个问题？</p>
+<ul>
+<li><p>什么情况会发生TCP分段和IP分片呢？</p>
+</li>
+<li><p>TCP协议如何避免IP分片？分段和分片会在TCP协议下同时工作吗？</p>
+</li>
+<li><p>UDP协议为什么没有分段操作，只有分片操作呢？</p>
+</li>
+</ul>
+<p>那么，带着问题继续了解下面的内容，能找到你想要的答案！</p>
+<h1 id="3-什么是MTU"><a href="#3-什么是MTU" class="headerlink" title="3.什么是MTU?"></a>3.什么是MTU?</h1><p>最大传输单元(Maximum Transmission Unit)，即MTU，为数据链路层的最大载荷上限(即IP数据报最大长度)，每段链路的MTU可能都不相同，一条端到端路径的MTU由这条路径上MTU最小的那段链路的MTU决定。</p>
+<p>MTU是链路层中的网络对数据帧的一个限制，例如在以太网中，MTU通常为1500字节，如果采用巨帧(Jumbo Frame)时可以达到9000字节。所谓的MTU，是二层协议的一个限制，对不同的二层协议可能有不同的值，只有二层协议为以太网(Ethernet)时，MTU一般才取1500字节，注意它不是物理链路介质的限制，<strong>只有工作在二层的设备才需要指定MTU的值，如网卡、转发设备端口(统称为网络接口)等，通过同一段线缆直连的通信端口或网卡，其MTU值一定相同</strong>。</p>
+<p>一个IP数据报在以太网中传输，如果它的长度大于当前链路MTU值，就要进行分片传输(这里指IP层分片)，保证每片数据报的长度都不超过MTU。另外需要明确一点的是，分片传输的IP数据报不一定按序到达，乱序的IP分片根据IP首部中的信息，能让这些数据报片按序重组。IP数据报的分片与重组是在网络上层完成的。</p>
+<h1 id="4-什么是MSS"><a href="#4-什么是MSS" class="headerlink" title="4.什么是MSS?"></a>4.什么是MSS?</h1><p>最大报文段长度(Maximum Segment Size)，即MSS，为TCP传输层的最大载荷上限(即应用层数据最大长度)，<strong>TCP三次握手期间通过TCP首部选项中的MSS字段通知对端，通常一条TCP连接的MSS取通信双方较小的那一个MSS值</strong>，与MTU的换算关系为：</p>
+<p><code>MTU = MSS + TCP首部长度 + IP首部长度</code></p>
+<p>故在以太网中(网络层以IPv4为例)：</p>
+<p><code>MSS = 以太网MTU - TCP首部长度 - IPv4首部长度 = 1500 - 20 - 20 = 1460字节</code></p>
+<p>如果未指定MSS大小时默认值为<code>536字节</code>，这是因为在Internet中标准的MTU值为<code>576字节</code>，<code>576字节MTU = TCP首部长度20字节 + IPv4首部长度20字节 + 536</code>字节MSS。</p>
+<p>一个应用程序如果要发送超过MSS大小的数据，就要进行分段传输(这里指TCP分段)，使得每个报文段长度都不超过MSS。分片传输的TCP报文段也是不一定按序到达，但TCP协议实现了可靠的机制保证乱序的处理，即利用报文段序列号在接收缓冲区进行数据重排以实现重组。TCP分段的重组是在TCP传输层完成的。</p>
+<p>正常情况下，IP分片的重组会影响传输的性能，所以在TCP协议下通过保证 <code>MSS&lt;链路最小MTU</code>来避免分片的发生，当MSS总是比MTU小的话，说明每一个分段都可以直接通过传输，但是当MSS&gt;链路最小MTU,超过了传输载荷上线，所以就需要对TCP分段进行IP分片操作，也就是需要对当前的TCP分段切割为多个适合链路MTU传输的IP分片，所以说，分段和分片是会在TCP协议下同时工作的，除非你能保证在TCP三次握手协商的MSS恒小于链路最小MTU</p>
+<h1 id="5-分段和分片的发生时机"><a href="#5-分段和分片的发生时机" class="headerlink" title="5.分段和分片的发生时机"></a>5.分段和分片的发生时机</h1><p>由上面可知，分段会发生在面向连接、提供可靠传输服务而具备各种复杂机制的TCP协议，但是UDP是简单至极的传输协议，属于不可靠的协议，UDP协议并不会自行分段，也没有所谓的握手操作，当然也就是没有所谓的MSS大小的协商，UDP协议传输数据是如果最终的IP数据报的长度超过了MTU时，就直接交付网络层执行IP分片。同样，(没有分段功能的)ICMP数据在网络层中同样会出现IP分片的情况。</p>
+<p>IP分片不仅会发生在在使用UDP、ICMP等没有分段功能的传输层协议的数据发送方，更还会发生在传输途中，甚至有可能都会发生，这是因为原本的大数据报被分片后很可能会经过不同MTU大小的链路，一旦链路MTU大于当前IP分片大小，则需要在当前转发设备(如路由器)中再次分片，但是各个分片只有到达目的地后才会在其网络层重组，而不是像其他网络协议，在下一跳就要进行重组。</p>
+<ul>
+<li><p>分段操作可以说只会发生在TCP协议，其他的协议当IP数据包长度超过MTU，就会触发IP分片的发生</p>
+</li>
+<li><p>TCP分段协商的MSS小于链路最小MTU的时候，TCP分段到达网络层也会发生IP分片的操作</p>
+</li>
+</ul>
+<p>再次强调的点：</p>
+<blockquote>
+<p>在发送端进行TCP分段后就一定不会在IP层进行分片，因为MSS本身就是基于MTU推导而来，TCP层分段满足了MSS限制，也就满足了MTU的物理限制。</p>
+</blockquote>
+<blockquote>
+<p>但在TCP分段发生后仍然可能发生IP分片，这是因为TCP分段仅满足了通信两端的MTU要求，传输路径上如经过MTU值比该MTU值更小的链路，那么在转发分片到该条链路的设备中仍会以更小的MTU值作为依据再次分片。</p>
+</blockquote>
+<blockquote>
+<p>当然如果两个通信主机直连，那么TCP连接协商得到的MTU值(两者网卡MTU较小值)就是端到端的路径MTU值，故发送端只要做了TCP分段，则在整个通信过程中一定不会发生IP分片。</p>
+</blockquote>
+<p>例如下面展示的TCP三次握手：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210917212914.png" srcset="/img/loading.gif" lazyload alt="TCP三次握手过程"></p>
+<p>客户端的网卡MTU设置为1500，服务端网卡MTU设置为1480，中间设备的网卡mtu均设置为1200，当客户端和服务端建立TCP连接的时候，通过三次握手建立连接，建立连接的过程通过wireshake抓包可知：</p>
+<ul>
+<li><p>客户端发起SYN包告诉自己可以接受的<code>MSS=1460</code>，即1500-20TCP报文头-20IP报文头</p>
+</li>
+<li><p>服务端响应SYN+ACK包也告诉自己可以接受的<code>MSS=1440</code>,即1480-20TCP报文头-20IP报文头</p>
+</li>
+<li><p>这个属于MSS协商的过程，MSS最终就会取最小的MSS作为连接彼此之间传输的大小，也就是TCP分段大小携带的数据为1440为准</p>
+</li>
+<li><p>但是这个MSS&#x3D;1440明显大于中间设备的MTU，所以，当出现大包传输的时候，<strong>虽然在C&#x2F;S两段均只会出现TCP分段，但是在传输到中间设备的时候，通过比较MTU发现1440&gt;1200,所以此时的TCP分段就会在中间设备发生IP分片，一个1440的TCP分段需要被切割为两个IP分片</strong>，然后进一步传输到目的端进行IP分片重组才能还原四层报文头，因为IP分片只有首片能访问到传输层的报文头，比如源和目的端口信息。</p>
+</li>
+</ul>
+<blockquote>
+<p>理论上的tcp分段在该拓补中是会发生IP分片的，但是当你实际搭建拓补并尝试抓包观察，你会发现mss的协商并不如上面所示，最终的mss大小也不是1440，而是1160，这是为什么呢？</p>
+</blockquote>
+<blockquote>
+<p>其实，这属于mss的自我动态调整，是由Path MTU Discovery（路径mtu发现）机制提供的，它帮助我们发现初始协商的mss比链路中的mtu还大，因此，PMTU Discovery帮我们重新调整了合适的mss，保证mss &lt; pmtu,避免了IP分片的发生,如果想要复现上面的实验，那你可以直接将Path MTU Discovery关闭，下一篇介绍如何搭建网络拓补使tcp分段基础下出现IP分片。因此，tcp分段和IP分片是有可能同时发生的！！！</p>
+</blockquote>
+<h1 id="6-TCP和UDP的分片对比"><a href="#6-TCP和UDP的分片对比" class="headerlink" title="6.TCP和UDP的分片对比"></a>6.TCP和UDP的分片对比</h1><p>TCP和UDP均为传输层的协议，最大的不同就是TCP是可靠的协议，具备超时重传等保证可靠传输的机制，而UDP是不可靠的协议，也没有所谓的握手和挥手的操作，因此UDP协议自然也没有TCP协议在三次握手时的MSS协商过程，当UDP传输的数据超过MTU的时候，完全交付网络层直接进行IP分片。</p>
+<p>另外，IP分片的传输过程是可能发生丢失的，当IP分片出现丢失的时候，不会重传丢失的IP片，而是会重传一整组的IP分片，这也是IP分片被诟病性能差的原因之一，TCP协议上层实现了超时重传机制，当某一个TCP分段包因为IP分片丢失，可以通过TCP协议要求重传IP分片，从而保证数据可靠性传输。</p>
+<p>对于UDP，用UDP协议发送64k的数据，那么如果网络发生了波动，丢失了某个IP分片，它不会反馈丢失了哪个分片给发送方的能力，这就意味着：64k的数据全都丢失了，如果需要重传，就得再次完整的传递这64K数据，因此一般使用UDP协议传输也会避免传输巨大数据，特意控制下单个包体的大小，从而提高传输效率。防止不可靠的性质导致频繁重传。</p>
+<h1 id="7-IP报文解析"><a href="#7-IP报文解析" class="headerlink" title="7.IP报文解析"></a>7.IP报文解析</h1><p>当IP数据报的长度超过帧的MTU时，会被分片传输。分片可能发生在发送端，也可能发生在中转路由器上，而且可能在传输过程中被多次分片，但只有在最终的目标机器上，这些分片才会被内核中的IP模块重新组装。</p>
+<p>IP头部中的三个字段给IP的分片和重组提供了足够的信息：<strong>数据报标识、标志和片偏移</strong>。</p>
+<p>一个数据报的每个分片都具有自己的IP头部,它们具有相同的标识值,但具有不同的片偏移。并且除了最后一个分片外，其他分片都将设置MF标识。此外，每个分片的IP头部的总长度字段将被设置为该分片的长度。</p>
+<blockquote>
+<p>IPv4头部结构如下图，其长度通常为20字节，除非含有可变长的选项部分。</p>
+</blockquote>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210928232651.png" srcset="/img/loading.gif" lazyload alt="IPV4的IP报文"></p>
+<ul>
+<li><p><strong>4位版本号（version）</strong>：指定IP协议的版本，对IPv4来说，值&#x3D;4。</p>
+</li>
+<li><p><strong>4位头部长度（header length）</strong>：标志该IP头部有多少个32bit（4字节）。英文4位最大能表示15，所以IP头部最长位为60字节。</p>
+</li>
+<li><p><strong>8位服务类型（Type Of Service，TOS）</strong>：包括一个3位的优先权限字段（现在已经被忽略），4位的TOS字段和1位保留字段（必须置0）。4位的TOS字段分别表示：最小延时、最大吞吐量、最高可靠性和最小费用。一种最多有一个能置为1，应用程序应该根据实际需求来设置它。比如像ssh和telent这样的登录程序需要的是最小延时的服务，而文件传输程序ftp则需要最大吞吐量的服务。</p>
+</li>
+<li><p><strong>16位总长度（total length）</strong>：是指整个IP数据报的长度，以字节为单位，以此IP数据报的最大长度为65535字节。但由于MTU的限制，长度超过MTU的数据报将被分片传输，所以实际传输的IP数据报（或分片）的长度都远远没有达到这个最大值。接下来的3个字段则描述了如何实现分片。</p>
+</li>
+<li><p><strong>16位标志（identification）</strong>：唯一标志主机发送的每一个数据报。其初始值由系统随机生成，每发送一个数据报，其值就加1。该值在数据分片时，被复制到每个分片中，因此同一个数据报的所有分片都具有相同的标识值。</p>
+</li>
+<li><p>3位标识字段的第一位保留。第二位<code>Don&#39;t Fragement，DF</code>表示“禁止分片”。如果设置了这个位，IP模块将不对数据报进行分片。在这种情况下，如果IP数据报长度超过MTU的话，IP模块将丢弃该数据报并返回一个ICMP差错报文。第三位<code>More Fragment，MF</code>表示“更多分片”。除数据报的最后一个分片外，其他分片都要把它置1。</p>
+</li>
+<li><p><strong>13位分片偏移（fragmentation offset）</strong>：分片相对原始IP数据报开始处（仅指数据部分）的偏移。实际的偏移值时该值左移3位（乘8）后得到的。由于这个原因，除了最后一个IP分片外，每个IP分片的数据部分的长度必须是８的整数倍（这样才能保障后面的IP分片拥有一个合适的偏移值）。</p>
+</li>
+<li><p><strong>８位生存时间（Time To Live，TTL）</strong>：数据报到达目的地之前允许经过的路由器跳数。TTL值被发送端设置（常见的值是64）.数据报在转发过程中没经过一个路由，该值就被路由器减1。当TTL值减为0时，路由器将丢弃数据报，并向源端发送一个ICMP差错报文。TTL值可以防止数据报陷入路由循环。</p>
+</li>
+<li><p><strong>8位协议（protocol）</strong>：区分上层协议。<code>/etc/protocls</code>文件定义了所有上层协议对应的protocol字段数值。其中，<code>ICMP=1，TCP=6，UDP=17</code>。</p>
+</li>
+<li><p><strong>16位头部校验和（header checksum）</strong>：由发送端填充，接收端对其使用CRC算法以检验IP数据报头部（注意，仅检验头部）在传输过程中是否损坏。<br>32位源端IP地址和目的端IP地址用来标识数据报的发送端和接收端。一般情况下，这两个地址在整个数据报的传递中保持不变，而不论它中间经过多少个中转路由器。</p>
+</li>
+<li><p><strong>选项字段（option）</strong>：可变长的可选信息。这部分最多包含40字节，因为IP头部最长是60个字节（包含前面讨论的20个字节的固定部分）。可用的IP选项包括：</p>
+<ul>
+<li><p>记录路由（record route）：告诉数据报途径的所有的路由器都将自己的IP地址填入IP头部的选项部分，这个我们可以跟踪数据报的传递路径。<br>时间戳（timestamp），告诉每个路由器都将数据报被转发时的时间（或时间与IP地址对）填入IP头部选项部分，这个就可以测量途径路由之间的数据报传输的时间。</p>
+</li>
+<li><p>松散源路由选择（loose source routing），指定一个路由器IP地址列表，数据报发送过程中必须经过其中所有的路由器。</p>
+</li>
+<li><p>严格源路由选择（strict source routing），和松散源路由选择类似，不过数据报只经过被指定的路由器。</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>我们也可以直接最简单的ICMP协议对IP分片的报文进行进一步的了解：</p>
+<p>以太网的MTU是1500字节，所以携带的IP数据报的数据部分最多是1480字节（IP头部占用20字节）。考虑用IP数据报封装一个长度为1481字节的ICMP报文（包括8字节的ICMP头部，所以其数据部分长度为1473字节），则该数据报在使用以太网传输时必须被分片，如下图所示：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20210917215624.png" srcset="/img/loading.gif" lazyload alt="ICMP网络层报文"></p>
+<p>IP分片的报文规律：</p>
+<ul>
+<li><p>同一组IP分片具备相同的<code>identification</code>，是一个无符号的16位整型，可表示65535个id，不代表唯一id</p>
+</li>
+<li><p>同一组的IP分片只有首片可以访问到传输层的报文头，中间片和尾片只有IP头</p>
+</li>
+<li><p>IP分片的区分规律：</p>
+<ul>
+<li><p><strong>非IP分片</strong>：<code>DF=1，MF=0，offset=0</code></p>
+</li>
+<li><p><strong>首片</strong>：<code>DF=0，MF=1，offset=0</code></p>
+</li>
+<li><p><strong>中间片</strong>：<code>DF=0，MF=1，offset为对应的偏移值</code></p>
+</li>
+<li><p><strong>尾片</strong>：<code>DF=0，MF=0，offset为对应的偏移值</code></p>
+</li>
+</ul>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="print-no-link">#网络协议</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【计算机网络】区分tcp分段和ip分片</div>
+      <div>https://littlejoyo.github.io/2021/09/16/network/tcp-ip-frame/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Joyo</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年9月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/11/21/tools/cloud-picture/" title="【生产力】搭建个人云图床+PicGo管理">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【生产力】搭建个人云图床+PicGo管理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/05/23/network/virtualbox-bridge/" title="【计算机网络】使用VirtualBox和namespace搭建桥接环境">
+                        <span class="hidden-mobile">【计算机网络】使用VirtualBox和namespace搭建桥接环境</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liZ3sDaPEbpnmKLz","clientSecret":"4b92b796ad1e3942fec1053c52b52f6801203b5e","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'ffa5173f0716a696073b7dcca7adf131'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://littlejoyo.github.io" target="_blank" rel="nofollow noopener"><span>JoyoHub</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

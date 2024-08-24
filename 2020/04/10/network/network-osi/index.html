@@ -1,0 +1,1123 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  <link rel="icon" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Joyo">
+  <meta name="keywords" content="Joyo,Blog,hexo,go,linux">
+  
+    <meta name="description" content="了解OSI模型可以更清晰掌握数据在网络互联的各个层次的传输过程  OSI七层模型也是面试热点问题，从中可以引申出大量的相关知识  另外，各层次的代表协议和硬件、TCP四层模型你是否都掌握了解呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【计算机网络】：OSI七层模型和各种协议介绍">
+<meta property="og:url" content="https://littlejoyo.github.io/2020/04/10/network/network-osi/index.html">
+<meta property="og:site_name" content="JoyoHub">
+<meta property="og:description" content="了解OSI模型可以更清晰掌握数据在网络互联的各个层次的传输过程  OSI七层模型也是面试热点问题，从中可以引申出大量的相关知识  另外，各层次的代表协议和硬件、TCP四层模型你是否都掌握了解呢？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2020/04/11/jC4gQM79mev2kGY.png">
+<meta property="og:image" content="https://i.loli.net/2020/04/11/XI89dtubHhYyOcU.png">
+<meta property="og:image" content="https://i.loli.net/2020/04/11/UiKHAZr4qMQYkF2.png">
+<meta property="og:image" content="https://i.loli.net/2020/04/11/Mq2c8VCTgURXPY6.png">
+<meta property="og:image" content="https://i.loli.net/2020/04/11/wP9dVET7ZK4LGzQ.png">
+<meta property="og:image" content="https://i.loli.net/2020/04/11/mhE3NRS7COiYqVn.png">
+<meta property="og:image" content="https://i.loli.net/2020/04/11/oU2yfX5xOK4p8uB.png">
+<meta property="article:published_time" content="2020-04-10T14:40:38.000Z">
+<meta property="article:modified_time" content="2024-08-24T13:08:50.417Z">
+<meta property="article:author" content="Joyo">
+<meta property="article:tag" content="网络">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2020/04/11/jC4gQM79mev2kGY.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>【计算机网络】：OSI七层模型和各种协议介绍 - JoyoHub</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":"08cb76f3e10f9858f7b56ffd9f9838f1","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>JoyoHub</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【计算机网络】：OSI七层模型和各种协议介绍"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2020-04-10 22:40" pubdate>
+          2020年4月10日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          54 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【计算机网络】：OSI七层模型和各种协议介绍</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <ul>
+<li><p>了解OSI模型可以更清晰掌握数据在网络互联的各个层次的传输过程</p>
+</li>
+<li><p>OSI七层模型也是面试热点问题，从中可以引申出大量的相关知识</p>
+</li>
+<li><p>另外，各层次的代表协议和硬件、TCP四层模型你是否都掌握了解呢？</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<blockquote>
+<p>Github issues:<a target="_blank" rel="noopener" href="https://github.com/littlejoyo/Blog/issues/">https://github.com/littlejoyo/Blog/issues/</a></p>
+</blockquote>
+<h1 id="1-什么是OSI七层模型？"><a href="#1-什么是OSI七层模型？" class="headerlink" title="1.什么是OSI七层模型？"></a>1.什么是OSI七层模型？</h1><blockquote>
+<p>维基百科介绍OSI模型：</p>
+</blockquote>
+<p>开放式系统互联模型（英语：Open System Interconnection Model，缩写：OSI；简称为OSI模型）是一种概念模型，由国际标准化组织提出，一个试图使各种计算机在世界范围内互连为网络的标准框架。定义于ISO&#x2F;IEC 7498-1。</p>
+<p><strong>概念不重要，最重要是理解好各层次的含义和对应的典型协议应用。</strong></p>
+<p>OSI七层协议自上而下分为：</p>
+<ul>
+<li><p>应用层</p>
+</li>
+<li><p>表示层</p>
+</li>
+<li><p>会话层</p>
+</li>
+<li><p>传输层</p>
+</li>
+<li><p>网络层</p>
+</li>
+<li><p>数据链路层</p>
+</li>
+<li><p>物理层</p>
+</li>
+</ul>
+<h1 id="2-OSI模型各层介绍"><a href="#2-OSI模型各层介绍" class="headerlink" title="2.OSI模型各层介绍"></a>2.OSI模型各层介绍</h1><p><img src="https://i.loli.net/2020/04/11/jC4gQM79mev2kGY.png" srcset="/img/loading.gif" lazyload alt="osi"></p>
+<h2 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h2><ul>
+<li><p>物理层通过媒介传输比特,确定机械及电气规范，如集线器；</p>
+</li>
+<li><p>作用：为上层协议提供了一个传输数据的物理媒体</p>
+</li>
+<li><p>协议数据单元（PDU）：<strong>比特Bit</strong></p>
+</li>
+<li><p>硬件代表：网卡，网线，集线器，中继器，调制解调器</p>
+</li>
+</ul>
+<h2 id="数据链路层"><a href="#数据链路层" class="headerlink" title="数据链路层"></a>数据链路层</h2><ul>
+<li><p>数据链路层在不可靠的物理介质上提供可靠的传输。</p>
+</li>
+<li><p>该层的作用包括：物理地址寻址、数据的成帧、流量控制、数据的检错、重发等</p>
+</li>
+<li><p>协议数据单元（PDU）：<strong>帧Frame</strong></p>
+</li>
+<li><p>硬件代表：网桥，交换机</p>
+</li>
+</ul>
+<h2 id="网络层"><a href="#网络层" class="headerlink" title="网络层"></a>网络层</h2><ul>
+<li><p>这层对端到端的包传输进行定义，定义了能够标识所有结点的逻辑地址，还定义了路由实现的方式和学习的方式。</p>
+</li>
+<li><p>为了适应最大传输单元长度小于包长度的传输介质，网络层还定义了如何将一个包分解成更小的包的分段方法。</p>
+</li>
+<li><p>作用：网络层负责对子网间的数据包进行路由选择。还可以实现拥塞控制、网际互连等功能。</p>
+</li>
+<li><p>协议数据单元（PDU）：<strong>数据包packet</strong></p>
+</li>
+<li><p>硬件代表：路由器</p>
+</li>
+</ul>
+<blockquote>
+<p>网络层通过寻址（寻址地址）来建立两个节点之间的连接，我们的电脑连接上网络后都会有一个IP地址，我们可以通过IP地址来确定不同的计算机是否在同一个子网路。当我们的电脑连接上网络后就有两种地址：<strong>物理地址（MAC）</strong>和<strong>网络地址（IP地址）</strong>，网络上的计算机要通信，必须要知道通信的计算机“在哪里”， 首先通过网络地址来判断是否处于同一个子网络，然后再对物理地址（MAC）地址进行处理，从而来确定要通信计算机的位置。</p>
+</blockquote>
+<h2 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h2><ul>
+<li><p>通过网络层让我们建立主机与主机的通信，而传输层的功能就是建立端口到端口的通信通道，这样就可以实现程序之间的数据通信。</p>
+</li>
+<li><p>作用：提供可靠和尽力而为的传输；</p>
+</li>
+<li><p>协议数据单元（PDU）：<strong>段Fragment</strong></p>
+</li>
+<li><p>代表：网关</p>
+</li>
+</ul>
+<blockquote>
+<p>通过MAC和IP地址，帮助我们找到互联网上任意两台主机来建立通信。然而这里有一个问题，找到主机后，主机上有很多程序都需要用到网络，比如说你在一边听歌和使用QQ聊天， 当网络上发送来一个数据包时， 该怎么知道它是表示聊天的内容还是歌曲的内容的， 这时候就需要一个参数来表示这个数据包是发送给那个程序（进程）来使用的，这个参数我们就叫做<strong>端口号</strong>，主机上用端口号来标识不同的程序（进程），端口是0到65535之间的一个整数，<strong>0到1023的端口被系统占用，用户只能选择大于1023的端口</strong>。</p>
+</blockquote>
+<h2 id="会话层"><a href="#会话层" class="headerlink" title="会话层"></a>会话层</h2><ul>
+<li><p>会话层定义了如何开始、控制和结束一个会话，以便在只完成连续消息的一部分时可以通知应用，从而使表示层看到的数据是连续的，在某些情况下，如果表示层收到了所有的数据，则用数据代表表示层。示例：RPC，SQL等。</p>
+</li>
+<li><p>作用：控制会话，建立管理终止应用程序会话；</p>
+</li>
+<li><p>协议数据单元（PDU）：<strong>会话协议数据单元SPDU</strong></p>
+</li>
+<li><p>代表：SSH、RPC（远程过程调用）、SQL、RTCP（实时传输控制协议）</p>
+</li>
+</ul>
+<h2 id="表示层"><a href="#表示层" class="headerlink" title="表示层"></a>表示层</h2><ul>
+<li><p>表示层定义了数据格式及加密。例如，FTP允许你选择以二进制或ASII格式传输。如果选择二进制，那么发送方和接收方不改变文件的内容。如果选择ASII格式，发送方将把文本从发送方的字符集转换成标准的ASII后发送数据。在接收方将标准的ASII转换成接收方计算机的字符集。</p>
+</li>
+<li><p>作用：对数据提供加密、压缩、格式转换服务</p>
+</li>
+<li><p>协议数据单元（PDU）：<strong>表示协议数据单元PPDU</strong></p>
+</li>
+<li><p>代表：ASCII, JPEG. PNG, MP3, WAV, AVI</p>
+</li>
+</ul>
+<h2 id="应用层"><a href="#应用层" class="headerlink" title="应用层"></a>应用层</h2><ul>
+<li><p>应用层是模型中的最顶层，是用户与网络的接口，该层通过应用程序来完成网络用户的应用需求。该层的数据放在TCP数据包的数据部分，该层定义了一个很重要的协议——Http协议，一般的Web开发都是基于应用层的开发。</p>
+</li>
+<li><p>作用：控制应用程序，为应用程序提供网络服务。</p>
+</li>
+<li><p>协议数据单元（PDU）：<strong>应用协议数据单元APDU</strong></p>
+</li>
+<li><p>代表：Telnet, HTTP, FTP, SMTP</p>
+</li>
+</ul>
+<h1 id="3-TCP-IP四层模型"><a href="#3-TCP-IP四层模型" class="headerlink" title="3.TCP&#x2F;IP四层模型"></a>3.TCP&#x2F;IP四层模型</h1><p>TCP&#x2F;IP协议簇是一个四层协议系统，可以说是OSI模型的简化，结构如下图：</p>
+<p><img src="https://i.loli.net/2020/04/11/XI89dtubHhYyOcU.png" srcset="/img/loading.gif" lazyload alt="TCP/IP"></p>
+<p><strong>应用层：</strong></p>
+<p>应用程序间沟通的层，如简单电子邮件传输（SMTP）、文件传输协议（FTP）、网络远程访问协议（Telnet）等。 </p>
+<p><strong>传输层：</strong></p>
+<p>提供了节点间的数据传送服务，如传输控制协议（TCP）、用户数据报协议（UDP）等，TCP和UDP给数据包加入传输数据并把它传输到下一层中，这一层负责传送数据，并且确定数据已被送达并接收。</p>
+<p><strong>网络层：</strong></p>
+<p>负责提供基本的数据封包传送功能，让每一块数据包都能够到达目的主机（但不检查是否被正确接收），如网际协议（IP）。</p>
+<p><strong>网络接口层：</strong></p>
+<p>对实际的网络媒体的管理，定义如何使用实际网络（如Ethernet、Serial Line等）来传送数据。</p>
+<h2 id="数据解包和装包"><a href="#数据解包和装包" class="headerlink" title="数据解包和装包"></a>数据解包和装包</h2><p><img src="https://i.loli.net/2020/04/11/UiKHAZr4qMQYkF2.png" srcset="/img/loading.gif" lazyload alt="数据解包和装包"></p>
+<p><img src="https://i.loli.net/2020/04/11/Mq2c8VCTgURXPY6.png" srcset="/img/loading.gif" lazyload alt="xxx"></p>
+<h1 id="4-OSI七层模型各层代表协议"><a href="#4-OSI七层模型各层代表协议" class="headerlink" title="4.OSI七层模型各层代表协议"></a>4.OSI七层模型各层代表协议</h1><ul>
+<li><p>物理层：RJ45、CLOCK、IEEE802.3 </p>
+</li>
+<li><p>数据链路：PPP、FR、HDLC、VLAN、MAC </p>
+</li>
+<li><p>网络层：IP、ICMP、ARP、RARP、OSPF、IPX、RIP、IGRP</p>
+</li>
+<li><p>传输层：TCP、UDP、SPX</p>
+</li>
+<li><p>会话层：NFS、SQL、NETBIOS、RPC</p>
+</li>
+<li><p>表示层：JPEG、MPEG、ASII、MP4</p>
+</li>
+<li><p>应用层：FTP、DNS、Telnet、SMTP、HTTP、WWW、NFS</p>
+</li>
+</ul>
+<h1 id="5-TCP-IP协议介绍"><a href="#5-TCP-IP协议介绍" class="headerlink" title="5.TCP&#x2F;IP协议介绍"></a>5.TCP&#x2F;IP协议介绍</h1><blockquote>
+<p>TCP、UDP、IP协议在此不介绍，另起文章细究。</p>
+</blockquote>
+<h2 id="ICMP协议"><a href="#ICMP协议" class="headerlink" title="ICMP协议"></a>ICMP协议</h2><ul>
+<li><p>ICMP协议,即因特网控制报文协议。</p>
+</li>
+<li><p>它是TCP&#x2F;IP协议族的一个子协议，用于在IP主机、路由器之间传递控制消息。</p>
+</li>
+<li><p>属于网络层协议，ping命令就是ICMP协议的应用。</p>
+</li>
+</ul>
+<blockquote>
+<p>ping程序是用来探测主机到主机之间是否可通信，如果不能ping到某台主机，表明不能和这台主机建立连接。ping使用的是ICMP协议，它发送icmp回送请求消息给目的主机。ICMP协议规定：目的主机必须返回ICMP回送应答消息给源主机。如果源主机在一定时间内收到应答，则认为主机可达。</p>
+</blockquote>
+<h2 id="NAT协议"><a href="#NAT协议" class="headerlink" title="NAT协议"></a>NAT协议</h2><ul>
+<li><p>网络地址转换属接入广域网(WAN)技术，是一种将私有（保留）地址转化为合法IP地址的转换技术。</p>
+</li>
+<li><p>NAT将私有IP地址通过边界路由转换成外网IP地址，在边界路由的NAT地址转换表记录下这个转换映射记录，当外部数据返回时，路由使用NAT技术查询NAT转换表，再将目标地址替换成内网用户IP地址。</p>
+</li>
+<li><p>NAT协议属于网络层协议。</p>
+</li>
+</ul>
+<blockquote>
+<p>基于IPv4的IP地址只有32位，最多只有42.9亿个地址，还要去掉保留地址、组播地址，能用的地址只有36亿左右，但是当下有数以万亿的主机，没有这么多IP地址可以对应，虽然现在有了IPv6，但是当下IPv4还是主流，利用IPv4怎么满足这么多主机的IP地址呢？答案就是NAT，NAT技术使公司、机构以及个人产生以及局域网，然后在各个局域网的边界WAN端口使用一个或多个公网的IPv4进行一对多转换</p>
+</blockquote>
+<h2 id="DHCP协议"><a href="#DHCP协议" class="headerlink" title="DHCP协议"></a>DHCP协议</h2><ul>
+<li><p>动态主机配置协议，DHCP（Dynamic Host Configuration Protcol）</p>
+</li>
+<li><p>一种让系统得以连接到网络上，并获取所需要的配置参数手段，基于UDP协议工作。</p>
+</li>
+<li><p>具体用途：给内部网络或网络服务供应商自动分配IP地址，给用户或者内部网络管理员作为对所有计算机作中央管理的手段。</p>
+</li>
+<li><p>DHCP协议属于网络层协议。</p>
+</li>
+</ul>
+<blockquote>
+<p>一个主机如何获取IP地址？有两种获取方法，一种是静态配置，就是从网络管理员获取一个给定的IP地址，也叫硬编码，属于静态IP，还有一种就是动态配置IP地址，也就四基于DHCP协议进行动态IP配置。</p>
+</blockquote>
+<h2 id="ARP协议"><a href="#ARP协议" class="headerlink" title="ARP协议"></a>ARP协议</h2><ul>
+<li>地址解析协议，即ARP（Address Resolution Protocol），是根据IP地址获取物理地址的一个TCP&#x2F;IP协议。</li>
+</ul>
+<p><strong>工作流程：</strong></p>
+<ol>
+<li><p>通过DNS域名解析到主机的IP地址，应用程序发送请求通过TCP或者UDP使用得到的IP建立连接。</p>
+</li>
+<li><p>当主机知道IP地址，并把数据报发过去的过程之前，主机在链路层实际上是要知道目标主机的物理地址的，每台主机的物理地址又称MAC地址是全球唯一的。在这一步，就需要我们的ARP协议。</p>
+</li>
+<li><p>首先，每个主机都会在自己的ARP缓冲区中建立一个ARP列表，以表示IP地址和MAC地址之间的对应关系。</p>
+</li>
+<li><p>当源主机要发送数据时，首先检查ARP列表中是否有对应IP地址的目的主机的MAC地址，如果有，则直接发送数据，如果没有，就向本网段的所有主机发送ARP数据包，该数据包包括的内容有：源主机 IP地址，源主机MAC地址，目的主机的IP 地址。</p>
+</li>
+<li><p>当本网络的所有主机收到该ARP数据包时，首先检查数据包中的IP地址是否是自己的IP地址，如果不是，则忽略该数据包，如果是，则首先从数据包中取出源主机的IP和MAC地址写入到ARP列表中，如果已经存在，则覆盖，然后将自己的MAC地址写入ARP响应包中，告诉源主机自己是它想要找的MAC地址。</p>
+</li>
+<li><p>源主机收到ARP响应包后。将目的主机的IP和MAC地址写入ARP列表，并利用此信息发送数据。如果源主机一直没有收到ARP响应数据包，表示ARP查询失败。<br>广播发送ARP请求，单播发送ARP响应。</p>
+</li>
+<li><p>得到了目的主机的硬件地址后，就包含着IP数据报的以太网数据帧就可以正常发送了。</p>
+</li>
+</ol>
+<h2 id="RARP协议"><a href="#RARP协议" class="headerlink" title="RARP协议"></a>RARP协议</h2><ul>
+<li><p>RARP协议是逆地址解析协议，作用是完成硬件地址到IP地址的映射，</p>
+</li>
+<li><p>主要用于无盘工作站（没有磁盘驱动器的系统），因为给无盘工作站配置的IP地址不能保存。</p>
+</li>
+</ul>
+<p><strong>工作流程：</strong></p>
+<ol>
+<li><p>在网络中配置一台RARP服务器，里面保存着IP地址和MAC地址的映射关系</p>
+</li>
+<li><p>当无盘工作站启动后，就封装一个RARP数据包，里面有其MAC地址，然后广播到网络上去</p>
+</li>
+<li><p>当服务器收到请求包后，就查找对应的MAC地址的IP地址装入响应报文中发回给请求者。</p>
+</li>
+<li><p>因为需要广播请求报文，因此RARP只能用于具有广播能力的网络。</p>
+</li>
+</ol>
+<h2 id="FTP协议"><a href="#FTP协议" class="headerlink" title="FTP协议"></a>FTP协议</h2><ul>
+<li><p>文件传输协议（File Transfer Protocol，FTP）是一种提供网络之间共享文件的协议，它可以在计算机之间可靠、高效地传送文件。在传输时，传输双方的操作系统、磁盘文件系统类型可以不同。</p>
+</li>
+<li><p>FTP 协议允许 TCP&#x2F;IP 网络上的两台计算机之间进行文件传输。而 FTP 服务是基于 FTP 协议的文件传输服务。</p>
+</li>
+<li><p>工作时，一台计算机上运行 FTP 客户端应用程序，另一台计算机上需要运行 FTP 服务器端程序。只有拥有了 FTP 服务，客户端才能进行文件传输。</p>
+</li>
+</ul>
+<h3 id="TFTP协议"><a href="#TFTP协议" class="headerlink" title="TFTP协议"></a>TFTP协议</h3><ul>
+<li><p>TFTP协议，即简单文件传输协议（Trivial File Transfer Protocol，TFTP）</p>
+</li>
+<li><p>该协议是TCP&#x2F;IP协议族中的一个用来在客户机与服务器之间进行简单文件传输的协议</p>
+</li>
+<li><p>与 FTP 协议不同的是，TFTP 传输文件时不需要用户进行登录。提供不复杂、开销不大的文件传输服务，它只能从文件服务器上下载或上传文件，不能列出目录。</p>
+</li>
+<li><p>属于应用层的协议， TFTP 基于 UDP 协议进行文件传输。</p>
+</li>
+</ul>
+<h2 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a>HTTP协议</h2><ul>
+<li><p>超文本传输协议，是一个属于应用层的面向对象的协议，由于其简捷、快速的方式，适用于分布式超媒体信息系统。</p>
+</li>
+<li><p>属于应用层的协议，基于TCP&#x2F;IP协议实现，后面另起文章进行细究介绍</p>
+</li>
+</ul>
+<h2 id="DNS协议"><a href="#DNS协议" class="headerlink" title="DNS协议"></a>DNS协议</h2><ul>
+<li><p>DNS（Domain Name System）服务是和 HTTP 协议一样位于应用层的协议。它提供域名到 IP 地址之间的解析服务。</p>
+</li>
+<li><p>计算机既可以被赋予 IP 地址，也可以被赋予主机名和域名。用户通常使用主机名或域名来访问对方的计算机，而不是直接通过 IP地址访问。因为与 IP 地址的一组纯数字相比，用字母配合数字的表示形式来指定计算机名更符合人类的记忆习惯。</p>
+</li>
+<li><p>为了解决上述的问题，DNS 服务应运而生。DNS 协议提供通过域名查找 IP 地址，或逆向从 IP 地址反查域名的服务。</p>
+</li>
+</ul>
+<h2 id="Telnet-协议"><a href="#Telnet-协议" class="headerlink" title="Telnet 协议"></a>Telnet 协议</h2><ul>
+<li><p>Telnet 协议是 Internet 远程登录服务的标准协议和主要方式，它为用户提供了在本地计算机上远程管理主机的能力。</p>
+</li>
+<li><p>使用者在自己的电脑上使用 Telnet 程序连接到服务器，然后在 Telnet 程序中输入命令，这些命令将会在服务器上运行，就像直接在服务器的控制台上输入一样。</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/04/11/wP9dVET7ZK4LGzQ.png" srcset="/img/loading.gif" lazyload alt="Telnet"></p>
+<p>其中，工作流程分为 6 个步骤，每个步骤含义如下：</p>
+<ol>
+<li><p>Telnet 客户端通过 TCP 协议的三次握手与 Telnet 服务器建立连接。</p>
+</li>
+<li><p>建立连接后，需要通过用户名和密码才能远程登录到服务器。因此，服务器要求客户端提供用户名和密码。</p>
+</li>
+<li><p>Telnet 客户端输入用户名和密码，尝试登录服务器。</p>
+</li>
+<li><p>成功登录后客户端向服务器发送要执行的命令。</p>
+</li>
+<li><p>服务器收到客户端发来的执行命令，开始执行命令，并将结果返回给客户端。</p>
+</li>
+<li><p>客户端不再需要远程执行命令，将向服务器发送 TCP 断开数据包，用于撤销连接。</p>
+</li>
+</ol>
+<h2 id="SNMP-协议"><a href="#SNMP-协议" class="headerlink" title="SNMP 协议"></a>SNMP 协议</h2><ul>
+<li><p>简单网络管理协议（Simple Network Management Protocol，SNMP）是由互联网工程任务组定义的一套网络管理协议。该协议是基于简单网关监视协议（Simple Gateway Monitor Protocol，SGMP）制定的。</p>
+</li>
+<li><p>Telnet 协议可以用于连接远程计算机，并进行管理与控制，如远程执行命令。这种情况下，执行的命令有一定的局限性，如只能执行远程主机上支持的命令。由于网络设备越来越多，网络规模越来越大，管理这些设备也越来越重要。远程管理网络的需求日益迫切，SNMP 应运而生。</p>
+</li>
+<li><p>SNMP 协议能够帮助网络管理员提高网络管理效率，及时发现和解决网络问题，对网络增长做好规划。网络管理员还可以通过 SNMP 协议，接收网络节点的通知消息和警告事件报告等，从而获知网络出现的问题。</p>
+</li>
+</ul>
+<p>工作流程如图所示：</p>
+<p><img src="https://i.loli.net/2020/04/11/mhE3NRS7COiYqVn.png" srcset="/img/loading.gif" lazyload alt="snmp"></p>
+<p>上图中展现了管理员通过 NMS 获取网关监控数据的工作流程，其中涉及了一些 SNMP 协议的关键信息。</p>
+<p>为了方便理解，下面先介绍这些信息的作用及含义。</p>
+<p><strong>MIB（管理信息库）：</strong></p>
+<p>任何一个被管理的设备都表示成一个对象，并称为被管理的对象。而 MIB 就是被管理对象的集合。它定义了被管理对象的一系列属性，如对象的名称、对象的访问权限和对象的数据类型等。每个设备都有自己的 MIB。MIB 是一种树状数据库，MIB 管理的对象，就是树的端节点，每个节点都有唯一位置和唯一名字。</p>
+<p><strong>SNMP 代理：</strong></p>
+<p>是一种嵌入在被管理设备中的网络管理软件模块，主要用来控制本地机器的管理信息。它还负责将管理信息转换成 SNMP 兼容的格式，传递给 NMS。</p>
+<p>上图所示的工作流程分为以下 4 个步骤：</p>
+<ol>
+<li><p>当管理员查询被管理设备中的对象的相关值时，首先通过网络管理站 NMS 中的 MIB 找到相关对象。</p>
+</li>
+<li><p>网络管理站 NMS 向 SNMP 代理申请 MIB 中定义对象的相关值。</p>
+</li>
+<li><p>SNMP 代理在自己的 MIB 库中进行查找。</p>
+</li>
+<li><p>SNMP 代理将找到的对象相关值返回给网络管理站 NMS。</p>
+</li>
+</ol>
+<h1 id="6-硬件介绍"><a href="#6-硬件介绍" class="headerlink" title="6.硬件介绍"></a>6.硬件介绍</h1><h2 id="中继器"><a href="#中继器" class="headerlink" title="中继器"></a>中继器</h2><ul>
+<li><p>中继器是局域网环境下用来延长网络距离的最简单最廉价的网络互联设备</p>
+</li>
+<li><p>操作在OSI的物理层，中继器对在线路上的信号具有放大再生的功能，用于扩展局域网网段的长度(仅用于连接相同的局域网网段)。</p>
+</li>
+<li><p>中继器是连接网络线路的一种装置，常用于两个网络节点之间物理信号的双向转发工作。</p>
+</li>
+<li><p>中继器主要完成物理层的功能，负责在两个节点的物理层上按位传递信息，完成信号的复制、调整和放大功能，以此来延长网络的长度。也就说类似生活中变电的变压器功能。</p>
+</li>
+</ul>
+<h2 id="网桥"><a href="#网桥" class="headerlink" title="网桥"></a>网桥</h2><ul>
+<li><p>网桥不是真实的物质东西，而是一个作用域的代名词，网桥（Bridge）像一个聪明的中继器。</p>
+</li>
+<li><p>中继器从一个网络电缆里接收信号， 放大它们，将其送入下一个电缆，然而网桥将网络的多个网段在数据链路层连接起来。</p>
+</li>
+<li><p>相比较而言，网桥对从关卡上传下来的信息更敏锐一些。网桥是一种对帧进行转发的技术，根据MAC分区块，可隔离碰撞。</p>
+</li>
+<li><p>网桥也叫桥接器，是连接两个局域网的一种存储&#x2F;转发设备，它能将一个大的LAN分割为多个网段，或将两个以上的LAN互联为一个逻辑LAN，使LAN上的所有用户都可访问服务器。</p>
+</li>
+</ul>
+<h2 id="交换机"><a href="#交换机" class="headerlink" title="交换机"></a>交换机</h2><ul>
+<li><p>在计算机网络系统中，交换机是针对共享工作模式的弱点而推出的。</p>
+</li>
+<li><p>交换机拥有一条高带宽的背部总线和内部交换矩阵。交换机的所有的端口都挂接在这条背部总线上，当控制电路收到数据包以后，处理端口会查找内存中的地址对照表以确定目的MAC（网卡的硬件地址）的NIC（网卡）挂接在哪个端口上，通过内部 交换矩阵迅速将数据包传送到目的端口。</p>
+</li>
+<li><p>目的MAC若不存在，交换机才广播到所有的端口，接收端口回应后交换机会“学习”新的地址，并把它添加入内部地址表中。</p>
+</li>
+<li><p>交换机工作于OSI参考模型的第二层，即数据链路层。交换机内部的CPU会在每个端口成功连接时，通过ARP协议学习它的MAC地址，保存成一张 ARP表。在今后的通讯中，发往该MAC地址的数据包将仅送往其对应的端口，而不是所有的端口。因此，交换机可用于划分数据链路层广播，即冲突域；但它不 能划分网络层广播，即广播域。</p>
+</li>
+<li><p>交换机被广泛应用于二层网络交换，俗称“二层交换机”。交换机的种类有：二层交换机、三层交换机、四层交换机、七层交换机分别工作在OSI七层模型中的第二层、第三层、第四层盒第七层，并因此而得名。</p>
+</li>
+</ul>
+<h2 id="路由器"><a href="#路由器" class="headerlink" title="路由器"></a>路由器</h2><ul>
+<li><p>路由器用来连通不同的网络，另一个作用是选择信息和分发传送的线路功能。</p>
+</li>
+<li><p>选择通畅快捷的近路，能大大提高通信速度，减轻网络系统通信负荷，节约网络系统资源，提高网络系统畅通率。</p>
+</li>
+<li><p>具有多个接口，用于连接多个IP子网及多种链路，并实现其互联互通的网络设备。</p>
+</li>
+<li><p>工作在OSI网络层，其主要工作任务是在网络中转发IP数据包</p>
+</li>
+</ul>
+<h2 id="路由表"><a href="#路由表" class="headerlink" title="路由表"></a>路由表</h2><ul>
+<li><p>又称全局路由表，存储在路由器的内存中，用于指示路由器发送IP数据包转发至正确目的地的信息表。</p>
+</li>
+<li><p>例如，生活中我们去乘火车，我们只关心目的城市，从上车之前我们并不知道其最近路线</p>
+</li>
+<li><p>路由表里面就保存着我们下一站的信息，火车每到一个站，都要经过铁路公司的统一安排开始进入对应的股道</p>
+</li>
+<li><p>路由器可以理解为是铁路中的小枢纽站一样，路由表就是班车的到站信息。</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2020/04/11/oU2yfX5xOK4p8uB.png" srcset="/img/loading.gif" lazyload alt="路由表"></p>
+<h2 id="区分交换机和路由器"><a href="#区分交换机和路由器" class="headerlink" title="区分交换机和路由器"></a>区分交换机和路由器</h2><p>利用现实例子了解路由器和交换机的区别：</p>
+<ul>
+<li><p>路由器相当于邮局，把信投递到收件人地址，它的任务就完成了。但是信邮到了你们宿舍楼，而这个地址不是你一个人专享的</p>
+</li>
+<li><p>所以楼管王大爷还要负责把信给到你手里，他不会关心收件人地址，只看收件人姓名，然后打个内线电话叫你来取信。</p>
+</li>
+<li><p>如果没有邮局，你没法向世界各地的漂亮妹子们发信，也没法从楼外的漂亮妹子那里收信。</p>
+</li>
+<li><p>但是因为楼管王大爷的存在，你仍然可以通过他与同宿舍楼的好基友书信往来。</p>
+</li>
+<li><p>所有邮局构成的系统，就是“广域网”，而你的宿舍楼，就是“局域网”，构建局域网是不需要路由器的。</p>
+</li>
+</ul>
+<blockquote>
+<p>扮演角色：</p>
+</blockquote>
+<p>楼管王大爷：交换机（只负责局域网分配不同的IP）</p>
+<p>邮局：路由器，可以把一个IP分配给很多个主机使用，这些主机对外只表现出一个IP，也就是只把信送到宿舍楼下，共用一个邮箱（IP）</p>
+<h1 id="7-典型面试题"><a href="#7-典型面试题" class="headerlink" title="7.典型面试题"></a>7.典型面试题</h1><blockquote>
+<p>请介绍在浏览器中输入 <a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a> 后执行的全部过程。</p>
+</blockquote>
+<ol>
+<li><p>客户端浏览器首先获取本地host文件获取IP，如果获取不到再通过DNS解析到<a target="_blank" rel="noopener" href="http://www.baidu.com/">www.baidu.com</a> 的IP地址220.181.27.48，通过这个IP地址找到客户端到服务器的路径。</p>
+</li>
+<li><p>客户端浏览器发起一个HTTP会话到220.181.27.48，通过TCP握手建立连接，然后通过TCP进行封装数据包，输入到网络层。</p>
+</li>
+<li><p>在客户端的传输层，把HTTP会话请求分成报文段，添加源和目的端口，如服务器使用80端口监听客户端的请求，客户端由系统随机选择一个端口如5000，与服务器进行交换，服务器把相应的请求返回给客户端的5000端口。</p>
+</li>
+<li><p>然后使用IP层的IP地址查找目的端。客户端的网络层不用关心应用层或者传输层的东西，主要做的是通过查找路由表确定如何到达服务器。</p>
+</li>
+<li><p>期间可能经过多个路由器，这些都是由路由器来完成的工作，无非就是通过查找路由表决定通过那个路径到达服务器。</p>
+</li>
+<li><p>客户端的链路层，包通过链路层发送到路由器，通过邻居协议查找给定IP地址的MAC地址。</p>
+</li>
+<li><p>然后发送ARP请求查找目的地址，如果得到回应后就可以使用ARP的请求应答交换的IP数据包现在就可以传输了，然后发送IP数据包到达服务器的地址。</p>
+</li>
+<li><p>服务器处理请求后响应首页数据反向传输，传输到客户端后，TCP连接释放，浏览器将首页文件进行解析，并将Web页显示给用户。</p>
+</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C/" class="print-no-link">#网络</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【计算机网络】：OSI七层模型和各种协议介绍</div>
+      <div>https://littlejoyo.github.io/2020/04/10/network/network-osi/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Joyo</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2020年4月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/03/13/network/virtoolbox-network/" title="【计算机网络】：一次性理清Virtualbox虚拟机网络模型">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【计算机网络】：一次性理清Virtualbox虚拟机网络模型</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/04/06/development/git-rebase/" title="【Git】：git rebase和git merge有什么区别？">
+                        <span class="hidden-mobile">【Git】：git rebase和git merge有什么区别？</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liZ3sDaPEbpnmKLz","clientSecret":"4b92b796ad1e3942fec1053c52b52f6801203b5e","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'c58b1cbff748108a9532ef9f09f73cee'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://littlejoyo.github.io" target="_blank" rel="nofollow noopener"><span>JoyoHub</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

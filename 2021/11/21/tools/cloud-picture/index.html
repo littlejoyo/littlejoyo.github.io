@@ -1,0 +1,768 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  <link rel="icon" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Joyo">
+  <meta name="keywords" content="Joyo,Blog,hexo,go,linux">
+  
+    <meta name="description" content="写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片  那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路  除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【生产力】搭建个人云图床+PicGo管理">
+<meta property="og:url" content="https://littlejoyo.github.io/2021/11/21/tools/cloud-picture/index.html">
+<meta property="og:site_name" content="JoyoHub">
+<meta property="og:description" content="写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片  那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路  除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221310.png">
+<meta property="article:published_time" content="2021-11-21T11:17:59.000Z">
+<meta property="article:modified_time" content="2024-08-24T13:28:08.773Z">
+<meta property="article:author" content="Joyo">
+<meta property="article:tag" content="图床">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221310.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>【生产力】搭建个人云图床+PicGo管理 - JoyoHub</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":"08cb76f3e10f9858f7b56ffd9f9838f1","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>JoyoHub</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【生产力】搭建个人云图床+PicGo管理"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-11-21 19:17" pubdate>
+          2021年11月21日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【生产力】搭建个人云图床+PicGo管理</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <ul>
+<li><p>写博客的时候常常需要上传图片，一般都需要一个称为图床的地方来存放图片</p>
+</li>
+<li><p>那么如果自己搞个免费的图床服务呢？利用Github和Gitee是一个好出路</p>
+</li>
+<li><p>除了提供存放的地方，我们还需要图床管理工具PicGo来帮助我们提高生产力</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<h1 id="1-什么是图床"><a href="#1-什么是图床" class="headerlink" title="1.什么是图床"></a>1.什么是图床</h1><p>图床是一个存放图片并提供访问链接的地方，那么自然也可以是一个仓库，所以我们可以使用Github创建个人仓库来存放图片，然后通过Github服务器提供访问链接就可以实现自己的个人图床了，缺点就是Github在国内的访问速度有限，图片加载速度会比较慢，所以存放的地方可以从Github切换到Gitee或者直接使用七牛云，基本原理都是一样的。</p>
+<p>另一个需要操作的地方就是需要生成服务访问令牌，保证我们能够远程操作存放图片的仓库，管理我们的图床的数据，然后就可以依赖一款叫<code>PicGo</code>的图床管理软件实现对图床的远程管理。</p>
+<blockquote>
+<p>当然，如果不想折腾，可以使用收费的图床服务，一般都会提供客户端管理工具或者web管理页面和存放服务，现买先用，免费的图床也有一个很受欢迎的就是<a target="_blank" rel="noopener" href="https://sm.ms/">SM.MS</a>,注册用户后就能在提供的web管理页面进行图片上传，也提供了二次开发的API，也是不错的选择。</p>
+</blockquote>
+<h1 id="2-什么是PicGo"><a href="#2-什么是PicGo" class="headerlink" title="2.什么是PicGo"></a>2.什么是PicGo</h1><p>PicGo是一个用于快速上传图片并获取图片 URL 链接的工具，支持多种图床例如Github、Gitee、七牛云、腾讯云、又拍云、阿里云、sm.ms等等，并且支持插件扩展功能，甚至可以直接搭配Typora编辑器进行图片复制上传。</p>
+<p>具体的介绍请参见Github仓库：<a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/PicGo">PicGo Github</a></p>
+<p>软件下载地址：<a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/PicGo/releases">PicGo Releases</a></p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221335.png" srcset="/img/loading.gif" lazyload alt="PicGo"></p>
+<h1 id="3-利用Github搭建图床"><a href="#3-利用Github搭建图床" class="headerlink" title="3.利用Github搭建图床"></a>3.利用Github搭建图床</h1><p>首先，在Github中创建个人仓库，权限选用public</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221356.png" srcset="/img/loading.gif" lazyload alt="创建Github仓库"></p>
+<p>申请token，【Settings】-【Developer settings】-【Personal access tokens】-【Generate new token】，填写好描述，勾选【repo】，然后点击【Generate token】生成一个Token，注意这个Token只会显示一次，自己先保存下来，或者等后面配置好PicGo后再关闭此网页</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221428.png" srcset="/img/loading.gif" lazyload alt="申请token"></p>
+<p>另外，还要介绍一个Github图床访问加速的内容就是我们可以<strong>jsDelivr</strong>进行CDN加速，使用方法非常简单，即把图片链接地址的域名改为<strong>jsDelivr  CDN</strong>的域名（cdn.jsdelivr.net&#x2F;gh&#x2F;）就可以。替换格式如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs html">原图片访问地址：<br>https://github.com/<span class="hljs-tag">&lt;<span class="hljs-name">你的github用户名</span>&gt;</span>/<span class="hljs-tag">&lt;<span class="hljs-name">你的图床仓库名</span>&gt;</span>/图片的路径<br><br>CDN加速访问地址：<br>https://cdn.jsdelivr.net/gh/<span class="hljs-tag">&lt;<span class="hljs-name">你的github用户名</span>&gt;</span>/<span class="hljs-tag">&lt;<span class="hljs-name">你的图床仓库名</span>&gt;</span>/图片的路径<br></code></pre></td></tr></table></figure>
+
+<p>那么，最后就是配置PicGo实现远程图片管理了，打开PicGo的【图床设置】—【Github图床】，填入上面准备好的配置信息，确定后就可以到【上传区】进行图片上传了，上传成功后能在【相册】中看到图片，同时登陆Github页面也能看到对应的图片数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221451.png" srcset="/img/loading.gif" lazyload alt="PicGo配置"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221514.png" srcset="/img/loading.gif" lazyload alt="上传图片"></p>
+<h1 id="3-利用Gitee搭建图床"><a href="#3-利用Gitee搭建图床" class="headerlink" title="3.利用Gitee搭建图床"></a>3.利用Gitee搭建图床</h1><p>Gitee的操作过程和Github是相似的，首先还是需要创建一个公开的仓库存放图片</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221702.png" srcset="/img/loading.gif" lazyload alt="创建仓库"></p>
+<p>创建成功后，申请token，点击【右上角头像】—【设置】—【私人令牌】—【生成新令牌】—【勾选project】—【提交】，然后复制保存好token，配置好PicGo再关闭就可以。</p>
+<p><img src="C:/Users/Joyo/AppData/Roaming/Typora/typora-user-images/image-20211121144502255.png" srcset="/img/loading.gif" lazyload alt="申请令牌"></p>
+<p>接下来就是到PicGo中配置，默认不支持Gitee，需要安装扩展插件，打开【PicGo】—【插件设置】—【搜索gitee】—【安装gitee-uploader】，然后就会在图床列表中出现gitee的选项，点击进去就可以开始配置</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221539.png" srcset="/img/loading.gif" lazyload alt="gitee插件"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221609.png" srcset="/img/loading.gif" lazyload alt="Gitee配置"></p>
+<p>最后上传图片，可以在gitee的页面查看到对应的图片，同时gitee仓库也有对应的数据。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221636.png" srcset="/img/loading.gif" lazyload alt="查看图片"></p>
+<h1 id="5-Typora配置图床"><a href="#5-Typora配置图床" class="headerlink" title="5.Typora配置图床"></a>5.Typora配置图床</h1><p>Typora是一个Markdown编辑器，编辑内容时支持上传截图和图片，但是默认都是上传到本地，修改一下设置即可，【偏好设置】—【图像】,其中【插入图片时…】,选中<strong>上传图片</strong>，勾选<strong>对本地位置的图片应用上述规则</strong>和<strong>插入时自动转义图片URL</strong>，【上传服务设定】，上传服务选择使用<strong>PicGo app</strong>，PicGo路径选择本地安装路径，最后点击【验证图片上传选项】判断是否可以成功。成功后再到编辑器上编辑内容并上传图片就会直接上传到PicGo设置好的默认图床了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221724.png" srcset="/img/loading.gif" lazyload alt="Typora设置"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/littlejoyo/cdn/img/20220328221748.png" srcset="/img/loading.gif" lazyload alt="验证上传"></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%94%9F%E4%BA%A7%E5%8A%9B/" class="category-chain-item">生产力</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%9B%BE%E5%BA%8A/" class="print-no-link">#图床</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【生产力】搭建个人云图床+PicGo管理</div>
+      <div>https://littlejoyo.github.io/2021/11/21/tools/cloud-picture/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Joyo</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年11月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/12/25/linux/kernel-module/" title="【Linux】依赖Netfilter Hook编写自定义内核模块">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【Linux】依赖Netfilter Hook编写自定义内核模块</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/09/16/network/tcp-ip-frame/" title="【计算机网络】区分tcp分段和ip分片">
+                        <span class="hidden-mobile">【计算机网络】区分tcp分段和ip分片</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liZ3sDaPEbpnmKLz","clientSecret":"4b92b796ad1e3942fec1053c52b52f6801203b5e","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '7baa2390fbc4b739fa95e003326e3829'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://littlejoyo.github.io" target="_blank" rel="nofollow noopener"><span>JoyoHub</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

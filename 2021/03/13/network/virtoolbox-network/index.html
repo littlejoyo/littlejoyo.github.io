@@ -1,0 +1,896 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  <link rel="icon" href="https://i.loli.net/2019/11/18/LmViUpwhkIvETsl.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Joyo">
+  <meta name="keywords" content="Joyo,Blog,hexo,go,linux">
+  
+    <meta name="description" content="平时我们基于VirtualBox或者VMware软件可以随意创建虚拟机  虚拟机的网络模型有多种，不理清它们之间的区别很容易出现网络不通的头痛问题  通过分析各种虚拟网络模型，解决虚拟机平台和物理机的网络连接问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【计算机网络】：一次性理清Virtualbox虚拟机网络模型">
+<meta property="og:url" content="https://littlejoyo.github.io/2021/03/13/network/virtoolbox-network/index.html">
+<meta property="og:site_name" content="JoyoHub">
+<meta property="og:description" content="平时我们基于VirtualBox或者VMware软件可以随意创建虚拟机  虚拟机的网络模型有多种，不理清它们之间的区别很容易出现网络不通的头痛问题  通过分析各种虚拟网络模型，解决虚拟机平台和物理机的网络连接问题">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/03/13/enFEHXuoCqVtiLg.png">
+<meta property="article:published_time" content="2021-03-13T12:03:52.000Z">
+<meta property="article:modified_time" content="2024-08-24T13:21:43.829Z">
+<meta property="article:author" content="Joyo">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="虚拟网络">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2021/03/13/enFEHXuoCqVtiLg.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>【计算机网络】：一次性理清Virtualbox虚拟机网络模型 - JoyoHub</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":"08cb76f3e10f9858f7b56ffd9f9838f1","google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>JoyoHub</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【计算机网络】：一次性理清Virtualbox虚拟机网络模型"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2021-03-13 20:03" pubdate>
+          2021年3月13日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          26 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【计算机网络】：一次性理清Virtualbox虚拟机网络模型</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <ul>
+<li><p>平时我们基于VirtualBox或者VMware软件可以随意创建虚拟机</p>
+</li>
+<li><p>虚拟机的网络模型有多种，不理清它们之间的区别很容易出现网络不通的头痛问题</p>
+</li>
+<li><p>通过分析各种虚拟网络模型，解决虚拟机平台和物理机的网络连接问题</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<p><img src="https://i.loli.net/2021/03/28/gvbq2rjDwyQCmlK.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<h1 id="1-VirrtualBox和VMware简单对比"><a href="#1-VirrtualBox和VMware简单对比" class="headerlink" title="1.VirrtualBox和VMware简单对比"></a>1.VirrtualBox和VMware简单对比</h1><p>两者都是优秀的虚拟机平台，我们可以通过它们创建虚拟机来安装不同环境的操作系统</p>
+<p>主要区别对比：</p>
+<ol>
+<li><p>VirtualBox是开源免费软件，下载和安装比较方便，VMware功能更加强大，但是需要注册码</p>
+</li>
+<li><p>VirtualBox相对于VMware安装和配置更加简单，运行内存占用也比较小</p>
+</li>
+<li><p>VirtualBox由于是开源免费，社区相对更加活跃，但总体两者出现问题都能找到解决方案</p>
+</li>
+</ol>
+<p>综上，本次主要采用VirtualBox来创建虚拟机进行演示，安装的操作系统镜像是Linux CentOS8.2版本</p>
+<h1 id="2-常见的网络模型"><a href="#2-常见的网络模型" class="headerlink" title="2.常见的网络模型"></a>2.常见的网络模型</h1><p>主要有下面四种网络模型</p>
+<ul>
+<li>桥接（Bridge Adapter）</li>
+<li>NAT</li>
+<li>主机网络（Host-only Adapter）</li>
+<li>内部网络（Internal）</li>
+</ul>
+<blockquote>
+<p>VirtualBox包含了以上的四种网络模型，VMware只有前三种</p>
+</blockquote>
+<h1 id="3-桥接网络"><a href="#3-桥接网络" class="headerlink" title="3.桥接网络"></a>3.桥接网络</h1><h2 id="3-1-主要原理"><a href="#3-1-主要原理" class="headerlink" title="3.1 主要原理"></a>3.1 主要原理</h2><p>桥接网络模型依赖虚拟交换机（Linux bridge）将虚拟机和物理机连接起来，它们之间处在同一个二层网络</p>
+<p>虚拟机和物理机的ip处在相同网段之下，举例，比如都处在192.168.100.x的网段之下，物理机ip为<strong>192.168.100.10</strong>，虚拟机ip为<strong>192.168.100.20</strong></p>
+<blockquote>
+<p>桥接网络的网络连通总结：</p>
+</blockquote>
+<ul>
+<li><p>虚拟机之间彼此互通</p>
+</li>
+<li><p>虚拟机和物理机彼此互通</p>
+</li>
+<li><p>只要物理机能上外网，虚拟机也能上外网</p>
+</li>
+</ul>
+<h2 id="3-2-网络原理图"><a href="#3-2-网络原理图" class="headerlink" title="3.2 网络原理图"></a>3.2 网络原理图</h2><p><img src="https://i.loli.net/2021/03/13/enFEHXuoCqVtiLg.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>如上图所示，物理主机内创建了三台虚拟机，然后通过<strong>bridge虚拟设备</strong>将物理网卡和虚拟网卡进行连接，虚拟机和物理机的ip都处在同一网段（192.168.100.x）之内</p>
+<p>虚拟机借助物理机网卡实现外网的访问，物理机也可以ping通虚拟机，并且虚拟机之间网络是连通的，彼此之间可以进行访问</p>
+<h2 id="3-3-配置方式"><a href="#3-3-配置方式" class="headerlink" title="3.3 配置方式"></a>3.3 配置方式</h2><p><img src="https://i.loli.net/2021/03/13/k6YSAvVEcCIrfQG.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>找到创建好的虚拟机，【设置】-【网络】，连接方式选择“桥接网卡”，界面名称选择正确的外网网卡，然后勾选“启动网络连接”即可</p>
+<p>外网网卡名称可以在网络适配器查看是否匹配对应，例如就需要选择这个无线网卡虚拟机才能上外网</p>
+<p><img src="https://i.loli.net/2021/03/13/qpkxshVfUSHdwE1.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p><strong>验证网络连通情况</strong></p>
+<ul>
+<li>启动CentOS系统的虚拟机，输入<code>ip addr</code>查看网络设备地址,我这里虚拟网卡分配到的地址是<strong>192.168.123.21</strong></li>
+</ul>
+<p><img src="https://i.loli.net/2021/03/13/m1RFHyzesuwPGd9.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>查看本地的网卡地址是否也是属于<strong>192.168.123.x</strong>的网段下，打开cmd输入<code>ipconfig</code>命令查看,物理网卡的地址为<strong>192.168.123.67</strong>,符合理论</p>
+<p><img src="https://i.loli.net/2021/03/13/btCkXow15dNKze2.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>通过ping命令验证物理机和虚拟机彼此之间互ping的情况，结果是双方都可以ping通</p>
+<p><fancybox><img src="https://i.loli.net/2021/03/13/3A9T6dZ2lLQfhnJ.png" srcset="/img/loading.gif" lazyload alt="image.png"></fancybox></p>
+<blockquote>
+<p>插入一个问题：可能会出现虚拟机ping主机不通的情况，一般是因为防火墙的问题，比如我物理机是win10的系统，就出现防火墙设置问题，问题主要是因为win10的防火墙没有打开<strong>ICMPv4-In</strong>这个规则，解决如下：</p>
+</blockquote>
+<p>1.依次打开【控制面板】-【Windows Definder防火墙】-【高级设置】-【入站规则】-【按配置文件筛选】-【按公有配置文件筛选】</p>
+<p>2.找到并启用文件类型为“公用”的“文件和打印共享（回显请求 – ICMPv4-In）”规则，此时就可以ping通了</p>
+<p><fancybox><img src="https://i.loli.net/2021/03/13/hoHsLpAQzgqYVbE.png" srcset="/img/loading.gif" lazyload alt="image.png"></fancybox></p>
+<p>3.最后是验证虚拟机之间是否可以彼此互ping，另起一台虚拟机，同样的方式设置为桥接模式，我这里分配到为<strong>192.168.123.52</strong>,如下所示，彼此之间也能ping通</p>
+<p><fancybox><img src="https://i.loli.net/2021/03/13/zMThkCocxLGqjfW.png" srcset="/img/loading.gif" lazyload alt="image.png"></fancybox></p>
+<h1 id="4-NAT模式"><a href="#4-NAT模式" class="headerlink" title="4.NAT模式"></a>4.NAT模式</h1><h2 id="4-1-主要原理"><a href="#4-1-主要原理" class="headerlink" title="4.1 主要原理"></a>4.1 主要原理</h2><p>NAT网络模型基于NAT协议（Network Address Translation，网络地址转换），主要功能是能将IP数据报头中的IP地址转换为另一个IP地址的过程。</p>
+<p>在实际应用中，NAT主要用于实现私有网络访问公共网络的功能。</p>
+<p>NAT网络模型使得虚拟机的私有ip可以通过虚拟NAT设备转化为物理主机的ip，然后通过物理网卡实现外网的访问</p>
+<p>需要注意的是Virtualbox中的NAT网络模型分为了<code>NAT</code>和<code>NAT网络</code>，两者的区别主要有：</p>
+<ul>
+<li><p><code>NAT</code>下的虚拟机之间是互相隔离的，彼此之间不能进行通信，也就是不能彼此互ping，因为它们各自分配着独立的虚拟NAT设备</p>
+</li>
+<li><p><code>NAT网络</code>下的虚拟机之间因为共享同一台虚拟NAT设备，彼此互通</p>
+</li>
+</ul>
+<p>再回过来总结下NAT网络模型和物理主机的连通情况：</p>
+<ul>
+<li><p>虚拟机可以ping通物理机，但是物理主机无法ping通虚拟机</p>
+</li>
+<li><p>如果物理主机可以上外网，那么虚拟机就可以上外网</p>
+</li>
+</ul>
+<blockquote>
+<p>VirtualBox的NAT模型下，主机ping不通虚拟机，但是VMware经过实验验证是可以ping通的，既然无法ping通，那不是代表无法使主机ssh连接到虚拟机吗？在Virtualbox下有什么方法解决吗？方法还是有的：</p>
+</blockquote>
+<p><strong>方法一：端口映射</strong></p>
+<p>虚拟机采用<code>NAT网络</code>配置，虚拟机的ip相对于宿主机是隐藏的。想要使得宿主机对虚拟机进行访问，需要配置端口映射</p>
+<p>通过将宿主机的一个端口(localhost:port)与虚拟机的ssh端口进行连接，宿主机通过访问宿主机端口(localhost:port)实现对虚拟机ssh端口(ip:22)的访问</p>
+<p>选择<code>NAT网络</code>模式，然后打开virtualbox的【全局设定】-【网络】，添加新的NAT网络，然后点击【端口映射】，然后新增端口映射的配置</p>
+<p><img src="https://i.loli.net/2021/03/16/PQR9ZgxLbaplf7M.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>例如，这里我添加<strong>10.0.2.6</strong>的<strong>22</strong>端口映射到本地的5666端口，<strong>10.0.2.15</strong>的<strong>22</strong>端口映射到本地的<strong>5667</strong>端口</p>
+<p><img src="https://i.loli.net/2021/03/16/9w41ongU2TZtLhb.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>确认好配置后，记得勾选NAT网络的启动网络选项，然后就可以实现主机ssh连接到虚拟机了</p>
+<p><img src="https://i.loli.net/2021/03/16/eEhjSPgKtvsydQV.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p><strong>方法二：新建主机网络</strong></p>
+<p>通过给虚拟机添加新的网卡，然后选择模式为主机网络（Host-only Adapter），因为它能实现物理主机对虚拟机的访问，留在后面介绍。</p>
+<h2 id="4-2-网络原理图"><a href="#4-2-网络原理图" class="headerlink" title="4.2 网络原理图"></a>4.2 网络原理图</h2><h3 id="4-2-1-NAT"><a href="#4-2-1-NAT" class="headerlink" title="4.2.1 NAT"></a>4.2.1 NAT</h3><p><img src="https://i.loli.net/2021/03/17/tIc7C9DZ8LygzXo.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>如上图，每台虚拟机都连接着独立的虚拟NAT设备，虚拟机之间彼此都是独立的，彼此之间不能进行通信</p>
+<p>唯一的通信道路就是借着NAT设备和利用物理网卡来实现对外网的访问，也就是只要物理机能够上外网，那么虚拟机也就能上外网</p>
+<h3 id="4-2-2-NAT网络"><a href="#4-2-2-NAT网络" class="headerlink" title="4.2.2 NAT网络"></a>4.2.2 NAT网络</h3><p><img src="https://i.loli.net/2021/03/17/X1rzsuQU8MAgVT3.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>如上图，NAT网络模式下虚拟机之间共享同一台虚拟NAT设备，也就是彼此之间都连接在同一网段下，彼此之间是可以实现通信的</p>
+<p>与物理主机的通信方式就和NAT是一样的，通过物理网卡来实现对外网的通信 </p>
+<h2 id="4-3-配置方式"><a href="#4-3-配置方式" class="headerlink" title="4.3 配置方式"></a>4.3 配置方式</h2><h3 id="4-3-1-NAT"><a href="#4-3-1-NAT" class="headerlink" title="4.3.1  NAT"></a>4.3.1  NAT</h3><p><code>NAT</code>模式的配置还是比较简单的，只需要启动网卡并选择模式为NAT即可，启动后会发现已经给虚拟机分配好ip</p>
+<p><img src="https://i.loli.net/2021/03/18/lsPTRCKMAJS95Yw.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>查看ip，并尝试ping物理主机和外网，观察网络连通情况，如图</p>
+<p><fancybox><img src="https://i.loli.net/2021/03/18/rysBbNQ7Uk93pq1.png" srcset="/img/loading.gif" lazyload alt="image.png"></fancybox></p>
+<p>另起一台虚拟机，新增网卡并配置为NAT模式，尝试两台虚拟机进行互ping，结果是彼此之间都无法ping通</p>
+<p><fancybox><img src="https://i.loli.net/2021/03/18/P1DdmIcteuWkC8o.png" srcset="/img/loading.gif" lazyload alt="image.png"></fancybox></p>
+<h3 id="4-3-2-NAT网络"><a href="#4-3-2-NAT网络" class="headerlink" title="4.3.2 NAT网络"></a>4.3.2 NAT网络</h3><p>由上面的原理可知，<code>NAT网络</code>模式下是共享同一台虚拟NAT设备，所以需要新建一台共享的NAT设备，【全局设定】-【网络】-【添加新的NAT网络】</p>
+<p>然后创建虚拟机的时候，新增网卡并选择<code>NAT网络</code>模式，界面名称选择刚才新建的<code>NatNetWork</code>即可</p>
+<p><img src="https://i.loli.net/2021/03/18/dRrjEgsXPZkJBFv.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>网络情况基本上跟上面保持一致，ping主机和外网都没问题</p>
+<p><img src="https://i.loli.net/2021/03/18/uUWR28VCDgJ59KQ.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>唯一的区别，另起一台虚拟机，同样模型选<code>NAT网络</code>，然后彼此之间这一次是可以ping通的</p>
+<p><fancybox><img src="https://i.loli.net/2021/03/18/ghfyrQZ9E5GTW3M.png" srcset="/img/loading.gif" lazyload alt="image.png"></fancybox></p>
+<h1 id="5-主机网络"><a href="#5-主机网络" class="headerlink" title="5.主机网络"></a>5.主机网络</h1><h2 id="5-1-主要原理"><a href="#5-1-主要原理" class="headerlink" title="5.1 主要原理"></a>5.1 主要原理</h2><p>主机网络（Host-only Adapter）是指只限于主机内部访问的网络，虚拟机之间彼此互通，虚拟机与主机之间彼此互通。但是默认情况下虚拟机不能访问外网</p>
+<p>主机网络模型会在主机中模拟出一块虚拟网卡供虚拟机使用，然后基于该网络下的所有虚拟机都会连接到这块网卡上</p>
+<p>这块网卡可以在网络适配器中查看，具体的ip和网关可以在上面进行自定义设置</p>
+<p><img src="https://i.loli.net/2021/03/18/ITbkDJ2SY1qU4Gu.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>主机网络的网卡是支持随意增删的，打开virtualbox的【管理】——【主机网络管理器】创建新的网卡如下，相应会在本地的网络设配器中新增对应的网卡</p>
+<p>需要注意的是对应的ip段需要关注，新建的虚拟机需要处在同一网段下才能进行网络通信</p>
+<p><img src="https://i.loli.net/2021/03/19/S1PT7qGhc8o5x2H.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<blockquote>
+<p>总结一下，主机网络的网络连通情况</p>
+</blockquote>
+<ul>
+<li><p>主机和虚拟主机彼此可以实现互通</p>
+</li>
+<li><p>虚拟机之间彼此互通</p>
+</li>
+<li><p>通过进一步配置，只要主机能上网，虚拟机也能上网</p>
+</li>
+</ul>
+<h2 id="5-2-网络原理图"><a href="#5-2-网络原理图" class="headerlink" title="5.2 网络原理图"></a>5.2 网络原理图</h2><p><img src="https://i.loli.net/2021/03/19/WtRaE8fwuShJx1b.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<ul>
+<li>主机网络下的虚拟机都会连接在全局虚拟网卡，然后它们的ip地址属于同一网段下，虚拟机借助物理网卡可以实现外网的访问</li>
+</ul>
+<h2 id="5-3-配置方式"><a href="#5-3-配置方式" class="headerlink" title="5.3 配置方式"></a>5.3 配置方式</h2><p>新建虚拟机，新增网卡并选择【仅主机（Host-Only网络）】，界面名称选择对应的虚拟网卡，然后记住该网卡分配的ip段，比如我这里的虚拟网卡ip段是<strong>192.168.137.1&#x2F;24</strong></p>
+<p><img src="https://i.loli.net/2021/03/19/7e1Yl5h63QSMHxy.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<p>启动虚拟机后查看虚拟机分配到的ip地址是<strong>192.168.137.56</strong>，尝试虚拟机和物理机主彼此互ping，都能ping成功，如果出现了<strong>主机能ping虚拟机，但是虚拟机无法ping主机</strong>的问题，还是跟上面桥接网络一样关闭windows的防火墙来解决</p>
+<p><fancybox><img src="https://i.loli.net/2021/03/19/xBnQ6dhyleREptI.png" srcset="/img/loading.gif" lazyload alt="image.png"></fancybox></p>
+<p>需要注意的是，上面虚拟机ping外网也成功，但是你可能会遇到无法ping通外网的问题，如何解决呢？</p>
+<blockquote>
+<p>主机网络如何配置可以让虚拟机访问外网？</p>
+</blockquote>
+<p>打开【网络连接】，然后找到物理主机的上网网卡，右键属性，再选【共享】，勾选允许其他网络用户连接，然后【家庭网络连接】项目，选择共享的网卡为上面配置的主机网络的网卡，最后确定和重启虚拟机就可以实现外网的访问</p>
+<p><img src="https://i.loli.net/2021/03/19/as1e6VpPRYtgbFo.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<h1 id="6-内部网络"><a href="#6-内部网络" class="headerlink" title="6.内部网络"></a>6.内部网络</h1><ul>
+<li><p>内部网络模式是相对比较简单的一种，虚拟机与外部环境完全断开，一般是用来做内部环境搭建测试</p>
+</li>
+<li><p>通过配置相同网段，允许虚拟机之间互相访问，如果彼此之间的网段并不一致，是无法互相访问的</p>
+</li>
+<li><p>在后面，会再输出一篇关于<strong>利用bridge虚拟设备实现虚拟机通信</strong>的文章，到时候就会用到该模式的网卡搭建实验环境</p>
+</li>
+</ul>
+<p><img src="https://i.loli.net/2021/03/19/arG1emVoSpkl65W.png" srcset="/img/loading.gif" lazyload alt="image.png"></p>
+<blockquote>
+<p>这里你可能有一个问题，主机无法访问内部网络，那有没有方法实现主机对虚拟机进行ssh，因为如果在内部网络下有多台虚拟机，操作起来实在不够方便</p>
+</blockquote>
+<ul>
+<li>很简单，虚拟机是支持配置多网卡的，可以新增一张网卡，然后使用上面其他任意一种方式来实现物理主机对虚拟机的访问，那么不就可以实现ssh连接了吗？</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" class="category-chain-item">计算机网络</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C/" class="print-no-link">#网络</a>
+      
+        <a href="/tags/%E8%99%9A%E6%8B%9F%E7%BD%91%E7%BB%9C/" class="print-no-link">#虚拟网络</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【计算机网络】：一次性理清Virtualbox虚拟机网络模型</div>
+      <div>https://littlejoyo.github.io/2021/03/13/network/virtoolbox-network/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Joyo</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2021年3月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/05/23/network/virtualbox-bridge/" title="【计算机网络】使用VirtualBox和namespace搭建桥接环境">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【计算机网络】使用VirtualBox和namespace搭建桥接环境</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/04/10/network/network-osi/" title="【计算机网络】：OSI七层模型和各种协议介绍">
+                        <span class="hidden-mobile">【计算机网络】：OSI七层模型和各种协议介绍</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liZ3sDaPEbpnmKLz","clientSecret":"4b92b796ad1e3942fec1053c52b52f6801203b5e","repo":"littlejoyo.github.io","owner":"littlejoyo","admin":["littlejoyo"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '37135258b8c5a95d2baf507e13417f0b'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://littlejoyo.github.io" target="_blank" rel="nofollow noopener"><span>JoyoHub</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        总访问量 
+        <span id="busuanzi_value_site_pv"></span>
+         次
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        总访客数 
+        <span id="busuanzi_value_site_uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
