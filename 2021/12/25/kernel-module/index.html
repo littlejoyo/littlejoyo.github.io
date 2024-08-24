@@ -24,7 +24,7 @@
     <meta name="description" content="1.什么是内核模块模块是可以根据需要加载和卸载到内核中的代码片段,通过动态挂载的方式可以扩展内核的功能，而无需重启系统。 例如，一种类型的模块是设备驱动程序，它允许内核访问连接到系统的硬件。如果没有内核模块，我们必须修改内核代码，将新功能代码片段兼容添加到内核源码中，然后重新编译内核镜像。除了会让内核越来越大之外，还有一个缺点，即每次我们想要新功能时都需要我们重建和重启内核，并且一旦代码质量过低就">
 <meta property="og:type" content="article">
 <meta property="og:title" content="【Linux】依赖Netfilter Hook编写自定义内核模块">
-<meta property="og:url" content="http://example.com/2021/12/25/kernel-module/index.html">
+<meta property="og:url" content="https://littlejoyo.github.io/2021/12/25/kernel-module/index.html">
 <meta property="og:site_name" content="JoyoHub">
 <meta property="og:description" content="1.什么是内核模块模块是可以根据需要加载和卸载到内核中的代码片段,通过动态挂载的方式可以扩展内核的功能，而无需重启系统。 例如，一种类型的模块是设备驱动程序，它允许内核访问连接到系统的硬件。如果没有内核模块，我们必须修改内核代码，将新功能代码片段兼容添加到内核源码中，然后重新编译内核镜像。除了会让内核越来越大之外，还有一个缺点，即每次我们想要新功能时都需要我们重建和重启内核，并且一旦代码质量过低就">
 <meta property="og:locale" content="zh_CN">
@@ -76,7 +76,7 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"littlejoyo.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
@@ -435,7 +435,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>【Linux】依赖Netfilter Hook编写自定义内核模块</div>
-      <div>http://example.com/2021/12/25/kernel-module/</div>
+      <div>https://littlejoyo.github.io/2021/12/25/kernel-module/</div>
     </div>
     <div class="license-meta">
       
